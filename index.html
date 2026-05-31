@@ -143,6 +143,7 @@ footer a:hover{text-decoration:underline;}
 .key .kl{font-size:10px;font-weight:500;line-height:1;text-align:center;}
 .key.off{color:var(--text3);}
 .key.off:hover{background:var(--surface);color:var(--text2);}
+.key.dis{opacity:.25;cursor:not-allowed;filter:grayscale(1);pointer-events:none;}
 .key.on{background:#d9dde6;color:#15171c;border-color:transparent;}
 .key.on:hover{background:#e8ebf1;}
 .key.prog{min-height:42px;}
@@ -154,6 +155,9 @@ footer a:hover{text-decoration:underline;}
 .fbar-nav{font-family:var(--mono);font-size:13px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;padding:5px 9px;flex-shrink:0;}
 .fbar-nav:hover{color:var(--text);border-color:var(--text3);}
 .fbar-label{font-size:12px;color:var(--text2);min-width:78px;}
+.fbar-mode{font-family:var(--mono);font-size:10px;padding:3px 7px;border-radius:5px;font-weight:500;flex-shrink:0;}
+.fbar-mode.abs{background:var(--surface);color:var(--text3);border:1px solid var(--border);}
+.fbar-mode.incr{background:rgba(74,158,255,.15);color:var(--accent3);border:1px solid var(--accent3);}
 .fbar-pfx{font-family:var(--mono);font-size:14px;color:var(--accent3);}
 .fbar-val{font-family:var(--mono);font-size:14px;color:var(--text);flex:1;min-width:40px;padding:6px 8px;background:var(--bg);border:1px solid var(--accent3);border-radius:6px;}
 .fbar-dr{display:flex;gap:6px;flex:1;}
@@ -296,6 +300,7 @@ END PGM DEMO MM</textarea>
 
 <footer>
   <p>TNC Sim — open source project | <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a></p>
+  <a href="https://github.com/sponsors/slavomrkva" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:6px;background:#db61a2;color:#fff;text-decoration:none;border:none;white-space:nowrap;" title="Sponsor this project">&#9829; Sponsor</a>
   <p>Not affiliated with HEIDENHAIN GmbH</p>
 </footer>
 
@@ -463,21 +468,21 @@ var PATH_KEYS=[
   {l:'L',  code:'L X+0 Y+0 F500',          icon:'line', sup:true},
   {l:'C',  code:'C X+0 Y+0 DR+ R0 F500',   icon:'arc',  sup:true},
   {l:'CC', code:'CC X+0 Y+0',              icon:'cc',   sup:true},
-  {l:'CR', code:'CR X+0 Y+0 R0 DR+ F500',  icon:'cr'},
-  {l:'CT', code:'CT X+0 Y+0 F500',         icon:'ct'},
+  {l:'CR', code:'CR X+0 Y+0 R0 DR+ F500',  icon:'cr',   dis:true},
+  {l:'CT', code:'CT X+0 Y+0 F500',         icon:'ct',   dis:true},
   {l:'RND',code:'RND R0',                  icon:'rnd'},
   {l:'CHF',code:'CHF 0',                   icon:'chf'}
 ];
 var PROG_KEYS=[
-  {l:'CYCL DEF',  code:'CYCL DEF '},
-  {l:'CYCL CALL', code:'CYCL CALL'},
+  {l:'CYCL DEF',  code:'CYCL DEF ',        dis:true},
+  {l:'CYCL CALL', code:'CYCL CALL',        dis:true},
   {l:'LBL SET',   code:'LBL 1'},
   {l:'LBL CALL',  code:'CALL LBL 1'},
-  {l:'TOOL DEF',  code:'TOOL DEF 1 L+0 R5'},
+  {l:'TOOL DEF',  code:'TOOL DEF 1 L+0 R5', dis:true},
   {l:'TOOL CALL', code:'TOOL CALL 1 Z S3000'}
 ];
 var PI_KEYS=[
-  {l:'P', sub:'polar',    code:'LP PR+0 PA+0 F500', icon:'polar'},
+  {l:'P', sub:'polar',    code:'LP PR+0 PA+0 F500', icon:'polar', dis:true},
   {l:'I', sub:'increm.',  code:'L IX+0 IY+0 F500',  icon:'incr'}
 ];
 function kpIcon(n){
@@ -500,26 +505,115 @@ var ALL_KEYS=[];
 function buildKeypad(){
   ALL_KEYS=[];
   var html='';
-  html+='<div class="kp-legend"><span><i style="background:#d9dde6"></i>simulated</span><span><i style="background:var(--surface2);border:1px solid var(--border)"></i>inserts code only</span><span><i style="background:var(--accent)"></i>polar / incremental</span></div>';
+  html+='<div class="kp-legend"><span><i style="background:#d9dde6"></i>simulated</span><span><i style="background:var(--surface2);border:1px solid var(--border)"></i>functional</span><span><i style="background:var(--accent)"></i>polar / increm.</span><span style="opacity:.45"><i style="background:var(--text3)"></i>not implemented</span></div>';
   html+='<div class="kp-sec-title">Path functions</div><div class="kp-row">';
-  PATH_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; html+='<button class="key '+(k.sup?'on':'off')+'" data-idx="'+idx+'" title="'+k.l+'">'+kpIcon(k.icon)+'<span class="kl">'+k.l+'</span></button>'; });
+  PATH_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; var cls=k.dis?'dis':(k.sup?'on':'off'); html+='<button class="key '+cls+'"'+(k.dis?' disabled':'')+' data-idx="'+idx+'" title="'+k.l+'">'+kpIcon(k.icon)+'<span class="kl">'+k.l+'</span></button>'; });
   html+='</div><div class="kp-sec-title">Coordinate entry</div><div class="kp-row">';
-  PI_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; html+='<button class="key pi" data-idx="'+idx+'" title="'+k.sub+'"><span class="kl">'+k.l+'</span></button>'; });
+  PI_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; var cls='pi'+(k.dis?' dis':''); html+='<button class="key '+cls+'"'+(k.dis?' disabled':'')+' data-idx="'+idx+'" title="'+k.sub+'"><span class="kl">'+k.l+'</span></button>'; });
   html+='</div><div class="kp-sec-title">Program &amp; tools</div><div class="kp-grid prog">';
-  PROG_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; html+='<button class="key off prog" data-idx="'+idx+'"><span class="kl">'+k.l+'</span></button>'; });
+  PROG_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; var cls='off prog'+(k.dis?' dis':''); html+='<button class="key '+cls+'"'+(k.dis?' disabled':'')+' data-idx="'+idx+'"><span class="kl">'+k.l+'</span></button>'; });
   html+='</div>';
   var body=document.getElementById('keypad');
   body.innerHTML=html;
+  body.addEventListener('mousedown', function(e){
+    // ulož selekciu pred tým ako klik zoberie focus z editora
+    if(document.activeElement === codeEl) saveLastSel();
+  });
   body.addEventListener('click', function(e){
     var b=e.target.closest ? e.target.closest('.key') : null;
     if(!b) return;
     var i=parseInt(b.getAttribute('data-idx'),10);
     if(isNaN(i)) return;
     var obj=ALL_KEYS[i];
-    if(BUILDERS[obj.key]) enterFieldMode(obj.key);
-    else insertKey(obj.code);
+    if(obj.key==='I'){
+      // prepni iba označený / najbližší coord token medzi absolútnym a inkrementálnym
+      toggleIncrementalToken();
+    } else if(FM.active && (obj.key==='P'||obj.key==='L')){
+      var target = (FM.builderKey===obj.key && obj.key!=='L') ? 'L' : obj.key;
+      switchFieldMode(target);
+    } else if(BUILDERS[obj.key]){
+      var info=getCaretLine();
+      if(info && obj.key==='L'){
+        enterFieldModeOnLine(info);
+      } else {
+        enterFieldMode(obj.key);
+      }
+    } else {
+      insertKey(obj.code);
+    }
   });
 }
+function toggleIncrementalToken(){
+  var val = codeEl.value;
+  var selStart = lastSel.start;
+  var selEnd   = lastSel.end;
+
+  // Nájdi začiatok a koniec riadku kde je kurzor/selekcia
+  var lineStart = val.lastIndexOf('\n', selStart - 1) + 1;
+  var lineEnd   = val.indexOf('\n', selStart);
+  if(lineEnd === -1) lineEnd = val.length;
+  var line = val.slice(lineStart, lineEnd);
+
+  // Musí to byť L riadok
+  if(!/^L\b/i.test(line.trim())) return;
+
+  // Nájdi coord token ktorý je označený alebo najbližší ku kurzoru
+  // Token je napr. X+20, IY-5, Z+0 ...
+  var re = /\bI?[XYZABC][+\-]?\d+(\.\d+)?/gi;
+  var match, best = null, bestDist = Infinity;
+  var localSel = selEnd - lineStart; // koniec selekcie v rámci riadku
+
+  while((match = re.exec(line)) !== null){
+    var ms = match.index, me = ms + match[0].length;
+    // prioritne ak selekcia prekrýva token
+    if(selStart - lineStart <= me && localSel >= ms){
+      best = match; bestDist = -1; break;
+    }
+    var dist = Math.min(Math.abs((selStart - lineStart) - ms), Math.abs((selStart - lineStart) - me));
+    if(dist < bestDist){ bestDist = dist; best = match; }
+  }
+
+  if(!best) return;
+
+  var tok = best[0];
+  var newTok;
+  if(/^I/i.test(tok)){
+    // IY+60 → Y+60
+    newTok = tok.slice(1);
+  } else {
+    // Y+60 → IY+60
+    newTok = 'I' + tok;
+  }
+
+  var tokStart = lineStart + best.index;
+  var tokEnd   = tokStart + tok.length;
+  codeEl.value = val.slice(0, tokStart) + newTok + val.slice(tokEnd);
+
+  // obnov selekciu na nový token
+  try{ codeEl.setSelectionRange(tokStart, tokStart + newTok.length); }catch(e){}
+  dirty = true; updateLineNums(); runValidation();
+
+  // neruš field mode — len obnov polia z nového obsahu riadku
+  if(FM.active){
+    // getCaretLine číta z codeEl.selectionStart — nastav ho na tokStart
+    codeEl.focus();
+    try{ codeEl.setSelectionRange(tokStart+1, tokStart+1); }catch(e){}
+    var info=getCaretLine();
+    if(info){
+      var fields=parseExistingLine(info.lineText, info.builderKey);
+      FM.fields=fields;
+      FM.lineLen=info.lineLen;
+      // nájdi idx aktuálneho poľa podľa bare názvu
+      var bareNew = newTok.replace(/^I/i,'').replace(/[+\-].*$/,'');
+      var newIdx=0;
+      for(var fi=0;fi<fields.length;fi++){
+        if(fields[fi].p.toUpperCase()===bareNew){ newIdx=fi; break; }
+      }
+      selectField(newIdx);
+    }
+  }
+}
+
 function insertKey(code){
   var val=codeEl.value;
   var start=codeEl.selectionStart, end=codeEl.selectionEnd;
@@ -545,6 +639,7 @@ var BUILDERS = {
     {p:'Y', prompt:'Y coordinate', type:'coord', opt:true},
     {p:'Z', prompt:'Z coordinate', type:'coord', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'', prompt:'Radius compensation', type:'rc', opt:true},
     {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
   ]},
   'C':  {title:'C — circular arc', fields:[
@@ -553,6 +648,7 @@ var BUILDERS = {
     {p:'DR',prompt:'Rotation direction', type:'dr', opt:false},
     {p:'R', prompt:'Radius', type:'num', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'', prompt:'Radius compensation', type:'rc', opt:true},
     {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
   ]},
   'CC': {title:'CC — circle center', fields:[
@@ -599,12 +695,13 @@ function signFmt(v){ v=String(v).trim(); if(v==='')return v; if(v.charAt(0)==='+
 
 // ---------- inline field editing (Heidenhain-style) ----------
 var FM={active:false};
-function defVal(type){ if(type==='feed')return '500'; if(type==='dr')return '+'; return '0'; }
+function defVal(type, opt){ if(type==='feed')return '500'; if(type==='dr')return '+'; if(type==='rc')return ''; if(type==='coord' && opt) return null; return '0'; }
 function tokenFor(f){
   if(f.type==='dr') return 'DR'+f.val;
   if(f.type==='feed') return (f.val.toUpperCase()==='MAX'?'FMAX':'F'+f.val);
-  if(f.type==='coord') return f.p+signFmt(f.val);
-  return f.p+f.val; // num (incl CHF with empty prefix)
+  if(f.type==='rc') return f.val; // 'RL','RR','R0' or '' (omit)
+  if(f.type==='coord'){ if(f.val===null || f.val==='') return ''; return (f.incr?'I':'')+f.p+signFmt(f.val); }
+  return f.p+f.val;
 }
 function sanitizeVal(v,type){
   if(type==='coord') return v.replace(/[^0-9.+\-]/g,'');
@@ -615,9 +712,10 @@ function sanitizeVal(v,type){
 function lineParts(){
   var text=FM.cmd, ranges=[];
   for(var i=0;i<FM.fields.length;i++){
+    var tok=tokenFor(FM.fields[i]);
+    if(tok===''){ ranges.push({s:-1,e:-1}); continue; } // optional empty field (e.g. rc not set)
     text+=' ';
-    var s=text.length, tok=tokenFor(FM.fields[i]);
-    text+=tok; ranges.push({s:s,e:text.length});
+    var s=text.length; text+=tok; ranges.push({s:s,e:text.length});
   }
   return {text:text, ranges:ranges};
 }
@@ -635,7 +733,7 @@ function selectField(i){
   writeLine();
   var r=FM.ranges[i];
   codeEl.focus();
-  try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){}
+  if(r && r.s>=0){ try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){} }
   renderFbar();
 }
 var SUGS={
@@ -643,22 +741,29 @@ var SUGS={
   num:[['5','5'],['10','10'],['25','25'],['50','50']],
   coord:[['+','+ sign'],['-','- sign']]
 };
+function rcBtn(val,cur){ return '<button class="fbar-drbtn'+(cur===val?' sel':'')+'" onclick="setFieldVal(\''+val+'\')">'+val+'</button>'; }
 function renderFbar(){
   var f=FM.fields[FM.idx];
   var bar=document.getElementById('fbar');
   var html='<div class="fbar-crumb">';
   FM.fields.forEach(function(g,i){
-    var lbl=g.p||'val';
+    var lbl=g.type==='rc'?'R':(g.p||'val');
     html+='<button class="fbar-crumb-btn'+(i===FM.idx?' active':'')+'" onclick="selectField('+i+')" title="'+g.prompt+'">'+lbl+'</button>';
   });
   html+='</div><div class="fbar-row">';
   html+='<button class="fbar-nav" onclick="fieldPrev()">&#9664;</button>';
+  var isFieldIncr = f.type==='coord' && !!f.incr;
+  var modeLbl = FM.builderKey==='P'?'POLAR':(isFieldIncr?'INCR':'ABS');
+  var modeCls = isFieldIncr?'incr':'abs';
+  html+='<span class="fbar-mode '+modeCls+'">'+modeLbl+'</span>';
   html+='<span class="fbar-label">'+f.prompt+'</span>';
   if(f.type==='dr'){
     html+='<div class="fbar-dr"><button class="fbar-drbtn'+(f.val==='+'?' sel':'')+'" onclick="setFieldVal(\'+\')">DR+</button><button class="fbar-drbtn'+(f.val==='-'?' sel':'')+'" onclick="setFieldVal(\'-\')">DR-</button></div>';
+  } else if(f.type==='rc'){
+    html+='<div class="fbar-dr">'+rcBtn('RL',f.val)+rcBtn('R0',f.val)+rcBtn('RR',f.val)+'</div>';
   } else {
     var pfx=f.p||'';
-    html+='<span class="fbar-pfx">'+pfx+'</span><span class="fbar-val" id="fbarVal">'+f.val+'</span>';
+    html+='<span class="fbar-pfx">'+pfx+'</span><span class="fbar-val" id="fbarVal" style="'+(f.val===null?'color:var(--text3)':'')+'">'+( f.val===null ? '—' : f.val)+'</span>';
   }
   html+='<button class="fbar-nav" onclick="fieldNext()">&#9654;</button>';
   html+='<button class="fbar-done" onclick="exitFieldMode()">Done</button>';
@@ -680,7 +785,7 @@ function refreshSelection(){
   codeEl.focus();
   try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){}
   var el=document.getElementById('fbarVal');
-  if(el) el.textContent=FM.fields[FM.idx].val;
+  if(el){ var fv=FM.fields[FM.idx]; el.textContent=fv.val===null?'—':fv.val; el.style.color=fv.val===null?'var(--text3)':''; }
 }
 function setFieldVal(v){ FM.fields[FM.idx].val=v; FM.typing=true; selectField(FM.idx); }
 function applySug(v){
@@ -693,11 +798,43 @@ function applySug(v){
 }
 function fieldNext(){ if(FM.idx<FM.fields.length-1) selectField(FM.idx+1); else exitFieldMode(); }
 function fieldPrev(){ if(FM.idx>0) selectField(FM.idx-1); }
+function switchFieldMode(label){
+  var schema=BUILDERS[label]; if(!schema) return;
+  var newFields=[];
+  schema.fields.forEach(function(sf){
+    if(sf.type==='mfunc') return;
+    newFields.push({p:sf.p, type:sf.type, prompt:sf.prompt, opt:sf.opt, val:defVal(sf.type, sf.opt)});
+  });
+  // preniesť hodnoty zo starých polí do nových podľa typu súradnice
+  // napr. L→I: X→IX, Y→IY, Z→IZ a naopak
+  FM.fields.forEach(function(old){
+    if(old.type!=='coord' || old.val===null) return;
+    var bare = old.p.replace(/^I/,''); // IX→X, X→X
+    for(var j=0;j<newFields.length;j++){
+      var nf=newFields[j];
+      if(nf.type!=='coord') continue;
+      var nbare = nf.p.replace(/^I/,'');
+      if(nbare===bare){ nf.val=old.val; break; }
+    }
+  });
+  // preniesť feed
+  var oldFeed=null;
+  for(var k=0;k<FM.fields.length;k++){ if(FM.fields[k].type==='feed'){ oldFeed=FM.fields[k].val; break; } }
+  if(oldFeed!==null){
+    for(var j=0;j<newFields.length;j++){ if(newFields[j].type==='feed'){ newFields[j].val=oldFeed; break; } }
+  }
+  FM.cmd = schema.cmd||label;
+  FM.builderKey = label;
+  FM.fields = newFields;
+  FM.idx = Math.min(FM.idx, newFields.length-1);
+  FM.typing = false;
+  selectField(FM.idx);
+}
 function enterFieldMode(label){
   var schema=BUILDERS[label]; if(!schema) return;
   var fields=[];
-  schema.fields.forEach(function(sf){ if(sf.type==='mfunc') return; fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, val:defVal(sf.type)}); });
-  FM={active:true, cmd:(schema.cmd||label), fields:fields, idx:0, lineStart:0, lineLen:0, ranges:[]};
+  schema.fields.forEach(function(sf){ if(sf.type==='mfunc') return; fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, opt:sf.opt, val:defVal(sf.type, sf.opt)}); });
+  FM={active:true, cmd:(schema.cmd||label), builderKey:label, fields:fields, idx:0, lineStart:0, lineLen:0, ranges:[]};
   var v=codeEl.value;
   var pos;
   if(document.activeElement===codeEl){ pos=codeEl.selectionStart; }
@@ -721,10 +858,7 @@ function getCaretLine(){
   var rawCmd=toks[0]||'';
   var bk=rawCmd;
   if(rawCmd==='LP') bk='P';
-  else if(rawCmd==='L'){
-    var inc=toks.slice(1).some(function(t){ return /^I[XYZ]/.test(t); });
-    bk=inc?'I':'L';
-  }
+  else if(rawCmd==='L'){ bk='L'; }
   if(!BUILDERS[bk]) return null;
   return {lineStart:ls, lineLen:le-ls, lineText:lineText, cmd:rawCmd, builderKey:bk};
 }
@@ -734,27 +868,59 @@ function parseExistingLine(lineText, bk){
   var fields=[];
   schema.fields.forEach(function(sf){
     if(sf.type==='mfunc') return;
-    var val=defVal(sf.type), p=sf.p.toUpperCase();
+    var val=defVal(sf.type, sf.opt), p=sf.p.toUpperCase(), incr=false;
     for(var k=0;k<toks.length;k++){
       var t=toks[k];
       if(sf.type==='dr' && (t==='DR+'||t==='DR-')){ val=t.charAt(2); break; }
+      else if(sf.type==='rc' && (t==='RL'||t==='RR'||t==='R0')){ val=t; break; }
       else if(sf.type==='feed' && t==='FMAX'){ val='MAX'; break; }
       else if(sf.type==='feed' && p && t.charAt(0)==='F' && /^F\d/.test(t)){ val=t.slice(1); break; }
+      else if(sf.type==='coord' && p && t.indexOf('I'+p)===0 && t.length>p.length+1){ val=t.slice(p.length+1); incr=true; break; }
       else if(sf.type==='coord' && p && t.indexOf(p)===0 && t.length>p.length){ val=t.slice(p.length); break; }
       else if(sf.type==='num' && p && t.indexOf(p)===0 && t.length>p.length){ val=t.slice(p.length); break; }
       else if(sf.type==='num' && p==='' && /^\d/.test(t)){ val=t; break; }
     }
-    fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, val:val});
+    fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, opt:sf.opt, val:val, incr:incr});
   });
   return fields;
+}
+function findClickedFieldIdx(lineText, bk, posInLine){
+  var schema=BUILDERS[bk];
+  var schemaFields=[];
+  schema.fields.forEach(function(sf){ if(sf.type!=='mfunc') schemaFields.push(sf); });
+  var tokens=[], re=/\S+/g, match, first=true;
+  while((match=re.exec(lineText))!==null){
+    if(first){ first=false; continue; }
+    tokens.push({start:match.index, end:match.index+match[0].length, upper:match[0].toUpperCase()});
+  }
+  var clickedTok=null, bestDist=Infinity;
+  for(var k=0;k<tokens.length;k++){
+    if(posInLine>=tokens[k].start && posInLine<=tokens[k].end){ clickedTok=tokens[k]; break; }
+    var d=Math.abs(posInLine-(tokens[k].start+tokens[k].end)/2);
+    if(d<bestDist){ bestDist=d; clickedTok=tokens[k]; }
+  }
+  if(!clickedTok) return 0;
+  var t=clickedTok.upper;
+  for(var fi=0;fi<schemaFields.length;fi++){
+    var sf=schemaFields[fi], p=sf.p.toUpperCase();
+    if(sf.type==='dr' && (t==='DR+'||t==='DR-')) return fi;
+    if(sf.type==='rc' && (t==='RL'||t==='RR'||t==='R0')) return fi;
+    if(sf.type==='feed' && (t==='FMAX'||/^F\d/.test(t))) return fi;
+    if(sf.type==='coord' && p && t.indexOf(p)===0 && t.length>p.length) return fi;
+    if(sf.type==='num' && p && t.indexOf(p)===0 && t.length>p.length) return fi;
+    if(sf.type==='num' && p==='' && /^\d/.test(t)) return fi;
+  }
+  return 0;
 }
 function enterFieldModeOnLine(info){
   var schema=BUILDERS[info.builderKey];
   var fields=parseExistingLine(info.lineText, info.builderKey);
-  FM={active:true, cmd:(schema.cmd||info.cmd), fields:fields, idx:0,
-      lineStart:info.lineStart, lineLen:info.lineLen, ranges:[]};
+  var posInLine=codeEl.selectionStart - info.lineStart;
+  var startIdx=findClickedFieldIdx(info.lineText, info.builderKey, posInLine);
+  FM={active:true, cmd:(schema.cmd||info.cmd), builderKey:info.builderKey, fields:fields,
+      idx:startIdx, lineStart:info.lineStart, lineLen:info.lineLen, ranges:[]};
   document.getElementById('fbar').classList.add('on');
-  selectField(0);
+  selectField(startIdx);
 }
 function exitFieldMode(keepCaret){
   if(!FM.active) return;
@@ -765,6 +931,12 @@ function exitFieldMode(keepCaret){
 }
 
 var validateTimer=null;
+var lastSel = {start:0, end:0};
+function saveLastSel(){ lastSel={start:codeEl.selectionStart, end:codeEl.selectionEnd}; }
+codeEl.addEventListener('mouseup', saveLastSel);
+codeEl.addEventListener('keyup',   saveLastSel);
+codeEl.addEventListener('click',   saveLastSel);
+codeEl.addEventListener('select',  saveLastSel);
 codeEl.addEventListener('input', function(){
   dirty=true;
   updateLineNums();
@@ -774,6 +946,12 @@ codeEl.addEventListener('input', function(){
 codeEl.addEventListener('scroll', function(){ lineNums.scrollTop = codeEl.scrollTop; });
 codeEl.addEventListener('keydown', function(e){
   if(!FM.active) return;
+  // ak je označený viac ako jeden znak, exit field mode a nechaj browser mazať normálne
+  if(codeEl.selectionStart !== codeEl.selectionEnd &&
+     (e.key==='Delete' || e.key==='Backspace')) {
+    exitFieldMode(true);
+    return;
+  }
   var f=FM.fields[FM.idx];
   if(e.key==='Escape'){ e.preventDefault(); exitFieldMode(); return; }
   if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); e.shiftKey&&e.key==='Tab'?fieldPrev():fieldNext(); return; }
@@ -781,10 +959,12 @@ codeEl.addEventListener('keydown', function(e){
   if(e.key==='ArrowLeft'){ e.preventDefault(); fieldPrev(); return; }
   if(e.key==='ArrowUp'){ e.preventDefault(); fieldPrev(); return; }
   if(e.key==='ArrowDown'){ e.preventDefault(); fieldNext(); return; }
-  if(e.key==='Backspace'){
+  if(e.key==='Backspace'||e.key==='Delete'){
     e.preventDefault();
+    if(e.key==='Delete' && f.opt && f.type==='coord'){ f.val=null; FM.typing=false; refreshSelection(); return; }
+    if(f.val===null){ refreshSelection(); return; }
     if(!FM.typing){ f.val=''; FM.typing=true; }
-    else { f.val=f.val.slice(0,-1); }
+    else { f.val=f.val.slice(0,-1); if(f.val===''&&f.opt&&f.type==='coord') f.val=null; }
     refreshSelection(); return;
   }
   if(e.key.length===1){
@@ -805,6 +985,7 @@ codeEl.addEventListener('keydown', function(e){
 });
 codeEl.addEventListener('click', function(){
   if(FM.active) exitFieldMode(true);
+  if(codeEl.selectionStart !== codeEl.selectionEnd) return; // niečo je označené — nespúšťaj field mode
   var info=getCaretLine();
   if(info) enterFieldModeOnLine(info);
 });
@@ -820,6 +1001,7 @@ function changeSpeed(d){
 // ---------- parser ----------
 // produces { blkMin, blkMax, sub:[ {from,to,rapid,feed,blockIndex,srcLine} ], totalBlocks }
 var DEFAULT_FEED = 500;
+var TOOL_R = 5; // tool radius mm — used for radius compensation offset
 function num(m){ return m ? parseFloat(m[1]) : null; }
 
 function parseProgram(code){
@@ -828,6 +1010,7 @@ function parseProgram(code){
   var blkMax = {x:100,y:80,z:40};
   var ccx=null, ccy=null;
   var feed = DEFAULT_FEED;
+  var rcState = ''; // current radius compensation: '', 'RL', 'RR', 'R0'
   // start above the (default) stock; adjusted after we know blkMax
   var pos = {x:0,y:0,z:0};
   var sub = [];
@@ -847,12 +1030,12 @@ function parseProgram(code){
   }
   pos = {x:blkMin.x, y:blkMin.y, z:blkMax.z + 50};
 
-  function pushSeg(to, rapid, srcLine){
+  function pushSeg(to, rapid, srcLine, rc){
     var from = {x:pos.x,y:pos.y,z:pos.z};
     var dx=to.x-from.x, dy=to.y-from.y, dz=to.z-from.z;
     var len = Math.sqrt(dx*dx+dy*dy+dz*dz);
     if(len > 1e-6){
-      sub.push({from:from, to:{x:to.x,y:to.y,z:to.z}, rapid:rapid, feed:feed, len:len, blockIndex:blockIndex, srcLine:srcLine});
+      sub.push({from:from, to:{x:to.x,y:to.y,z:to.z}, rapid:rapid, feed:feed, len:len, blockIndex:blockIndex, srcLine:srcLine, rc:rc||''});
     }
     pos = {x:to.x,y:to.y,z:to.z};
   }
@@ -871,14 +1054,18 @@ function parseProgram(code){
       if(cx) ccx=parseFloat(cx[1]); if(cy) ccy=parseFloat(cy[1]);
     }
     else if(/^C(\s|$)/.test(line)){
-      // arc move
       blockIndex++;
       var ex=line.match(/X([+-]?\d+\.?\d*)/), ey=line.match(/Y([+-]?\d+\.?\d*)/);
       var endX = ex ? parseFloat(ex[1]) : pos.x;
       var endY = ey ? parseFloat(ey[1]) : pos.y;
       var dr = line.indexOf('DR-')>=0 ? -1 : 1;
+      if(line.indexOf('RL')>=0) rcState='RL'; else if(line.indexOf('RR')>=0) rcState='RR'; else if(line.indexOf('R0')>=0) rcState='R0';
       if(ccx!==null && ccy!==null){
         var R = Math.sqrt((pos.x-ccx)*(pos.x-ccx)+(pos.y-ccy)*(pos.y-ccy));
+        // apply radius compensation to arc
+        if(rcState==='RL') R = dr>0 ? R-TOOL_R : R+TOOL_R;
+        else if(rcState==='RR') R = dr>0 ? R+TOOL_R : R-TOOL_R;
+        R = Math.max(R, 0.1);
         var a0 = Math.atan2(pos.y-ccy, pos.x-ccx);
         var a1 = Math.atan2(endY-ccy, endX-ccx);
         var sweep;
@@ -887,20 +1074,35 @@ function parseProgram(code){
         var N = Math.max(8, Math.ceil(Math.abs(sweep)/(Math.PI/32)));
         for(var k=1;k<=N;k++){
           var a = a0 + sweep*(k/N);
-          pushSeg({x:ccx+R*Math.cos(a), y:ccy+R*Math.sin(a), z:pos.z}, false, i);
+          pushSeg({x:ccx+R*Math.cos(a), y:ccy+R*Math.sin(a), z:pos.z}, false, i, rcState);
         }
       }
     }
     else if(line.indexOf('L ')===0 || line==='L'){
       blockIndex++;
+      if(line.indexOf('RL')>=0) rcState='RL'; else if(line.indexOf('RR')>=0) rcState='RR'; else if(line.indexOf('R0')>=0) rcState='R0';
       var lx=line.match(/X([+-]?\d+\.?\d*)/), ly=line.match(/Y([+-]?\d+\.?\d*)/), lz=line.match(/Z([+-]?\d+\.?\d*)/);
       var target = {
         x: lx ? parseFloat(lx[1]) : pos.x,
         y: ly ? parseFloat(ly[1]) : pos.y,
         z: lz ? parseFloat(lz[1]) : pos.z
       };
-      pushSeg(target, line.indexOf('FMAX')>=0, i);
+      pushSeg(target, line.indexOf('FMAX')>=0, i, rcState);
     }
+  }
+
+  // Post-process: apply perpendicular offset to linear sub-moves with RC
+  for(var rc_i=0; rc_i<sub.length; rc_i++){
+    var sm=sub[rc_i]; if(!sm.rc||sm.rc===''||sm.rc==='R0') continue;
+    var dx2=sm.to.x-sm.from.x, dy2=sm.to.y-sm.from.y;
+    var l2=Math.sqrt(dx2*dx2+dy2*dy2); if(l2<1e-6) continue;
+    var nx2=-dy2/l2, ny2=dx2/l2; // left perpendicular
+    if(sm.rc==='RR'){ nx2=-nx2; ny2=-ny2; }
+    var off=TOOL_R;
+    sm.from={x:sm.from.x+nx2*off, y:sm.from.y+ny2*off, z:sm.from.z};
+    sm.to={x:sm.to.x+nx2*off, y:sm.to.y+ny2*off, z:sm.to.z};
+    var ddx=sm.to.x-sm.from.x, ddy=sm.to.y-sm.from.y, ddz=sm.to.z-sm.from.z;
+    sm.len=Math.sqrt(ddx*ddx+ddy*ddy+ddz*ddz);
   }
 
   return {blkMin:blkMin, blkMax:blkMax, sub:sub, totalBlocks:blockIndex, start:{x:blkMin.x,y:blkMin.y,z:blkMax.z+50}};
@@ -910,7 +1112,7 @@ function parseProgram(code){
 var scene, camera, renderer, controls, toolGroup, blockMesh, blockEdges;
 var feedLine, rapidLine, feedBuf, rapidBuf;
 var THREE_OK = (typeof THREE !== 'undefined');
-var TOOL_R = 5, TOOL_LEN = 50, TOOL_COLOR = 0xe8530a;
+var TOOL_LEN = 50, TOOL_COLOR = 0xe8530a;
 var RAPID_MMS = 250;        // visual rapid speed mm/s at 1x
 var VISUAL_GAIN = 3;        // overall liveliness factor
 
