@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TNC Sim — Free Online Heidenhain TNC Simulator</title>
+<meta name="description" content="Free online simulator for Heidenhain TNC CNC programming. Simulate toolpaths directly in your browser. No installation needed. Open source.">
+<meta name="keywords" content="heidenhain online simulator, tnc simulator online, heidenhain tnc programming online, cnc heidenhain online, tnc640 online, heidenhain simulator free, tnc programming simulator, cnc simulator online free">
+<meta name="author" content="slavomrkva">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://slavomrkva.github.io/tnc-sim/">
+
+<meta property="og:title" content="TNC Sim — Free Online Heidenhain TNC Simulator">
+<meta property="og:description" content="Free online simulator for Heidenhain TNC CNC programming. No installation needed.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://slavomrkva.github.io/tnc-sim/">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TNC Sim — Free Online Heidenhain TNC Simulator">
+<meta name="twitter:description" content="Free online simulator for Heidenhain TNC CNC programming. No installation needed.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TNC Sim — Online Heidenhain TNC Simulator",
+  "description": "Free open-source online simulator for Heidenhain TNC CNC programming. Simulate toolpaths directly in your browser.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web Browser",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "url": "https://slavomrkva.github.io/tnc-sim/"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161920;
+  --surface2: #1e2229;
+  --border: #2a2f3a;
+  --accent: #e8530a;
+  --accent2: #1da06a;
+  --accent3: #4a9eff;
+  --text: #e8eaf0;
+  --text2: #8a90a0;
+  --text3: #555c6e;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Syne', sans-serif;
+  --radius: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; }
+
+header { padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; font-family: var(--mono); flex-shrink: 0; }
+.logo-text { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.logo-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
+.header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); color: var(--text2); }
+.badge.green { border-color: var(--accent2); color: var(--accent2); }
+.badge.blue { border-color: var(--accent3); color: var(--accent3); }
+
+.sim-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+.sim-main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+.editor-panel { width: 340px; min-width: 280px; display: flex; flex-direction: column; border-right: 1px solid var(--border); background: var(--surface); }
+.panel-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--text2); flex-shrink: 0; }
+.panel-header span { display: flex; align-items: center; gap: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+.editor-wrap { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.line-nums { padding: 10px 6px 10px 10px; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--text3); background: var(--surface2); border-right: 1px solid var(--border); min-width: 38px; text-align: right; overflow: hidden; user-select: none; flex-shrink: 0; }
+textarea#code { flex: 1; padding: 10px 12px; font-family: var(--mono); font-size: 12px; line-height: 1.8; background: var(--surface); color: var(--text); border: none; outline: none; resize: none; tab-size: 2; min-height: 0; }
+textarea#code::selection { background: rgba(232,83,10,0.3); }
+
+.toolbar { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--border); background: var(--surface2); flex-shrink: 0; flex-wrap: wrap; }
+.btn { font-family: var(--mono); font-size: 11px; padding: 7px 14px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; white-space: nowrap; }
+.btn:hover { border-color: var(--text3); color: var(--text); }
+.btn:active { transform: scale(0.97); }
+.btn-run { background: var(--accent); border-color: var(--accent); color: white; font-weight: 500; }
+.btn-run:hover { background: #d44800; border-color: #d44800; color: white; }
+.btn-step { border-color: var(--accent3); color: var(--accent3); }
+.btn-step:hover { background: rgba(74,158,255,0.1); }
+
+.canvas-panel { flex: 1; display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
+.view-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface2); flex-shrink: 0; }
+.tab { font-family: var(--mono); font-size: 11px; padding: 8px 16px; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+canvas#sim { flex: 1; width: 100%; display: block; min-height: 0; }
+
+.status-bar { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-top: 1px solid var(--border); background: var(--surface2); font-family: var(--mono); font-size: 11px; color: var(--text3); flex-shrink: 0; flex-wrap: wrap; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); display: inline-block; flex-shrink: 0; }
+#statusMsg { color: var(--text2); flex: 1; min-width: 120px; }
+#posDisplay { color: var(--text3); }
+
+.info-section { background: var(--surface); border-top: 1px solid var(--border); padding: 32px 24px; }
+.info-title { text-align: center; margin-bottom: 28px; }
+.info-title h1 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.info-title p { font-size: 14px; color: var(--text2); }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+.info-card h3 { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
+.info-card p, .info-card li { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.info-card ul { padding-left: 16px; }
+.info-card code { font-family: var(--mono); font-size: 11px; background: var(--surface2); padding: 1px 6px; border-radius: 4px; color: var(--accent3); }
+
+footer { background: var(--surface2); border-top: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+footer p { font-size: 12px; color: var(--text3); }
+footer a { color: var(--accent3); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 700px) {
+  .sim-main { flex-direction: column; }
+  .editor-panel { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border); height: 280px; flex-shrink: 0; }
+  .canvas-panel { min-height: 280px; }
+  .header-badges { display: none; }
+  .logo-text { font-size: 13px; }
+  .toolbar { padding: 8px 10px; gap: 5px; }
+  .btn { padding: 8px 12px; font-size: 11px; }
+  textarea#code { font-size: 11px; }
+  .line-nums { font-size: 11px; }
+  .info-section { padding: 20px 16px; }
+}
+@media (max-width: 400px) {
+  .editor-panel { height: 240px; }
+  .btn-step, .btn-reset { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">T</div>
+    <div>
+      <div class="logo-text">TNC Sim</div>
+      <div class="logo-sub">Online Heidenhain TNC simulator — open source</div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge green">● live</span>
+    <span class="badge blue">open source</span>
+    <span class="badge">v0.1</span>
+  </div>
+</header>
+
+<div class="sim-container">
+  <div class="sim-main">
+    <div class="editor-panel">
+      <div class="panel-header">
+        <span><span class="dot"></span> program.H</span>
+        <span id="blockCount">0 blocks</span>
+      </div>
+      <div class="editor-wrap">
+        <div class="line-nums" id="lineNums">1</div>
+        <textarea id="code" spellcheck="false" autocorrect="off" autocapitalize="off">BEGIN PGM DEMO MM
+BLK FORM 0.1 Z X+0 Y+0 Z-20
+BLK FORM 0.2 X+100 Y+80 Z+0
+TOOL CALL 1 Z S3000
+L Z+50 FMAX
+L X+10 Y+10 F500
+L X+90 Y+10
+L X+90 Y+70
+L X+10 Y+70
+L X+10 Y+10
+L Z+50 FMAX
+L X+50 Y+40
+CC X+50 Y+40
+C X+50 Y+40 DR+ R30 F400
+L Z+50 FMAX
+END PGM DEMO MM</textarea>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-run" onclick="runSim()">&#9654; Run</button>
+        <button class="btn btn-step" onclick="stepSim()">&#8594; Step</button>
+        <button class="btn btn-reset" onclick="clearCanvas()">&#8635; Reset</button>
+      </div>
+    </div>
+
+    <div class="canvas-panel">
+      <div class="view-tabs">
+        <div class="tab active">XY view</div>
+        <div class="tab" style="color:var(--text3);cursor:default">XZ (soon)</div>
+        <div class="tab" style="color:var(--text3);cursor:default">3D (soon)</div>
+      </div>
+      <canvas id="sim"></canvas>
+      <div class="status-bar">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusMsg">Ready — press Run</span>
+        <span id="posDisplay">X: 0.000  Y: 0.000  Z: 0.000</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="info-section">
+  <div class="info-title">
+    <h1>Heidenhain TNC Online Simulator</h1>
+    <p>Free open-source tool for TNC programming and toolpath simulation — directly in your browser, no installation needed</p>
+  </div>
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>Supported commands</h3>
+      <ul>
+        <li><code>L X Y Z F</code> — linear move</li>
+        <li><code>FMAX</code> — rapid positioning</li>
+        <li><code>CC X Y</code> — arc center</li>
+        <li><code>C DR+ / DR-</code> — arc move</li>
+        <li><code>BLK FORM</code> — workpiece</li>
+        <li><code>TOOL CALL</code> — tool selection</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>What is TNC</h3>
+      <p>Heidenhain TNC is a CNC control system used in milling machines worldwide. This simulator lets you practice TNC programming without any software installation — just open and start.</p>
+    </div>
+    <div class="info-card">
+      <h3>Open source</h3>
+      <p>This project is fully open source. Source code available on <a href="https://github.com/slavomrkva/tnc-sim" style="color:var(--accent3)">GitHub</a>. Contributions welcome — bug reports, new features, translations.</p>
+    </div>
+    <div class="info-card">
+      <h3>Coming soon</h3>
+      <ul>
+        <li>3D toolpath visualization</li>
+        <li>Cycle support (CYCL DEF)</li>
+        <li>Tool radius compensation RL/RR</li>
+        <li>NC program export</li>
+        <li>Save &amp; share programs</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>TNC Sim — open source project | <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a></p>
+  <p>Not affiliated with HEIDENHAIN GmbH</p>
+</footer>
+
+<script>
+const codeEl = document.getElementById('code');
+const lineNums = document.getElementById('lineNums');
+const canvas = document.getElementById('sim');
+const ctx = canvas.getContext('2d');
+const statusMsg = document.getElementById('statusMsg');
+const statusDot = document.getElementById('statusDot');
+const posDisplay = document.getElementById('posDisplay');
+const blockCount = document.getElementById('blockCount');
+
+let parsedBlocks = [];
+let stepIndex = 0;
+let currentPos = {x:0,y:0,z:50};
+let lastBlkMin = {x:0,y:0};
+let lastBlkMax = {x:100,y:80};
+
+function updateLineNums() {
+  const lines = codeEl.value.split('\n');
+  lineNums.innerHTML = lines.map((_,i) => i+1).join('<br>');
+  blockCount.textContent = lines.length + ' blocks';
+}
+codeEl.addEventListener('input', updateLineNums);
+codeEl.addEventListener('scroll', () => { lineNums.scrollTop = codeEl.scrollTop; });
+updateLineNums();
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width || 400;
+  canvas.height = Math.max(rect.height - 60, 200);
+}
+
+function parseCode(code) {
+  const lines = code.split('\n');
+  const blocks = [];
+  let blkMin = {x:0,y:0}, blkMax = {x:100,y:80};
+  let ccCenter = null;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim().toUpperCase();
+    if (!line || line.startsWith(';')) continue;
+    if (line.startsWith('BLK FORM 0.1')) {
+      const xm = line.match(/X([+-]?\d+\.?\d*)/), ym = line.match(/Y([+-]?\d+\.?\d*)/);
+      if (xm && ym) blkMin = {x: parseFloat(xm[1]), y: parseFloat(ym[1])};
+    } else if (line.startsWith('BLK FORM 0.2')) {
+      const xm = line.match(/X([+-]?\d+\.?\d*)/), ym = line.match(/Y([+-]?\d+\.?\d*)/);
+      if (xm && ym) blkMax = {x: parseFloat(xm[1]), y: parseFloat(ym[1])};
+      blocks.push({type:'blk', min:{...blkMin}, max:{...blkMax}, line:i});
+    } else if (line.startsWith('CC')) {
+      const xm = line.match(/X([+-]?\d+\.?\d*)/), ym = line.match(/Y([+-]?\d+\.?\d*)/);
+      if (xm && ym) ccCenter = {x: parseFloat(xm[1]), y: parseFloat(ym[1])};
+    } else if (/^C\s/.test(line) || /^C\s*[XY]/.test(line)) {
+      const rm = line.match(/R(\d+\.?\d*)/);
+      const dir = line.includes('DR-') ? -1 : 1;
+      if (ccCenter && rm) blocks.push({type:'arc', cx:ccCenter.x, cy:ccCenter.y, r:parseFloat(rm[1]), dir, line:i});
+    } else if (line.startsWith('L ') || line === 'L') {
+      const xm = line.match(/X([+-]?\d+\.?\d*)/), ym = line.match(/Y([+-]?\d+\.?\d*)/), zm = line.match(/Z([+-]?\d+\.?\d*)/);
+      blocks.push({type:'linear', x:xm?parseFloat(xm[1]):null, y:ym?parseFloat(ym[1]):null, z:zm?parseFloat(zm[1]):null, rapid:line.includes('FMAX'), line:i});
+    }
+  }
+  return {blocks, blkMin, blkMax};
+}
+
+function getTransform(blkMin, blkMax, cw, ch) {
+  const pad = 36;
+  const rangeX = (blkMax.x - blkMin.x) || 100;
+  const rangeY = (blkMax.y - blkMin.y) || 80;
+  const scale = Math.min((cw - pad*2) / rangeX, (ch - pad*2) / rangeY);
+  const offX = pad + (cw - pad*2 - rangeX*scale)/2 - blkMin.x*scale;
+  const offY = pad + (ch - pad*2 - rangeY*scale)/2 - blkMin.y*scale;
+  return {scale, offX, offY};
+}
+
+function toScreen(wx, wy, t) {
+  return {sx: wx*t.scale + t.offX, sy: canvas.height - (wy*t.scale + t.offY)};
+}
+
+function drawGrid(t, blkMin, blkMax) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 0.5;
+  const step = 10;
+  for (let x = Math.ceil(blkMin.x/step)*step; x <= blkMax.x; x+=step) {
+    const a = toScreen(x, blkMin.y, t), b = toScreen(x, blkMax.y, t);
+    ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+  }
+  for (let y = Math.ceil(blkMin.y/step)*step; y <= blkMax.y; y+=step) {
+    const a = toScreen(blkMin.x, y, t), b = toScreen(blkMax.x, y, t);
+    ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+  }
+  const p1 = toScreen(blkMin.x, blkMin.y, t), p2 = toScreen(blkMax.x, blkMax.y, t);
+  ctx.strokeStyle = 'rgba(74,158,255,0.25)'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+  ctx.strokeRect(Math.min(p1.sx,p2.sx), Math.min(p1.sy,p2.sy), Math.abs(p2.sx-p1.sx), Math.abs(p2.sy-p1.sy));
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(74,158,255,0.03)';
+  ctx.fillRect(Math.min(p1.sx,p2.sx), Math.min(p1.sy,p2.sy), Math.abs(p2.sx-p1.sx), Math.abs(p2.sy-p1.sy));
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillText('X0,Y0', p1.sx + 4, p1.sy - 4);
+  ctx.fillText('X'+blkMax.x, p2.sx - 30, p1.sy - 4);
+}
+
+function drawToolMarker(pos, t) {
+  const p = toScreen(pos.x, pos.y, t);
+  ctx.beginPath(); ctx.arc(p.sx, p.sy, 5, 0, Math.PI*2);
+  ctx.fillStyle = '#e8530a'; ctx.fill();
+  ctx.beginPath(); ctx.arc(p.sx, p.sy, 8, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(232,83,10,0.3)'; ctx.lineWidth = 1; ctx.stroke();
+}
+
+function runSim() {
+  resizeCanvas();
+  parsedBlocks = []; stepIndex = 0;
+  const {blocks, blkMin, blkMax} = parseCode(codeEl.value);
+  parsedBlocks = blocks; lastBlkMin = blkMin; lastBlkMax = blkMax;
+  const t = getTransform(blkMin, blkMax, canvas.width, canvas.height);
+  drawGrid(t, blkMin, blkMax);
+  let pos = {x:0, y:0, z:50};
+  let linCount = 0, arcCount = 0;
+  const origin = toScreen(0, 0, t);
+  ctx.beginPath(); ctx.arc(origin.sx, origin.sy, 3, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fill();
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    if (b.type === 'linear') {
+      const nx = b.x!==null?b.x:pos.x, ny = b.y!==null?b.y:pos.y, nz = b.z!==null?b.z:pos.z;
+      const cutting = pos.z <= 0.5 || nz <= 0.5;
+      if (cutting || b.rapid) {
+        const from = toScreen(pos.x, pos.y, t), to2 = toScreen(nx, ny, t);
+        ctx.beginPath(); ctx.moveTo(from.sx, from.sy); ctx.lineTo(to2.sx, to2.sy);
+        if (b.rapid) { ctx.strokeStyle='rgba(74,158,255,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,3]); }
+        else { ctx.strokeStyle='#e8530a'; ctx.lineWidth=1.8; ctx.setLineDash([]); }
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+      pos = {x:nx, y:ny, z:nz}; linCount++;
+    } else if (b.type === 'arc') {
+      const cScr = toScreen(b.cx, b.cy, t), r = b.r * t.scale;
+      const startAngle = Math.atan2(-(pos.y - b.cy), pos.x - b.cx);
+      const ccw = b.dir > 0;
+      ctx.beginPath(); ctx.arc(cScr.sx, cScr.sy, r, startAngle, startAngle + (ccw?-1:1)*2*Math.PI*0.9999, ccw);
+      ctx.strokeStyle = '#1da06a'; ctx.lineWidth = 1.8; ctx.setLineDash([]); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cScr.sx, cScr.sy, 2, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(29,160,106,0.4)'; ctx.fill();
+      pos = {x: b.cx + b.r*Math.cos(startAngle+(ccw?-1:1)*2*Math.PI*0.9999), y: b.cy - b.r*Math.sin(startAngle+(ccw?-1:1)*2*Math.PI*0.9999), z: pos.z};
+      arcCount++;
+    }
+  }
+  drawToolMarker(pos, t);
+  posDisplay.textContent = 'X: '+pos.x.toFixed(3)+'  Y: '+pos.y.toFixed(3)+'  Z: '+pos.z.toFixed(3);
+  statusDot.className = 'status-dot';
+  statusMsg.textContent = 'Done — '+blocks.length+' blocks | linear: '+linCount+' | arcs: '+arcCount;
+}
+
+function stepSim() {
+  if (parsedBlocks.length === 0) {
+    const r = parseCode(codeEl.value); parsedBlocks = r.blocks; lastBlkMin = r.blkMin; lastBlkMax = r.blkMax; resizeCanvas();
+  }
+  if (stepIndex === 0) {
+    const t = getTransform(lastBlkMin, lastBlkMax, canvas.width, canvas.height);
+    drawGrid(t, lastBlkMin, lastBlkMax); currentPos = {x:0,y:0,z:50};
+  }
+  if (stepIndex >= parsedBlocks.length) { stepIndex = 0; clearCanvas(); return; }
+  const t = getTransform(lastBlkMin, lastBlkMax, canvas.width, canvas.height);
+  const b = parsedBlocks[stepIndex];
+  if (b.type === 'linear') {
+    const nx = b.x!==null?b.x:currentPos.x, ny = b.y!==null?b.y:currentPos.y, nz = b.z!==null?b.z:currentPos.z;
+    const cutting = currentPos.z <= 0.5 || nz <= 0.5;
+    if (cutting || b.rapid) {
+      const from = toScreen(currentPos.x, currentPos.y, t), to2 = toScreen(nx, ny, t);
+      ctx.beginPath(); ctx.moveTo(from.sx, from.sy); ctx.lineTo(to2.sx, to2.sy);
+      ctx.strokeStyle = b.rapid?'rgba(74,158,255,0.5)':'#e8530a'; ctx.lineWidth=1.8; ctx.setLineDash(b.rapid?[4,3]:[]); ctx.stroke(); ctx.setLineDash([]);
+    }
+    currentPos = {x:nx, y:ny, z:nz};
+    posDisplay.textContent = 'X: '+nx.toFixed(3)+'  Y: '+ny.toFixed(3)+'  Z: '+nz.toFixed(3);
+  }
+  drawToolMarker(currentPos, t);
+  const lineText = codeEl.value.split('\n')[b.line]?.trim() || '';
+  statusMsg.textContent = 'Block '+(stepIndex+1)+'/'+parsedBlocks.length+': '+lineText;
+  stepIndex++;
+}
+
+function clearCanvas() {
+  resizeCanvas(); ctx.clearRect(0, 0, canvas.width, canvas.height);
+  parsedBlocks = []; stepIndex = 0; currentPos = {x:0,y:0,z:50};
+  statusDot.className = 'status-dot';
+  statusMsg.textContent = 'Ready — press Run';
+  posDisplay.textContent = 'X: 0.000  Y: 0.000  Z: 0.000';
+}
+
+window.addEventListener('resize', () => {
+  if (parsedBlocks.length > 0) runSim();
+  else { resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); }
+});
+resizeCanvas();
+</script>
+</body>
+</html>
