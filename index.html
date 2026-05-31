@@ -155,8 +155,7 @@ footer a:hover{text-decoration:underline;}
 .fbar-nav:hover{color:var(--text);border-color:var(--text3);}
 .fbar-label{font-size:12px;color:var(--text2);min-width:78px;}
 .fbar-pfx{font-family:var(--mono);font-size:14px;color:var(--accent3);}
-.fbar input{flex:1;min-width:40px;font-family:var(--mono);font-size:14px;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);outline:none;}
-.fbar input:focus{border-color:var(--accent3);}
+.fbar-val{font-family:var(--mono);font-size:14px;color:var(--text);flex:1;min-width:40px;padding:6px 8px;background:var(--bg);border:1px solid var(--accent3);border-radius:6px;}
 .fbar-dr{display:flex;gap:6px;flex:1;}
 .fbar-drbtn{flex:1;font-family:var(--mono);font-size:13px;padding:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);cursor:pointer;}
 .fbar-drbtn.sel{background:var(--accent);color:#fff;border-color:transparent;}
@@ -165,6 +164,10 @@ footer a:hover{text-decoration:underline;}
 .fbar-sug button{font-family:var(--mono);font-size:11px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text2);cursor:pointer;}
 .fbar-sug button:hover{background:var(--bg);color:var(--text);border-color:var(--accent3);}
 .fbar-sug button.max{border-color:var(--accent);color:var(--accent);}
+.fbar-crumb{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
+.fbar-crumb-btn{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text3);cursor:pointer;}
+.fbar-crumb-btn.active{background:var(--accent);color:#fff;border-color:transparent;}
+.fbar-crumb-btn:hover:not(.active){color:var(--text);border-color:var(--text3);}
 @media(max-width:700px){
   .sim-container{overflow:visible;}
   .sim-main{flex-direction:column;overflow:visible;}
@@ -628,64 +631,64 @@ function writeLine(){
 }
 function selectField(i){
   FM.idx=i;
+  FM.typing=false;
   writeLine();
   var r=FM.ranges[i];
+  codeEl.focus();
   try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){}
   renderFbar();
 }
 var SUGS={
   feed:[['100','F100'],['500','F500'],['1000','F1000'],['2000','F2000'],['MAX','FMAX']],
   num:[['5','5'],['10','10'],['25','25'],['50','50']],
-  coord:[['+','make +'],['-','make -'],['0','0']]
+  coord:[['+','+ sign'],['-','- sign']]
 };
 function renderFbar(){
   var f=FM.fields[FM.idx];
   var bar=document.getElementById('fbar');
-  var html='<div class="fbar-row">';
-  html+='<button class="fbar-nav" onclick="fieldPrev()" title="previous">&#9664;</button>';
+  var html='<div class="fbar-crumb">';
+  FM.fields.forEach(function(g,i){
+    var lbl=g.p||'val';
+    html+='<button class="fbar-crumb-btn'+(i===FM.idx?' active':'')+'" onclick="selectField('+i+')" title="'+g.prompt+'">'+lbl+'</button>';
+  });
+  html+='</div><div class="fbar-row">';
+  html+='<button class="fbar-nav" onclick="fieldPrev()">&#9664;</button>';
   html+='<span class="fbar-label">'+f.prompt+'</span>';
   if(f.type==='dr'){
     html+='<div class="fbar-dr"><button class="fbar-drbtn'+(f.val==='+'?' sel':'')+'" onclick="setFieldVal(\'+\')">DR+</button><button class="fbar-drbtn'+(f.val==='-'?' sel':'')+'" onclick="setFieldVal(\'-\')">DR-</button></div>';
   } else {
     var pfx=f.p||'';
-    html+='<span class="fbar-pfx">'+pfx+'</span><input id="fbarInput" inputmode="'+(f.type==='feed'?'text':'decimal')+'" autocomplete="off" value="'+f.val+'">';
+    html+='<span class="fbar-pfx">'+pfx+'</span><span class="fbar-val" id="fbarVal">'+f.val+'</span>';
   }
-  html+='<button class="fbar-nav" onclick="fieldNext()" title="next">&#9654;</button>';
+  html+='<button class="fbar-nav" onclick="fieldNext()">&#9654;</button>';
   html+='<button class="fbar-done" onclick="exitFieldMode()">Done</button>';
   html+='</div>';
-  var sug = SUGS[f.type];
+  var sug=SUGS[f.type];
   if(sug){
     html+='<div class="fbar-sug">';
     for(var k=0;k<sug.length;k++){
-      var isMax = sug[k][0]==='MAX';
+      var isMax=sug[k][0]==='MAX';
       html+='<button class="'+(isMax?'max':'')+'" onclick="applySug(\''+sug[k][0]+'\')">'+sug[k][1]+'</button>';
     }
     html+='</div>';
   }
   bar.innerHTML=html;
-  if(f.type!=='dr'){
-    var inp=document.getElementById('fbarInput');
-    inp.addEventListener('input', function(){ inp.value=sanitizeVal(inp.value,f.type); f.val=inp.value; refreshSelection(); });
-    inp.addEventListener('keydown', function(e){
-      if(e.key==='Enter'){ e.preventDefault(); fieldNext(); }
-      else if(e.key==='Tab'){ e.preventDefault(); e.shiftKey?fieldPrev():fieldNext(); }
-      else if(e.key==='ArrowRight' && inp.selectionStart===inp.value.length){ e.preventDefault(); fieldNext(); }
-      else if(e.key==='ArrowLeft' && inp.selectionStart===0){ e.preventDefault(); fieldPrev(); }
-    });
-    setTimeout(function(){ try{ inp.focus(); inp.setSelectionRange(inp.value.length,inp.value.length); }catch(e){} }, 20);
-  }
 }
 function refreshSelection(){
   writeLine();
   var r=FM.ranges[FM.idx];
+  codeEl.focus();
   try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){}
+  var el=document.getElementById('fbarVal');
+  if(el) el.textContent=FM.fields[FM.idx].val;
 }
-function setFieldVal(v){ FM.fields[FM.idx].val=v; selectField(FM.idx); }
+function setFieldVal(v){ FM.fields[FM.idx].val=v; FM.typing=true; selectField(FM.idx); }
 function applySug(v){
   var f=FM.fields[FM.idx];
   if(f.type==='coord' && (v==='+'||v==='-')){
     var num=f.val.replace(/^[+\-]/,''); if(num==='')num='0'; f.val=v+num;
   } else { f.val=v; }
+  FM.typing=true;
   selectField(FM.idx);
 }
 function fieldNext(){ if(FM.idx<FM.fields.length-1) selectField(FM.idx+1); else exitFieldMode(); }
@@ -695,7 +698,6 @@ function enterFieldMode(label){
   var fields=[];
   schema.fields.forEach(function(sf){ if(sf.type==='mfunc') return; fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, val:defVal(sf.type)}); });
   FM={active:true, cmd:(schema.cmd||label), fields:fields, idx:0, lineStart:0, lineLen:0, ranges:[]};
-  // insertion point
   var v=codeEl.value;
   var pos;
   if(document.activeElement===codeEl){ pos=codeEl.selectionStart; }
@@ -710,12 +712,56 @@ function enterFieldMode(label){
   document.getElementById('fbar').classList.add('on');
   selectField(0);
 }
-function exitFieldMode(){
+function getCaretLine(){
+  var pos=codeEl.selectionStart, text=codeEl.value;
+  var ls=text.lastIndexOf('\n',pos-1)+1;
+  var le=text.indexOf('\n',pos); if(le===-1) le=text.length;
+  var lineText=text.slice(ls,le);
+  var toks=lineText.trim().toUpperCase().split(/\s+/);
+  var rawCmd=toks[0]||'';
+  var bk=rawCmd;
+  if(rawCmd==='LP') bk='P';
+  else if(rawCmd==='L'){
+    var inc=toks.slice(1).some(function(t){ return /^I[XYZ]/.test(t); });
+    bk=inc?'I':'L';
+  }
+  if(!BUILDERS[bk]) return null;
+  return {lineStart:ls, lineLen:le-ls, lineText:lineText, cmd:rawCmd, builderKey:bk};
+}
+function parseExistingLine(lineText, bk){
+  var schema=BUILDERS[bk];
+  var toks=lineText.trim().toUpperCase().split(/\s+/).slice(1);
+  var fields=[];
+  schema.fields.forEach(function(sf){
+    if(sf.type==='mfunc') return;
+    var val=defVal(sf.type), p=sf.p.toUpperCase();
+    for(var k=0;k<toks.length;k++){
+      var t=toks[k];
+      if(sf.type==='dr' && (t==='DR+'||t==='DR-')){ val=t.charAt(2); break; }
+      else if(sf.type==='feed' && t==='FMAX'){ val='MAX'; break; }
+      else if(sf.type==='feed' && p && t.charAt(0)==='F' && /^F\d/.test(t)){ val=t.slice(1); break; }
+      else if(sf.type==='coord' && p && t.indexOf(p)===0 && t.length>p.length){ val=t.slice(p.length); break; }
+      else if(sf.type==='num' && p && t.indexOf(p)===0 && t.length>p.length){ val=t.slice(p.length); break; }
+      else if(sf.type==='num' && p==='' && /^\d/.test(t)){ val=t; break; }
+    }
+    fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, val:val});
+  });
+  return fields;
+}
+function enterFieldModeOnLine(info){
+  var schema=BUILDERS[info.builderKey];
+  var fields=parseExistingLine(info.lineText, info.builderKey);
+  FM={active:true, cmd:(schema.cmd||info.cmd), fields:fields, idx:0,
+      lineStart:info.lineStart, lineLen:info.lineLen, ranges:[]};
+  document.getElementById('fbar').classList.add('on');
+  selectField(0);
+}
+function exitFieldMode(keepCaret){
   if(!FM.active) return;
   FM.active=false;
   document.getElementById('fbar').classList.remove('on');
   document.getElementById('fbar').innerHTML='';
-  try{ codeEl.setSelectionRange(FM.lineStart+FM.lineLen, FM.lineStart+FM.lineLen); }catch(e){}
+  if(!keepCaret){ try{ codeEl.setSelectionRange(FM.lineStart+FM.lineLen,FM.lineStart+FM.lineLen); }catch(e){} }
 }
 
 var validateTimer=null;
@@ -726,8 +772,42 @@ codeEl.addEventListener('input', function(){
   validateTimer=setTimeout(runValidation, 350);
 });
 codeEl.addEventListener('scroll', function(){ lineNums.scrollTop = codeEl.scrollTop; });
-codeEl.addEventListener('mousedown', function(){ if(FM.active) exitFieldMode(); });
-codeEl.addEventListener('touchstart', function(){ if(FM.active) exitFieldMode(); });
+codeEl.addEventListener('keydown', function(e){
+  if(!FM.active) return;
+  var f=FM.fields[FM.idx];
+  if(e.key==='Escape'){ e.preventDefault(); exitFieldMode(); return; }
+  if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); e.shiftKey&&e.key==='Tab'?fieldPrev():fieldNext(); return; }
+  if(e.key==='ArrowRight'){ e.preventDefault(); fieldNext(); return; }
+  if(e.key==='ArrowLeft'){ e.preventDefault(); fieldPrev(); return; }
+  if(e.key==='ArrowUp'){ e.preventDefault(); fieldPrev(); return; }
+  if(e.key==='ArrowDown'){ e.preventDefault(); fieldNext(); return; }
+  if(e.key==='Backspace'){
+    e.preventDefault();
+    if(!FM.typing){ f.val=''; FM.typing=true; }
+    else { f.val=f.val.slice(0,-1); }
+    refreshSelection(); return;
+  }
+  if(e.key.length===1){
+    e.preventDefault();
+    var ch=e.key;
+    if(f.type==='dr'){
+      if(ch==='+'||ch==='-') setFieldVal(ch);
+      return;
+    }
+    var patterns={coord:/[0-9.+\-]/,num:/[0-9.]/,feed:/[0-9.]/,mfunc:/[0-9]/};
+    if(patterns[f.type] && !patterns[f.type].test(ch)) return;
+    if(f.type==='feed' && (ch==='m'||ch==='M'||ch==='a'||ch==='A'||ch==='x'||ch==='X')) ch=ch.toUpperCase();
+    if(!FM.typing){ f.val=''; FM.typing=true; }
+    f.val+=ch;
+    f.val=sanitizeVal(f.val,f.type);
+    refreshSelection(); return;
+  }
+});
+codeEl.addEventListener('click', function(){
+  if(FM.active) exitFieldMode(true);
+  var info=getCaretLine();
+  if(info) enterFieldModeOnLine(info);
+});
 
 // ---------- speed ----------
 var SPEEDS = [0.25,0.5,1,2,5];
