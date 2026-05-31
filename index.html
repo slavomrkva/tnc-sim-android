@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TNC Sim — Free Online Heidenhain TNC Simulator</title>
+<title>TNC Sim — Free online CNC simulator for Heidenhain TNC</title>
 <meta name="description" content="Free online simulator for Heidenhain TNC CNC programming with 3D toolpath visualization. Simulate directly in your browser. No installation needed. Open source.">
 <meta name="keywords" content="heidenhain online simulator, tnc simulator online, heidenhain tnc programming online, cnc heidenhain online, tnc640 online, heidenhain simulator free, tnc programming simulator, cnc simulator online free, 3d cnc simulator">
 <meta name="author" content="slavomrkva">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://slavomrkva.github.io/tnc-sim/">
-<meta property="og:title" content="TNC Sim — Free Online Heidenhain TNC Simulator">
+<meta property="og:title" content="TNC Sim — Free online CNC simulator for Heidenhain TNC">
 <meta property="og:description" content="Free online Heidenhain TNC CNC simulator with 3D visualization. No installation needed.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://slavomrkva.github.io/tnc-sim/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TNC Sim — Free Online Heidenhain TNC Simulator">
+<meta name="twitter:title" content="TNC Sim — Free online CNC simulator for Heidenhain TNC">
 <meta name="twitter:description" content="Free online Heidenhain TNC CNC simulator with 3D visualization.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "TNC Sim — Online Heidenhain TNC Simulator",
+  "name": "TNC Sim — CNC simulator compatible with Heidenhain TNC",
   "description": "Free open-source online simulator for Heidenhain TNC CNC programming with 3D toolpath visualization.",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Web Browser",
@@ -125,6 +125,26 @@ footer a:hover{text-decoration:underline;}
 .help-cmd code{font-family:var(--mono);font-size:12px;color:var(--accent3);background:var(--surface2);padding:2px 8px;border-radius:4px;}
 .help-cmd p{font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6;}
 .help-cmd .ex{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px;}
+.keypad-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:60;}
+.keypad-overlay.open{display:block;}
+.keypad-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:720px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:72vh;overflow-y:auto;padding:10px 16px 22px;animation:kpUp .22s ease;}
+@keyframes kpUp{from{transform:translateY(40px);opacity:.4;}to{transform:translateY(0);opacity:1;}}
+.kp-grip{width:40px;height:4px;border-radius:2px;background:var(--border);margin:2px auto 10px;}
+.kp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.kp-head h3{font-size:14px;color:var(--text);font-weight:600;}
+.kp-sec-title{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px;}
+.kp-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));}
+.kp-grid.prog{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));}
+.key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 6px;border-radius:8px;cursor:pointer;border:1px solid transparent;font-family:var(--mono);transition:transform .08s,background .15s;user-select:none;}
+.key:active{transform:translateY(1px);}
+.key svg{width:22px;height:22px;}
+.key .kl{font-size:11px;font-weight:500;line-height:1;text-align:center;}
+.key.light{background:#e7e9ef;color:#16181d;}
+.key.light:hover{background:#f2f4f9;}
+.key.dark{background:#21242c;color:#dfe2ea;border-color:#2f333d;min-height:50px;}
+.key.dark:hover{background:#282c35;}
+.key.orange{background:var(--accent);color:#fff;min-height:50px;}
+.key.orange:hover{background:#f0631b;}
 @media(max-width:700px){
   .sim-main{flex-direction:column;}
   .editor-panel{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);height:240px;flex-shrink:0;}
@@ -136,6 +156,8 @@ footer a:hover{text-decoration:underline;}
   textarea#code{font-size:11px;}
   .line-nums{font-size:11px;}
   .info-section{padding:20px 16px;}
+  .kp-grid{grid-template-columns:repeat(auto-fit,minmax(62px,1fr));}
+  .kp-grid.prog{grid-template-columns:repeat(auto-fit,minmax(92px,1fr));}
 }
 </style>
 </head>
@@ -145,7 +167,7 @@ footer a:hover{text-decoration:underline;}
     <div class="logo-icon">T</div>
     <div>
       <div class="logo-text">TNC Sim</div>
-      <div class="logo-sub">Online Heidenhain TNC simulator — open source</div>
+      <div class="logo-sub">Online CNC simulator for Heidenhain TNC — open source</div>
     </div>
   </div>
   <div class="header-badges">
@@ -194,6 +216,7 @@ END PGM DEMO MM</textarea>
         <button class="btn btn-step" onclick="onStep()">&#8594; Step</button>
         <button class="btn" onclick="onReset()">&#8635; Reset</button>
         <button class="btn" onclick="openHelp()">? Help</button>
+        <button class="btn" onclick="openKeypad()">&#9638; Keypad</button>
         <div class="speed-ctrl">
           <button class="speed-btn" onclick="changeSpeed(-1)">&#8722;</button>
           <span class="speed-val" id="speedVal">1.0&#215;</span>
@@ -223,7 +246,7 @@ END PGM DEMO MM</textarea>
 
 <div class="info-section">
   <div class="info-title">
-    <h1>Heidenhain TNC Online Simulator</h1>
+    <h1>Online CNC simulator compatible with Heidenhain TNC</h1>
     <p>Free open-source tool for TNC programming and 3D toolpath simulation — right in your browser, no installation needed</p>
   </div>
   <div class="info-grid">
@@ -248,7 +271,7 @@ END PGM DEMO MM</textarea>
     </div>
     <div class="info-card">
       <h3>Contribute</h3>
-      <p>This is an early-stage open source project. Ideas, bug reports and code are welcome on <a href="https://github.com/slavomrkva/tnc-sim" style="color:var(--accent3)">GitHub</a>.</p>
+      <p>This is an early-stage open source project. The source code is available on <a href="https://github.com/slavomrkva/tnc-sim" style="color:var(--accent3)">GitHub</a>.</p>
     </div>
   </div>
 </div>
@@ -262,6 +285,14 @@ END PGM DEMO MM</textarea>
   <div class="help-modal">
     <h2>TNC command reference <button class="help-close" onclick="closeHelp()">&times;</button></h2>
     <div class="help-body" id="helpBody"></div>
+  </div>
+</div>
+
+<div class="keypad-overlay" id="keypadOverlay" onclick="if(event.target===this)closeKeypad()">
+  <div class="keypad-sheet">
+    <div class="kp-grip"></div>
+    <div class="kp-head"><h3>Insert program block</h3><button class="help-close" onclick="closeKeypad()">&times;</button></div>
+    <div id="keypadBody"></div>
   </div>
 </div>
 
@@ -413,7 +444,77 @@ function openHelp(){
   document.getElementById('helpOverlay').classList.add('open');
 }
 function closeHelp(){ document.getElementById('helpOverlay').classList.remove('open'); }
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeHelp(); });
+
+// ---------- keypad (Heidenhain-style path/program keys) ----------
+var PATH_KEYS=[
+  {l:'L',  code:'L X+0 Y+0 F500',          icon:'line'},
+  {l:'C',  code:'C X+0 Y+0 DR+ R0 F500',   icon:'arc'},
+  {l:'CC', code:'CC X+0 Y+0',              icon:'cc'},
+  {l:'CR', code:'CR X+0 Y+0 R0 DR+ F500',  icon:'cr'},
+  {l:'CT', code:'CT X+0 Y+0 F500',         icon:'ct'},
+  {l:'RND',code:'RND R0',                  icon:'rnd'},
+  {l:'CHF',code:'CHF 0',                   icon:'chf'}
+];
+var PROG_KEYS=[
+  {l:'CYCL DEF',  code:'CYCL DEF '},
+  {l:'CYCL CALL', code:'CYCL CALL'},
+  {l:'LBL SET',   code:'LBL 1'},
+  {l:'LBL CALL',  code:'CALL LBL 1'},
+  {l:'TOOL DEF',  code:'TOOL DEF 1 L+0 R5'},
+  {l:'TOOL CALL', code:'TOOL CALL 1 Z S3000'}
+];
+function kpIcon(n){
+  var o='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">';
+  var dot='fill="currentColor" stroke="none"';
+  switch(n){
+    case 'line': return o+'<line x1="4" y1="19" x2="20" y2="6"/><circle cx="20" cy="6" r="1.7" '+dot+'/><circle cx="4" cy="19" r="1.7" '+dot+'/></svg>';
+    case 'arc':  return o+'<path d="M4 18 A 13 13 0 0 1 18 6"/><circle cx="4" cy="18" r="1.7" '+dot+'/><circle cx="18" cy="6" r="1.7" '+dot+'/></svg>';
+    case 'cc':   return o+'<path d="M12 5V19M5 12H19"/><circle cx="12" cy="12" r="3"/></svg>';
+    case 'cr':   return o+'<path d="M6 17 A 9 9 0 0 1 18 7"/><line x1="12" y1="12" x2="18" y2="7"/><circle cx="12" cy="12" r="1.5" '+dot+'/></svg>';
+    case 'ct':   return o+'<path d="M3 17 H10"/><path d="M10 17 A 8 8 0 0 1 19 9"/></svg>';
+    case 'rnd':  return o+'<path d="M5 19 V11 Q5 7 9 7 H19"/></svg>';
+    case 'chf':  return o+'<path d="M5 19 V11 L9 7 H19"/></svg>';
+  }
+  return '';
+}
+var ALL_KEYS=[];
+var keypadBuilt=false;
+function buildKeypad(){
+  ALL_KEYS=[];
+  var html='<div class="kp-sec-title">Path functions</div><div class="kp-grid">';
+  PATH_KEYS.forEach(function(k){ var idx=ALL_KEYS.push(k.code)-1; html+='<button class="key light" data-idx="'+idx+'" title="'+k.l+'">'+kpIcon(k.icon)+'<span class="kl">'+k.l+'</span></button>'; });
+  html+='</div><div class="kp-sec-title">Program &amp; tools</div><div class="kp-grid prog">';
+  PROG_KEYS.forEach(function(k){ var idx=ALL_KEYS.push(k.code)-1; html+='<button class="key dark" data-idx="'+idx+'"><span class="kl">'+k.l+'</span></button>'; });
+  html+='</div>';
+  var body=document.getElementById('keypadBody');
+  body.innerHTML=html;
+  body.addEventListener('click', function(e){
+    var b=e.target.closest ? e.target.closest('.key') : null;
+    if(!b) return;
+    var i=parseInt(b.getAttribute('data-idx'),10);
+    if(!isNaN(i)) insertKey(ALL_KEYS[i]);
+  });
+  keypadBuilt=true;
+}
+function insertKey(code){
+  var val=codeEl.value;
+  var start=codeEl.selectionStart, end=codeEl.selectionEnd;
+  if(document.activeElement!==codeEl){
+    var idx=val.toUpperCase().lastIndexOf('\nEND PGM');
+    if(idx>=0){ start=end=idx+1; } else { start=end=val.length; }
+  }
+  var before=val.slice(0,start);
+  var needNL = before.length>0 && before.charAt(before.length-1)!=='\n';
+  var ins=(needNL?'\n':'')+code+'\n';
+  codeEl.value = before + ins + val.slice(end);
+  var caret=(before+ins).length;
+  try{ codeEl.setSelectionRange(caret-1, caret-1); }catch(e){}
+  dirty=true; updateLineNums(); runValidation();
+}
+function openKeypad(){ if(!keypadBuilt) buildKeypad(); document.getElementById('keypadOverlay').classList.add('open'); }
+function closeKeypad(){ document.getElementById('keypadOverlay').classList.remove('open'); }
+
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeHelp(); closeKeypad(); } });
 
 var validateTimer=null;
 codeEl.addEventListener('input', function(){
