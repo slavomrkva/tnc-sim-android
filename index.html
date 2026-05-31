@@ -93,6 +93,9 @@ canvas#sim2d{width:100%;height:100%;display:block;}
 .info-title h1{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;}
 .info-title p{font-size:14px;color:var(--text2);}
 .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;margin:0 auto;}
+.disclaimer{max-width:900px;margin:28px auto 0;padding:14px 18px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);}
+.disclaimer p{font-size:12px;color:var(--text2);line-height:1.65;margin:0;}
+.disclaimer b{color:var(--text);}
 .info-card h3{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;}
 .info-card p,.info-card li{font-size:13px;color:var(--text2);line-height:1.7;}
 .info-card ul{padding-left:16px;}
@@ -125,30 +128,49 @@ footer a:hover{text-decoration:underline;}
 .help-cmd code{font-family:var(--mono);font-size:12px;color:var(--accent3);background:var(--surface2);padding:2px 8px;border-radius:4px;}
 .help-cmd p{font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6;}
 .help-cmd .ex{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px;}
-.keypad-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:60;}
-.keypad-overlay.open{display:block;}
-.keypad-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:720px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:72vh;overflow-y:auto;padding:10px 16px 22px;animation:kpUp .22s ease;}
-@keyframes kpUp{from{transform:translateY(40px);opacity:.4;}to{transform:translateY(0);opacity:1;}}
-.kp-grip{width:40px;height:4px;border-radius:2px;background:var(--border);margin:2px auto 10px;}
-.kp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.kp-head h3{font-size:14px;color:var(--text);font-weight:600;}
-.kp-sec-title{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px;}
-.kp-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));}
-.kp-grid.prog{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));}
-.key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 6px;border-radius:8px;cursor:pointer;border:1px solid transparent;font-family:var(--mono);transition:transform .08s,background .15s;user-select:none;}
+.keypad{flex-shrink:0;border-top:1px solid var(--border);background:var(--surface);padding:8px 10px 10px;}
+.kp-legend{font-family:var(--mono);font-size:9.5px;color:var(--text3);display:flex;gap:14px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.kp-legend i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px;}
+.kp-sec-title{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:4px 0 6px;}
+.kp-grid{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));}
+.kp-row{display:flex;flex-wrap:wrap;gap:6px;}
+.kp-row .key{flex:0 0 60px;min-height:46px;}
+.key.pi .kl{font-size:15px;}
+.kp-grid.prog{grid-template-columns:repeat(auto-fit,minmax(92px,1fr));margin-top:8px;}
+.key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 4px;border-radius:7px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--mono);transition:transform .08s,background .15s,color .15s;user-select:none;}
 .key:active{transform:translateY(1px);}
-.key svg{width:22px;height:22px;}
-.key .kl{font-size:11px;font-weight:500;line-height:1;text-align:center;}
-.key.light{background:#e7e9ef;color:#16181d;}
-.key.light:hover{background:#f2f4f9;}
-.key.dark{background:#21242c;color:#dfe2ea;border-color:#2f333d;min-height:50px;}
-.key.dark:hover{background:#282c35;}
-.key.orange{background:var(--accent);color:#fff;min-height:50px;}
-.key.orange:hover{background:#f0631b;}
+.key svg{width:18px;height:18px;}
+.key .kl{font-size:10px;font-weight:500;line-height:1;text-align:center;}
+.key.off{color:var(--text3);}
+.key.off:hover{background:var(--surface);color:var(--text2);}
+.key.on{background:#d9dde6;color:#15171c;border-color:transparent;}
+.key.on:hover{background:#e8ebf1;}
+.key.prog{min-height:42px;}
+.key.pi{background:var(--accent);color:#fff;border-color:transparent;}
+.key.pi:hover{background:#f0631b;}
+.fbar{display:none;flex-shrink:0;border-top:1px solid var(--border);background:var(--surface2);padding:8px 10px;}
+.fbar.on{display:block;}
+.fbar-row{display:flex;align-items:center;gap:8px;}
+.fbar-nav{font-family:var(--mono);font-size:13px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;padding:5px 9px;flex-shrink:0;}
+.fbar-nav:hover{color:var(--text);border-color:var(--text3);}
+.fbar-label{font-size:12px;color:var(--text2);min-width:78px;}
+.fbar-pfx{font-family:var(--mono);font-size:14px;color:var(--accent3);}
+.fbar input{flex:1;min-width:40px;font-family:var(--mono);font-size:14px;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);outline:none;}
+.fbar input:focus{border-color:var(--accent3);}
+.fbar-dr{display:flex;gap:6px;flex:1;}
+.fbar-drbtn{flex:1;font-family:var(--mono);font-size:13px;padding:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);cursor:pointer;}
+.fbar-drbtn.sel{background:var(--accent);color:#fff;border-color:transparent;}
+.fbar-done{font-family:var(--mono);font-size:12px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;flex-shrink:0;}
+.fbar-sug{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.fbar-sug button{font-family:var(--mono);font-size:11px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text2);cursor:pointer;}
+.fbar-sug button:hover{background:var(--bg);color:var(--text);border-color:var(--accent3);}
+.fbar-sug button.max{border-color:var(--accent);color:var(--accent);}
 @media(max-width:700px){
-  .sim-main{flex-direction:column;}
-  .editor-panel{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);height:240px;flex-shrink:0;}
-  .canvas-panel{min-height:360px;}
+  .sim-container{overflow:visible;}
+  .sim-main{flex-direction:column;overflow:visible;}
+  .editor-panel{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);height:auto;flex-shrink:0;}
+  .editor-wrap{min-height:130px;}
+  .canvas-panel{height:420px;min-height:420px;}
   .header-badges{display:none;}
   .logo-text{font-size:13px;}
   .toolbar{padding:8px 10px;gap:5px;}
@@ -205,18 +227,19 @@ C X+75 Y+40 DR+ R25 F800
 L Z+60 FMAX
 END PGM DEMO MM</textarea>
       </div>
+      <div class="fbar" id="fbar"></div>
       <div class="problems" id="problems" style="display:none;">
         <div class="problems-head" onclick="toggleProblems()">
           <span id="problemsCount" class="pc-ok">No problems</span>
         </div>
         <div class="problems-list" id="problemsList"></div>
       </div>
+      <div class="keypad" id="keypad"></div>
       <div class="toolbar">
         <button class="btn btn-run" id="runBtn" onclick="onRun()">&#9654; Run</button>
         <button class="btn btn-step" onclick="onStep()">&#8594; Step</button>
         <button class="btn" onclick="onReset()">&#8635; Reset</button>
         <button class="btn" onclick="openHelp()">? Help</button>
-        <button class="btn" onclick="openKeypad()">&#9638; Keypad</button>
         <div class="speed-ctrl">
           <button class="speed-btn" onclick="changeSpeed(-1)">&#8722;</button>
           <span class="speed-val" id="speedVal">1.0&#215;</span>
@@ -251,17 +274,6 @@ END PGM DEMO MM</textarea>
   </div>
   <div class="info-grid">
     <div class="info-card">
-      <h3>Supported commands</h3>
-      <ul>
-        <li><code>L X Y Z F</code> — linear move</li>
-        <li><code>FMAX</code> — rapid positioning</li>
-        <li><code>CC X Y</code> — arc center</li>
-        <li><code>C DR+ / DR-</code> — arc move</li>
-        <li><code>BLK FORM</code> — workpiece</li>
-        <li><code>TOOL CALL</code> — tool selection</li>
-      </ul>
-    </div>
-    <div class="info-card">
       <h3>What is TNC</h3>
       <p>Heidenhain TNC is a CNC control used in milling machines worldwide. This simulator lets you practice TNC programming with a live 3D view — no software to install, just open and start.</p>
     </div>
@@ -274,6 +286,9 @@ END PGM DEMO MM</textarea>
       <p>This is an early-stage open source project. The source code is available on <a href="https://github.com/slavomrkva/tnc-sim" style="color:var(--accent3)">GitHub</a>.</p>
     </div>
   </div>
+  <div class="disclaimer">
+    <p><b>Educational use only.</b> TNC Sim is an independent learning tool that simulates only a subset of TNC programming. It may not exactly match the behavior, calculations, cycles, or results of a real Heidenhain control, and it can contain bugs or simplifications. Treat the output as a rough visual guide, not a verified result — never rely on it for real machining. Always check your program on the actual machine or with official software before cutting.</p>
+  </div>
 </div>
 
 <footer>
@@ -285,14 +300,6 @@ END PGM DEMO MM</textarea>
   <div class="help-modal">
     <h2>TNC command reference <button class="help-close" onclick="closeHelp()">&times;</button></h2>
     <div class="help-body" id="helpBody"></div>
-  </div>
-</div>
-
-<div class="keypad-overlay" id="keypadOverlay" onclick="if(event.target===this)closeKeypad()">
-  <div class="keypad-sheet">
-    <div class="kp-grip"></div>
-    <div class="kp-head"><h3>Insert program block</h3><button class="help-close" onclick="closeKeypad()">&times;</button></div>
-    <div id="keypadBody"></div>
   </div>
 </div>
 
@@ -336,7 +343,7 @@ function updateLineNums(){
   blockCountEl.textContent = lines.length + ' blocks';
 }
 
-var AXIS_TOKENS = /^([XYZABC][+-]?\d+\.?\d*|F\d+\.?\d*|FMAX|RL|RR|R0|M\d+|DR[+-]|R\d+\.?\d*)$/;
+var AXIS_TOKENS = /^(I?[XYZABC][+-]?\d+\.?\d*|F\d+\.?\d*|FMAX|RL|RR|R0|M\d+|DR[+-]|R\d+\.?\d*|PR[+-]?\d+\.?\d*|PA[+-]?\d+\.?\d*)$/;
 
 function validateProgram(code){
   var lines = code.split('\n');
@@ -373,11 +380,14 @@ function validateProgram(code){
       if(!lastCC) probs.push({line:i,sev:'warn',msg:'C arc without a preceding CC (arc center)'});
       if(!/R\d/.test(u)) probs.push({line:i,sev:'warn',msg:'C arc usually needs a radius R'});
       for(var t=1;t<toks.length;t++){ if(toks[t] && !AXIS_TOKENS.test(toks[t])) probs.push({line:i,sev:'err',msg:'Unknown token "'+toks[t]+'" in C block'}); }
+    } else if(toks[0]==='LP' || toks[0]==='CP'){
+      probs.push({line:i,sev:'warn',msg:'Polar move ('+toks[0]+') is not simulated yet'});
     } else if(toks[0]==='L'){
-      var hasAxis=/[XYZABC][+-]?\d/.test(u);
+      var hasAxis=/I?[XYZABC][+-]?\d/.test(u);
       var hasF=/\bF/.test(u);
       if(!hasAxis && !hasF) probs.push({line:i,sev:'err',msg:'L needs at least one coordinate (X, Y or Z)'});
       for(var t2=1;t2<toks.length;t2++){ if(toks[t2] && !AXIS_TOKENS.test(toks[t2])) probs.push({line:i,sev:'err',msg:'Unknown token "'+toks[t2]+'" in L block'}); }
+      if(/\bI[XYZABC][+-]?\d/.test(u)) probs.push({line:i,sev:'warn',msg:'Incremental coordinates are not simulated accurately yet'});
     } else if(/^M\d+$/.test(toks[0])){
       /* standalone M function, accepted */
     } else {
@@ -447,9 +457,9 @@ function closeHelp(){ document.getElementById('helpOverlay').classList.remove('o
 
 // ---------- keypad (Heidenhain-style path/program keys) ----------
 var PATH_KEYS=[
-  {l:'L',  code:'L X+0 Y+0 F500',          icon:'line'},
-  {l:'C',  code:'C X+0 Y+0 DR+ R0 F500',   icon:'arc'},
-  {l:'CC', code:'CC X+0 Y+0',              icon:'cc'},
+  {l:'L',  code:'L X+0 Y+0 F500',          icon:'line', sup:true},
+  {l:'C',  code:'C X+0 Y+0 DR+ R0 F500',   icon:'arc',  sup:true},
+  {l:'CC', code:'CC X+0 Y+0',              icon:'cc',   sup:true},
   {l:'CR', code:'CR X+0 Y+0 R0 DR+ F500',  icon:'cr'},
   {l:'CT', code:'CT X+0 Y+0 F500',         icon:'ct'},
   {l:'RND',code:'RND R0',                  icon:'rnd'},
@@ -463,6 +473,10 @@ var PROG_KEYS=[
   {l:'TOOL DEF',  code:'TOOL DEF 1 L+0 R5'},
   {l:'TOOL CALL', code:'TOOL CALL 1 Z S3000'}
 ];
+var PI_KEYS=[
+  {l:'P', sub:'polar',    code:'LP PR+0 PA+0 F500', icon:'polar'},
+  {l:'I', sub:'increm.',  code:'L IX+0 IY+0 F500',  icon:'incr'}
+];
 function kpIcon(n){
   var o='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">';
   var dot='fill="currentColor" stroke="none"';
@@ -474,27 +488,34 @@ function kpIcon(n){
     case 'ct':   return o+'<path d="M3 17 H10"/><path d="M10 17 A 8 8 0 0 1 19 9"/></svg>';
     case 'rnd':  return o+'<path d="M5 19 V11 Q5 7 9 7 H19"/></svg>';
     case 'chf':  return o+'<path d="M5 19 V11 L9 7 H19"/></svg>';
+    case 'polar':return o+'<circle cx="6" cy="18" r="1.7" '+dot+'/><line x1="6" y1="18" x2="18" y2="7"/><path d="M12 18 A 6 6 0 0 0 9 13"/></svg>';
+    case 'incr': return o+'<path d="M12 5 L19 19 H5 Z"/></svg>';
   }
   return '';
 }
 var ALL_KEYS=[];
-var keypadBuilt=false;
 function buildKeypad(){
   ALL_KEYS=[];
-  var html='<div class="kp-sec-title">Path functions</div><div class="kp-grid">';
-  PATH_KEYS.forEach(function(k){ var idx=ALL_KEYS.push(k.code)-1; html+='<button class="key light" data-idx="'+idx+'" title="'+k.l+'">'+kpIcon(k.icon)+'<span class="kl">'+k.l+'</span></button>'; });
+  var html='';
+  html+='<div class="kp-legend"><span><i style="background:#d9dde6"></i>simulated</span><span><i style="background:var(--surface2);border:1px solid var(--border)"></i>inserts code only</span><span><i style="background:var(--accent)"></i>polar / incremental</span></div>';
+  html+='<div class="kp-sec-title">Path functions</div><div class="kp-row">';
+  PATH_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; html+='<button class="key '+(k.sup?'on':'off')+'" data-idx="'+idx+'" title="'+k.l+'">'+kpIcon(k.icon)+'<span class="kl">'+k.l+'</span></button>'; });
+  html+='</div><div class="kp-sec-title">Coordinate entry</div><div class="kp-row">';
+  PI_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; html+='<button class="key pi" data-idx="'+idx+'" title="'+k.sub+'"><span class="kl">'+k.l+'</span></button>'; });
   html+='</div><div class="kp-sec-title">Program &amp; tools</div><div class="kp-grid prog">';
-  PROG_KEYS.forEach(function(k){ var idx=ALL_KEYS.push(k.code)-1; html+='<button class="key dark" data-idx="'+idx+'"><span class="kl">'+k.l+'</span></button>'; });
+  PROG_KEYS.forEach(function(k){ var idx=ALL_KEYS.push({code:k.code,key:k.l})-1; html+='<button class="key off prog" data-idx="'+idx+'"><span class="kl">'+k.l+'</span></button>'; });
   html+='</div>';
-  var body=document.getElementById('keypadBody');
+  var body=document.getElementById('keypad');
   body.innerHTML=html;
   body.addEventListener('click', function(e){
     var b=e.target.closest ? e.target.closest('.key') : null;
     if(!b) return;
     var i=parseInt(b.getAttribute('data-idx'),10);
-    if(!isNaN(i)) insertKey(ALL_KEYS[i]);
+    if(isNaN(i)) return;
+    var obj=ALL_KEYS[i];
+    if(BUILDERS[obj.key]) enterFieldMode(obj.key);
+    else insertKey(obj.code);
   });
-  keypadBuilt=true;
 }
 function insertKey(code){
   var val=codeEl.value;
@@ -511,10 +532,191 @@ function insertKey(code){
   try{ codeEl.setSelectionRange(caret-1, caret-1); }catch(e){}
   dirty=true; updateLineNums(); runValidation();
 }
-function openKeypad(){ if(!keypadBuilt) buildKeypad(); document.getElementById('keypadOverlay').classList.add('open'); }
-function closeKeypad(){ document.getElementById('keypadOverlay').classList.remove('open'); }
 
-document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeHelp(); closeKeypad(); } });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeHelp(); exitFieldMode(); } });
+
+// ---------- guided block builder (Heidenhain-style conversational entry) ----------
+var BUILDERS = {
+  'L':  {title:'L — straight line', fields:[
+    {p:'X', prompt:'X coordinate', type:'coord', opt:true},
+    {p:'Y', prompt:'Y coordinate', type:'coord', opt:true},
+    {p:'Z', prompt:'Z coordinate', type:'coord', opt:true},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
+  ]},
+  'C':  {title:'C — circular arc', fields:[
+    {p:'X', prompt:'End point X', type:'coord', opt:true},
+    {p:'Y', prompt:'End point Y', type:'coord', opt:true},
+    {p:'DR',prompt:'Rotation direction', type:'dr', opt:false},
+    {p:'R', prompt:'Radius', type:'num', opt:true},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
+  ]},
+  'CC': {title:'CC — circle center', fields:[
+    {p:'X', prompt:'Center X', type:'coord', opt:true},
+    {p:'Y', prompt:'Center Y', type:'coord', opt:true}
+  ]},
+  'CR': {title:'CR — arc by radius', fields:[
+    {p:'X', prompt:'End point X', type:'coord', opt:true},
+    {p:'Y', prompt:'End point Y', type:'coord', opt:true},
+    {p:'R', prompt:'Radius', type:'num', opt:false},
+    {p:'DR',prompt:'Rotation direction', type:'dr', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
+  ]},
+  'CT': {title:'CT — tangential arc', fields:[
+    {p:'X', prompt:'End point X', type:'coord', opt:true},
+    {p:'Y', prompt:'End point Y', type:'coord', opt:true},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
+  ]},
+  'RND':{title:'RND — corner rounding', fields:[
+    {p:'R', prompt:'Rounding radius', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true}
+  ]},
+  'CHF':{title:'CHF — chamfer', fields:[
+    {p:'', prompt:'Chamfer size', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true}
+  ]},
+  'P':  {title:'LP — polar straight line', cmd:'LP', fields:[
+    {p:'PR',prompt:'Polar radius PR', type:'coord', opt:true},
+    {p:'PA',prompt:'Polar angle PA', type:'coord', opt:true},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
+  ]},
+  'I':  {title:'L — incremental move', cmd:'L', fields:[
+    {p:'IX',prompt:'Incremental X', type:'coord', opt:true},
+    {p:'IY',prompt:'Incremental Y', type:'coord', opt:true},
+    {p:'IZ',prompt:'Incremental Z', type:'coord', opt:true},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'Miscellaneous function M', type:'mfunc', opt:true}
+  ]}
+};
+function signFmt(v){ v=String(v).trim(); if(v==='')return v; if(v.charAt(0)==='+'||v.charAt(0)==='-')return v; return '+'+v; }
+
+// ---------- inline field editing (Heidenhain-style) ----------
+var FM={active:false};
+function defVal(type){ if(type==='feed')return '500'; if(type==='dr')return '+'; return '0'; }
+function tokenFor(f){
+  if(f.type==='dr') return 'DR'+f.val;
+  if(f.type==='feed') return (f.val.toUpperCase()==='MAX'?'FMAX':'F'+f.val);
+  if(f.type==='coord') return f.p+signFmt(f.val);
+  return f.p+f.val; // num (incl CHF with empty prefix)
+}
+function sanitizeVal(v,type){
+  if(type==='coord') return v.replace(/[^0-9.+\-]/g,'');
+  if(type==='num') return v.replace(/[^0-9.]/g,'');
+  if(type==='feed') return v.toUpperCase().replace(/[^0-9.MAX]/g,'');
+  return v;
+}
+function lineParts(){
+  var text=FM.cmd, ranges=[];
+  for(var i=0;i<FM.fields.length;i++){
+    text+=' ';
+    var s=text.length, tok=tokenFor(FM.fields[i]);
+    text+=tok; ranges.push({s:s,e:text.length});
+  }
+  return {text:text, ranges:ranges};
+}
+function writeLine(){
+  var lp=lineParts();
+  var v=codeEl.value;
+  codeEl.value = v.slice(0,FM.lineStart) + lp.text + v.slice(FM.lineStart+FM.lineLen);
+  FM.lineLen = lp.text.length;
+  FM.ranges = lp.ranges;
+  dirty=true; updateLineNums(); runValidation();
+}
+function selectField(i){
+  FM.idx=i;
+  writeLine();
+  var r=FM.ranges[i];
+  try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){}
+  renderFbar();
+}
+var SUGS={
+  feed:[['100','F100'],['500','F500'],['1000','F1000'],['2000','F2000'],['MAX','FMAX']],
+  num:[['5','5'],['10','10'],['25','25'],['50','50']],
+  coord:[['+','make +'],['-','make -'],['0','0']]
+};
+function renderFbar(){
+  var f=FM.fields[FM.idx];
+  var bar=document.getElementById('fbar');
+  var html='<div class="fbar-row">';
+  html+='<button class="fbar-nav" onclick="fieldPrev()" title="previous">&#9664;</button>';
+  html+='<span class="fbar-label">'+f.prompt+'</span>';
+  if(f.type==='dr'){
+    html+='<div class="fbar-dr"><button class="fbar-drbtn'+(f.val==='+'?' sel':'')+'" onclick="setFieldVal(\'+\')">DR+</button><button class="fbar-drbtn'+(f.val==='-'?' sel':'')+'" onclick="setFieldVal(\'-\')">DR-</button></div>';
+  } else {
+    var pfx=f.p||'';
+    html+='<span class="fbar-pfx">'+pfx+'</span><input id="fbarInput" inputmode="'+(f.type==='feed'?'text':'decimal')+'" autocomplete="off" value="'+f.val+'">';
+  }
+  html+='<button class="fbar-nav" onclick="fieldNext()" title="next">&#9654;</button>';
+  html+='<button class="fbar-done" onclick="exitFieldMode()">Done</button>';
+  html+='</div>';
+  var sug = SUGS[f.type];
+  if(sug){
+    html+='<div class="fbar-sug">';
+    for(var k=0;k<sug.length;k++){
+      var isMax = sug[k][0]==='MAX';
+      html+='<button class="'+(isMax?'max':'')+'" onclick="applySug(\''+sug[k][0]+'\')">'+sug[k][1]+'</button>';
+    }
+    html+='</div>';
+  }
+  bar.innerHTML=html;
+  if(f.type!=='dr'){
+    var inp=document.getElementById('fbarInput');
+    inp.addEventListener('input', function(){ inp.value=sanitizeVal(inp.value,f.type); f.val=inp.value; refreshSelection(); });
+    inp.addEventListener('keydown', function(e){
+      if(e.key==='Enter'){ e.preventDefault(); fieldNext(); }
+      else if(e.key==='Tab'){ e.preventDefault(); e.shiftKey?fieldPrev():fieldNext(); }
+      else if(e.key==='ArrowRight' && inp.selectionStart===inp.value.length){ e.preventDefault(); fieldNext(); }
+      else if(e.key==='ArrowLeft' && inp.selectionStart===0){ e.preventDefault(); fieldPrev(); }
+    });
+    setTimeout(function(){ try{ inp.focus(); inp.setSelectionRange(inp.value.length,inp.value.length); }catch(e){} }, 20);
+  }
+}
+function refreshSelection(){
+  writeLine();
+  var r=FM.ranges[FM.idx];
+  try{ codeEl.setSelectionRange(FM.lineStart+r.s, FM.lineStart+r.e); }catch(e){}
+}
+function setFieldVal(v){ FM.fields[FM.idx].val=v; selectField(FM.idx); }
+function applySug(v){
+  var f=FM.fields[FM.idx];
+  if(f.type==='coord' && (v==='+'||v==='-')){
+    var num=f.val.replace(/^[+\-]/,''); if(num==='')num='0'; f.val=v+num;
+  } else { f.val=v; }
+  selectField(FM.idx);
+}
+function fieldNext(){ if(FM.idx<FM.fields.length-1) selectField(FM.idx+1); else exitFieldMode(); }
+function fieldPrev(){ if(FM.idx>0) selectField(FM.idx-1); }
+function enterFieldMode(label){
+  var schema=BUILDERS[label]; if(!schema) return;
+  var fields=[];
+  schema.fields.forEach(function(sf){ if(sf.type==='mfunc') return; fields.push({p:sf.p, type:sf.type, prompt:sf.prompt, val:defVal(sf.type)}); });
+  FM={active:true, cmd:(schema.cmd||label), fields:fields, idx:0, lineStart:0, lineLen:0, ranges:[]};
+  // insertion point
+  var v=codeEl.value;
+  var pos;
+  if(document.activeElement===codeEl){ pos=codeEl.selectionStart; }
+  else { var ie=v.toUpperCase().lastIndexOf('\nEND PGM'); pos = ie>=0 ? ie+1 : v.length; }
+  var before=v.slice(0,pos);
+  var needNL = before.length>0 && before.charAt(before.length-1)!=='\n';
+  var lp=lineParts();
+  var prefix=(needNL?'\n':'');
+  FM.lineStart=before.length+prefix.length;
+  FM.lineLen=lp.text.length;
+  codeEl.value = before + prefix + lp.text + '\n' + v.slice(pos);
+  document.getElementById('fbar').classList.add('on');
+  selectField(0);
+}
+function exitFieldMode(){
+  if(!FM.active) return;
+  FM.active=false;
+  document.getElementById('fbar').classList.remove('on');
+  document.getElementById('fbar').innerHTML='';
+  try{ codeEl.setSelectionRange(FM.lineStart+FM.lineLen, FM.lineStart+FM.lineLen); }catch(e){}
+}
 
 var validateTimer=null;
 codeEl.addEventListener('input', function(){
@@ -524,6 +726,8 @@ codeEl.addEventListener('input', function(){
   validateTimer=setTimeout(runValidation, 350);
 });
 codeEl.addEventListener('scroll', function(){ lineNums.scrollTop = codeEl.scrollTop; });
+codeEl.addEventListener('mousedown', function(){ if(FM.active) exitFieldMode(); });
+codeEl.addEventListener('touchstart', function(){ if(FM.active) exitFieldMode(); });
 
 // ---------- speed ----------
 var SPEEDS = [0.25,0.5,1,2,5];
@@ -966,6 +1170,7 @@ function switchView(v){
 // ---------- boot ----------
 updateLineNums();
 runValidation();
+buildKeypad();
 if(THREE_OK){
   init3D();
   prepare();
