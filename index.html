@@ -732,12 +732,8 @@ END PGM PROGRAM MM</textarea>
       </div>
       <div>
         <label style="font-family:var(--mono);font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Screenshot <span style="color:var(--text3);font-size:10px;">(optional)</span></label>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button onclick="bugCaptureScreen()" style="font-family:var(--mono);font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text2);cursor:pointer;">📷 Capture 3D view</button>
-          <button onclick="bugClearScreen()" id="bugClearBtn" style="display:none;font-family:var(--mono);font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text3);cursor:pointer;">✕ Clear</button>
-        </div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;">Copied to your clipboard, not uploaded automatically — on the GitHub page that opens, click into the text box and press <b style="color:var(--text2);">Ctrl+V</b> to paste it in.</div>
-        <canvas id="bugCanvas" style="display:none;margin-top:8px;max-width:100%;border:1px solid var(--border);border-radius:6px;"></canvas>
+        <button onclick="bugCopyScreenshot()" style="font-family:var(--mono);font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text2);cursor:pointer;">📋 Copy image to clipboard</button>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;">Paste it (<b style="color:var(--text2);">Ctrl+V</b>) wherever you're filing the report.</div>
       </div>
       <div>
         <label style="font-family:var(--mono);font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Program <span id="bugProgLines" style="color:var(--text3);font-size:10px;"></span></label>
@@ -1397,7 +1393,7 @@ var HELP_MAP = {
   'Q257':     {title:'Q257 — Depth per chip break', desc:'How deep the tap goes before retracting slightly to break chips. 0 = no chip breaking.', ex:'Q257=+5'},
   'Q256':     {title:'Q256 — Chip break retract', desc:'Distance to retract for chip breaking (stays inside the hole). Typically 0.2–0.5mm.', ex:'Q256=+0.2'},
   'measure':  {title:'◎ Measure', desc:'Click to enter measure mode. Click any point on the workpiece surface to record its X/Y/Z coordinates. Click two points to measure the distance between them. Click again to exit measure mode.', ex:''},
-  'bug-report':{title:'🐛 Bug report', desc:'Opens the bug report dialog. Describe what went wrong; your program is included automatically. If you capture a screenshot of the 3D view, it is copied to your clipboard so you can paste it (Ctrl+V) into the GitHub issue text box.', ex:''},
+  'bug-report':{title:'🐛 Bug report', desc:'Opens the bug report dialog. Describe what went wrong; your program is included automatically. Use "Copy image to clipboard" to grab a screenshot of the 3D view, then paste it (Ctrl+V) into the GitHub issue or email.', ex:''},
   'editor':   {title:'NC Program editor', desc:'Write your Heidenhain Klartext NC program here. Click any line to activate the inline field editor. Use the keypad buttons above to insert commands. Lines starting with ; are comments.', ex:'; This is a comment'},
   'export':   {title:'↓ Export', desc:'Downloads the current NC program as a .H file (Heidenhain format). You can load it into a real TNC control or keep it as a backup.', ex:''},
   'speed':    {title:'Simulation speed', desc:'Controls how fast the simulation plays. − slows down, + speeds up. Range from 0.1× (very slow, useful for step-by-step inspection) to 8× (fast preview). Speed does not affect accuracy.', ex:''},
@@ -1689,8 +1685,6 @@ function openBugReport(){
   document.getElementById('bugProgPreview').textContent = progTxt;
   document.getElementById('bugProgLines').textContent = '('+progTxt.split('\n').length+' lines — included in report)';
   document.getElementById('bugDesc').value = '';
-  document.getElementById('bugCanvas').style.display = 'none';
-  document.getElementById('bugClearBtn').style.display = 'none';
   overlay.classList.add('open');
   setTimeout(function(){ document.getElementById('bugDesc').focus(); }, 100);
 }
@@ -1699,32 +1693,18 @@ function closeBugReport(){
   document.getElementById('bugOverlay').classList.remove('open');
 }
 
-var _bugScreenshotBlob = null;
-function bugCaptureScreen(){
+function bugCopyScreenshot(){
   if(!renderer) return;
-  // Force a render to make sure canvas is up to date
-  renderer.render(scene, camera);
+  var btn = event.target;
+  var orig = btn.textContent;
+  renderer.render(scene, camera); // make sure the canvas reflects the current view
   renderer.domElement.toBlob(function(blob){
-    if(!blob) return;
-    _bugScreenshotBlob = blob;
-    var c = document.getElementById('bugCanvas');
-    c.style.display = 'block';
-    document.getElementById('bugClearBtn').style.display = '';
-    var url = URL.createObjectURL(blob);
-    var img = new Image();
-    img.onload = function(){
-      c.width = img.width; c.height = img.height;
-      c.getContext('2d').drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-    };
-    img.src = url;
+    if(!blob || !navigator.clipboard || !window.ClipboardItem) return;
+    navigator.clipboard.write([new ClipboardItem({'image/png': blob})]).then(function(){
+      btn.textContent = '✓ Copied';
+      setTimeout(function(){ btn.textContent = orig; }, 1500);
+    }).catch(function(){});
   }, 'image/png');
-}
-
-function bugClearScreen(){
-  _bugScreenshotBlob = null;
-  document.getElementById('bugCanvas').style.display = 'none';
-  document.getElementById('bugClearBtn').style.display = 'none';
 }
 
 function _bugBuildText(){
@@ -1732,7 +1712,8 @@ function _bugBuildText(){
   var debug = document.getElementById('bugDebug').textContent;
   var codeEl2 = document.getElementById('code');
   var prog_txt = codeEl2 ? codeEl2.value : (codeEl ? codeEl.value : '(unavailable)');
-  return '## Description\n'+(desc||'(no description)')+'\n\n## Debug info\n```\n'+debug+'\n```\n\n## Program\n```\n'+prog_txt+'\n```';
+  return '## Description\n'+(desc||'(no description)')+'\n\n## Debug info\n```\n'+debug+'\n```\n\n## Program\n```\n'+prog_txt+'\n```'
+    +'\n\n## Screenshot\n(paste here, if you have one)';
 }
 
 function bugSubmit(){
@@ -1750,7 +1731,8 @@ function bugSubmit(){
   function buildBody(progPart, debugPart){
     return '## Description\n'+(desc||'(no description)')
       +'\n\n## Program\n```\n'+progPart+'\n```'
-      +'\n\n## Debug info\n```\n'+debugPart+'\n```';
+      +'\n\n## Debug info\n```\n'+debugPart+'\n```'
+      +'\n\n## Screenshot\n(paste here, if you have one)';
   }
 
   var encoded = encodeURIComponent(buildBody(prog_txt, debug));
@@ -1775,14 +1757,6 @@ function bugSubmit(){
     }
   }
   window.open('https://github.com/slavomrkva/tnc-sim/issues/new?title='+title+'&body='+encoded, '_blank');
-
-  // A screenshot can't be embedded in the URL itself (it's not text) — copy
-  // it to the clipboard instead so the user can paste it into the issue body.
-  if(_bugScreenshotBlob && navigator.clipboard && window.ClipboardItem){
-    navigator.clipboard.write([new ClipboardItem({'image/png': _bugScreenshotBlob})]).then(function(){
-      setTimeout(function(){ alert('Screenshot copied to clipboard \u2014 paste it (Ctrl+V) into the GitHub issue text box that just opened.'); }, 300);
-    }).catch(function(){});
-  }
 }
 
 function bugEmailReport(){
@@ -1822,20 +1796,6 @@ function bugEmailReport(){
   }
 
   window.location.href = 'mailto:slavo.zett@gmail.com?subject='+subject+'&body='+encoded;
-
-  // Many mail clients (Gmail/Outlook web, Apple Mail) accept a pasted
-  // image directly in the message body — copy the full report text and
-  // screenshot together so it's ready to paste if the mailto body got
-  // trimmed or the client doesn't show images from mailto.
-  var fullText = _bugBuildText();
-  if(_bugScreenshotBlob && navigator.clipboard && window.ClipboardItem){
-    var textBlob = new Blob([fullText], {type:'text/plain'});
-    navigator.clipboard.write([new ClipboardItem({'text/plain':textBlob, 'image/png':_bugScreenshotBlob})]).then(function(){
-      setTimeout(function(){ alert('Opening your email app\u2026\n\nFull report + screenshot also copied to your clipboard \u2014 paste (Ctrl+V) into the email if it looks cut off or to include the image.'); }, 300);
-    }).catch(function(){});
-  } else {
-    navigator.clipboard.writeText(fullText).catch(function(){});
-  }
 }
 
 function bugCopyReport(){
@@ -1845,16 +1805,6 @@ function bugCopyReport(){
   function flashCopied(){
     btn.textContent = '✓ Copied';
     setTimeout(function(){ btn.textContent = orig; }, 1500);
-  }
-  if(_bugScreenshotBlob && navigator.clipboard && window.ClipboardItem){
-    var textBlob = new Blob([text], {type:'text/plain'});
-    navigator.clipboard.write([new ClipboardItem({'text/plain':textBlob, 'image/png':_bugScreenshotBlob})]).then(function(){
-      flashCopied();
-    }).catch(function(){
-      // Some targets only accept one type at a time — fall back to text only.
-      navigator.clipboard.writeText(text).then(flashCopied).catch(function(){});
-    });
-    return;
   }
   navigator.clipboard.writeText(text).then(flashCopied).catch(function(){
     // fallback
