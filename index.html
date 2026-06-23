@@ -37,16 +37,16 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0d0f14; --surface:#161920; --surface2:#1e2229; --border:#2a2f3a;
+  --bg:#100f0d; --surface:#1a1814; --surface2:#22201c; --border:#2c2a26;
   --accent:#e8530a; --accent2:#1da06a; --accent3:#4a9eff;
   --text:#e8eaf0; --text2:#8a90a0; --text3:#555c6e;
   --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif; --radius:8px;
   --editor-fs:12px;
 }
 html[data-theme="light"]{
-  --bg:#eaedf2; --surface:#ffffff; --surface2:#dfe3ea; --border:#b7bdc9;
+  --bg:#f5f2ee; --surface:#fffdf9; --surface2:#ede9e3; --border:#d8cfc4;
   --accent:#d6490a; --accent2:#147a52; --accent3:#1f64c4;
-  --text:#12151c; --text2:#3d4452; --text3:#69707f;
+  --text:#1a1510; --text2:#4a3f35; --text3:#7a6a5a;
 }
 /* Buttons that rely on a transparent/none background read as washed-out on a
    light page (no fill, only a faint border) — give the common interactive
@@ -83,7 +83,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);height:100%;
 /* help mode: popup only, no dimming */
 header{padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .logo{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;}
+.logo-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .logo-text{font-size:15px;font-weight:700;color:var(--text);line-height:1.2;}
 .logo-sub{font-size:11px;color:var(--text2);font-weight:400;}
 .header-badges{display:flex;gap:6px;flex-wrap:wrap;}
@@ -111,6 +111,8 @@ header{padding:12px 20px;background:var(--surface);border-bottom:1px solid var(-
 textarea#code{position:absolute;inset:0;width:100%;height:100%;z-index:2;padding:10px 12px;font-family:var(--mono);font-size:var(--editor-fs);line-height:1.8;background:transparent;color:transparent;caret-color:var(--text);border:none;outline:none;resize:none;tab-size:2;min-height:0;white-space:pre;overflow-x:auto;word-wrap:normal;overflow-wrap:normal;-webkit-text-size-adjust:none;text-size-adjust:none;}
 @media(pointer:fine){textarea#code{resize:both;min-height:80px;}}
 textarea#code::selection{background:rgba(232,83,10,0.3);}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+textarea#code:focus-visible{outline:none;}
 /* Syntax highlight colors — vivid-on-dark by default, overridden for light theme below */
 .syn-comment{color:#4ADE80;}
 .syn-tool{color:#FB923C;}
@@ -118,16 +120,18 @@ textarea#code::selection{background:rgba(232,83,10,0.3);}
 .syn-qvar{color:#C084FC;}
 .syn-cycle{color:#C9A876;}
 @keyframes refine-spin{ to{ transform:rotate(360deg); } }
-html[data-theme="light"] .syn-comment{color:#16A34A;}
-html[data-theme="light"] .syn-tool{color:#EA580C;}
-html[data-theme="light"] .syn-lbl{color:#2563EB;}
-html[data-theme="light"] .syn-qvar{color:#9333EA;}
-html[data-theme="light"] .syn-cycle{color:#92400E;}
+html[data-theme="light"] .syn-comment{color:#2d7a4a;}
+html[data-theme="light"] .syn-tool{color:#c2440a;}
+html[data-theme="light"] .syn-lbl{color:#1a52a8;}
+html[data-theme="light"] .syn-qvar{color:#7a2db0;}
+html[data-theme="light"] .syn-cycle{color:#7a5520;}
 .toolbar{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;flex-wrap:nowrap;align-items:center;overflow:hidden;}
-.btn{font-family:var(--mono);font-size:11px;padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;}
+.btn{font-family:var(--mono);font-size:11px;padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;touch-action:manipulation;}
 .btn:hover{border-color:var(--text3);color:var(--text);}
 .btn:active{transform:scale(.97);}
-.btn-run,.btn-step,.btn-stop,.btn-reset{min-width:0;width:36px;height:36px;padding:0;justify-content:center;font-size:14px;border-radius:6px;}
+.btn-run,.btn-step,.btn-stop{min-width:0;height:30px;padding:0 10px;justify-content:center;font-size:12px;border-radius:6px;gap:5px;}
+.btn-reset{min-width:0;width:30px;height:30px;padding:0;justify-content:center;font-size:12px;border-radius:6px;}
+@media(max-width:480px){.btn-label{display:none;}.btn-run,.btn-step,.btn-stop{width:30px;padding:0;}}
 .btn-run{border-color:rgba(29,160,106,.5);color:rgba(29,160,106,.8);}
 .btn-run:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(29,160,106,.1);}
 .btn-step{border-color:rgba(74,158,255,.5);color:rgba(74,158,255,.8);}
@@ -148,8 +152,8 @@ html[data-theme="light"] .syn-cycle{color:#92400E;}
 .speed-val{font-family:var(--mono);font-size:11px;padding:0 10px;color:var(--accent2);min-width:44px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 .canvas-panel{flex:1;display:flex;flex-direction:column;background:var(--bg);min-width:0;}
 .view-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
-.tab{font-family:var(--mono);font-size:11px;padding:8px 16px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab{font-family:var(--mono);font-size:11px;padding:8px 16px;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.tab.active{color:var(--accent);border-bottom:3px solid var(--accent);background:rgba(232,83,10,.06);}
 .tab:hover:not(.active){color:var(--text2);}
 .view-area{flex:1;position:relative;min-height:0;}
 #view3d{position:absolute;inset:0;width:100%;height:100%;}
@@ -184,6 +188,11 @@ canvas#sim2d{width:100%;height:100%;display:block;}
 .tool-btn-cancel{font-family:var(--mono);font-size:11px;padding:6px 12px;background:none;border:1px solid var(--border);border-radius:5px;color:var(--text3);cursor:pointer;}
 .tool-swatch{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle;border:1px solid rgba(255,255,255,.15);}
 .view-hint{position:absolute;bottom:10px;right:12px;font-family:var(--mono);font-size:10px;color:var(--text3);pointer-events:none;text-align:right;line-height:1.8;}
+.status-bar #statusMsg{color:var(--text2);}
+.status-bar #posDisplay{font-size:10px;letter-spacing:.04em;margin-left:auto;}
+#estTime{margin-left:0 !important;}
+.ph-btn{font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:none;color:var(--text3);cursor:pointer;}
+.ph-btn:hover{color:var(--text2);background:var(--surface2);}
 .status-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;border-top:1px solid var(--border);background:var(--surface2);font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;flex-wrap:wrap;}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);display:inline-block;flex-shrink:0;}
 .status-dot.run{background:var(--accent);animation:pulse 1s infinite;}
@@ -204,10 +213,12 @@ canvas#sim2d{width:100%;height:100%;display:block;}
 .info-card p,.info-card li{font-size:13px;color:var(--text2);line-height:1.7;}
 .info-card ul{padding-left:16px;}
 .info-card code{font-family:var(--mono);font-size:11px;background:var(--surface2);padding:1px 6px;border-radius:4px;color:var(--accent3);}
-footer{background:var(--surface2);border-top:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-footer p{font-size:12px;color:var(--text3);}
-footer a{color:var(--accent3);text-decoration:none;}
-footer a:hover{text-decoration:underline;}
+footer{background:var(--surface2);border-top:1px solid var(--border);padding:8px 24px;display:flex;flex-direction:column;gap:0;}
+.footer-disclaimer{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.5;background:var(--bg);margin:-8px -24px 0;padding:10px 24px 10px;border-bottom:1px solid var(--border);margin-bottom:0;}
+.footer-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.footer-actions p{font-size:12px;color:var(--text3);}
+.footer-actions a{color:var(--accent3);text-decoration:none;}
+.footer-actions a:hover{text-decoration:underline;}
 .line-nums .ln.err{color:#ff5d5d;font-weight:500;}
 .line-nums .ln.warn{color:#e8a23a;}
 .line-nums .ln.fixed{color:#e8a23a;font-weight:500;}
@@ -326,7 +337,7 @@ footer a:hover{text-decoration:underline;}
 .kp-row .key{flex:0 0 40px;min-height:30px;}
 .key.pi .kl{font-size:15px;}
 .kp-grid.prog{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
-.key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 3px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--mono);transition:transform .08s,background .15s,color .15s;user-select:none;}
+.key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 3px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--mono);transition:transform .08s,background .15s,color .15s;user-select:none;touch-action:manipulation;}
 .key:active{transform:translateY(1px);}
 .key svg{width:14px;height:14px;}
 .key .kl{font-size:9px;font-weight:500;line-height:1;text-align:center;}
@@ -377,6 +388,7 @@ footer a:hover{text-decoration:underline;}
   #view3d, #view2d, #viewTools{position:absolute;inset:0;width:100%;height:100%;}
   .disclaimer-bar{padding:16px 16px 8px;}
   .disclaimer-bar p{text-align:center;font-size:10px;line-height:1.7;}
+  .footer-disclaimer{display:none;}
   .header-badges{display:flex;}
   .header-badges .badge{display:none;}
   .logo-text{font-size:13px;}
@@ -387,6 +399,38 @@ footer a:hover{text-decoration:underline;}
   .kp-grid{grid-template-columns:repeat(auto-fit,minmax(62px,1fr));}
   .ph-title{display:none;}
   .ph-blocks{display:none;}
+  .logo-sub{display:none;}
+  .status-bar #posDisplay{display:none;}
+  :root{--editor-fs:13px;}
+}
+/* ── Touch targets ≥44px (Apple HIG / Material You) ────────── */
+@media(pointer:coarse){
+  .btn-run,.btn-step,.btn-stop{height:44px;padding:0 14px;}
+  .btn-reset{width:44px;height:44px;}
+  .btn{min-height:44px;padding:8px 14px;}
+  .speed-btn{padding:10px 14px;}
+  .tab{padding:12px 18px;}
+  .key{min-height:44px;}
+  .kp-row .key{flex:0 0 46px;min-height:44px;}
+  .ph-btn{padding:6px 12px;min-height:36px;}
+  .fbar-crumb-btn{padding:8px 14px;font-size:12px;}
+  .fbar-drbtn{padding:10px 8px;}
+  .fbar-nav{padding:9px 13px;font-size:14px;}
+  .btn-group .btn-tog{padding:10px 12px;}
+  .speed-val{min-width:52px;}
+  .cycle-list-item{padding:14px 12px;}
+}
+/* ── Safe area insets — notch / home indicator (iOS & Android) */
+@supports(padding:env(safe-area-inset-bottom)){
+  header{
+    padding-left:max(20px,env(safe-area-inset-left));
+    padding-right:max(20px,env(safe-area-inset-right));
+  }
+  .status-bar{
+    padding-bottom:max(6px,env(safe-area-inset-bottom));
+    padding-left:max(14px,env(safe-area-inset-left));
+    padding-right:max(14px,env(safe-area-inset-right));
+  }
 }
 </style>
 <script>
@@ -403,7 +447,7 @@ footer a:hover{text-decoration:underline;}
 <body>
 <header>
   <div class="logo">
-    <div class="logo-icon">T</div>
+    <div class="logo-icon"><svg width="32" height="32" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="34" height="34" rx="6" fill="var(--accent)"/><line x1="8" y1="11" x2="26" y2="11" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="8" y1="17" x2="26" y2="17" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="8" y1="23" x2="26" y2="23" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="11" y1="8" x2="11" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="17" y1="8" x2="17" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="23" y1="8" x2="23" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><circle cx="17" cy="17" r="4" fill="white"/><circle cx="17" cy="17" r="1.5" fill="var(--accent)"/></svg></div>
     <div>
       <div class="logo-text">TNC Sim</div>
       <div class="logo-sub">Online CNC simulator for Heidenhain TNC</div>
@@ -425,9 +469,9 @@ footer a:hover{text-decoration:underline;}
       <div class="panel-header">
         <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
         <span style="display:flex;align-items:center;gap:8px;">
-          <button id="kpHelpBtn" onclick="toggleKpHelp()" style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:none;color:var(--text3);cursor:pointer;" title="Context help">? Help</button>
-          <button onclick="exportProgram()" data-help="export" style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:none;color:var(--text3);cursor:pointer;" title="Download program.H">&#8595; Export</button>
-          <button onclick="importProgram()" style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:none;color:var(--text3);cursor:pointer;" title="Load .H program file">&#8593; Import</button>
+          <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help">? Help</button>
+          <button class="ph-btn" onclick="exportProgram()" data-help="export" title="Download program.H">&#8595; Export</button>
+          <button class="ph-btn" onclick="importProgram()" title="Load .H program file">&#8593; Import</button>
           <input type="file" id="importFileInput" accept="text/plain,.h,.H,.nc,.txt,.tap,.cnc" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onImportFile(event)">
           <span id="blockCount" class="ph-blocks">0 blocks</span>
         </span>
@@ -660,16 +704,16 @@ END PGM PROGRAM MM</textarea>
     <div class="canvas-panel">
       <div class="toolbar">
         <span id="staleSimWarning" style="display:none;font-family:var(--mono);font-size:10px;color:#f0a500;padding:0 8px;white-space:nowrap;align-self:center;">⚠ re-run</span>
-        <button class="btn btn-run" id="runBtn" onclick="onRun()" title="Run" data-help="run"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6,4 20,12 6,20"/></svg></button>
-        <button class="btn btn-step" onclick="onStep()" title="Step" data-help="step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="3,4 13,12 3,20"/><polygon points="12,4 22,12 12,20"/></svg></button>
-        <button class="btn btn-stop" onclick="onStop()" title="Stop" data-help="stop"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="16" rx="1"/><rect x="13" y="4" width="7" height="16" rx="1"/></svg></button>
+        <button class="btn btn-run" id="runBtn" onclick="onRun()" title="Run" data-help="run"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6,4 20,12 6,20"/></svg><span class="btn-label">Run</span></button>
+        <button class="btn btn-step" onclick="onStep()" title="Step" data-help="step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="3,4 13,12 3,20"/><polygon points="12,4 22,12 12,20"/></svg><span class="btn-label">Step</span></button>
+        <button class="btn btn-stop" onclick="onStop()" title="Stop" data-help="stop"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="16" rx="1"/><rect x="13" y="4" width="7" height="16" rx="1"/></svg><span class="btn-label">Stop</span></button>
         <button class="btn btn-reset" onclick="onReset()" title="Reset" data-help="reset"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-        <div style="display:flex;flex-direction:column;gap:1px;"><span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.05em;">QUALITY</span><div class="btn-group" id="qualityGroup"><button class="btn btn-tog active" onclick="setQuality(0)" data-help="q-low">Low</button><button class="btn btn-tog" onclick="setQuality(1)" data-help="q-med">Med</button><button class="btn btn-tog" onclick="setQuality(2)" data-help="q-high">High</button></div></div>
-        <div class="speed-ctrl" data-help="speed">
+        <div style="display:flex;flex-direction:column;gap:1px;"><span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.05em;">QUALITY</span><div class="btn-group" id="qualityGroup"><button class="btn btn-tog active" onclick="setQuality(0)" data-help="q-low">Def</button><button class="btn btn-tog" onclick="setQuality(1)" data-help="q-med">High</button></div></div>
+        <div style="display:flex;flex-direction:column;gap:1px;"><span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.05em;">SPEED</span><div class="speed-ctrl" data-help="speed">
           <button class="speed-btn" onclick="changeSpeed(-1)">&#8722;</button>
           <span class="speed-val" id="speedVal">1.0&#215;</span>
           <button class="speed-btn" onclick="changeSpeed(1)">+</button>
-        </div>
+        </div></div>
       </div>
       <div class="view-tabs">
         <div class="tab active" id="tab3d" onclick="switchView('3d')" data-help="view-3d">3D view</div>
@@ -697,20 +741,19 @@ END PGM PROGRAM MM</textarea>
         <span class="status-dot" id="statusDot"></span>
         <span id="statusMsg">Ready — press Run</span>
         <span id="posDisplay">X: 0.000  Y: 0.000  Z: 0.000</span>
-        <span id="estTime" style="margin-left:auto;color:var(--text3);white-space:nowrap;"></span>
+        <span id="estTime" style="color:var(--text3);white-space:nowrap;"></span>
       </div>
     </div>
   </div>
 </div>
 
-<div class="disclaimer-bar">
-  <p>TNC Sim is an open-source independent Heidenhain TNC simulator — early release, bugs are expected. Results may differ from a real TNC control — never use for actual machining without verification. Desktop first, mobile friendly. · Not affiliated with HEIDENHAIN GmbH.</p>
-</div>
-
 <footer>
-  <p>TNC Sim &nbsp;·&nbsp; <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a></p>
-  <button onclick="openBugReport()" data-help="bug-report" style="font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:6px;background:transparent;color:var(--text3);border:1px solid var(--border);cursor:pointer;white-space:nowrap;">🐛 Bug report</button>
-  <a href="https://buymeacoffee.com/slavozett" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:6px;background:transparent;color:var(--text3);border:1px solid var(--border);text-decoration:none;white-space:nowrap;" title="Buy me a coffee">&#9749; Buy me a coffee</a>
+  <p class="footer-disclaimer">TNC Sim is an open-source independent Heidenhain TNC simulator — early release, bugs are expected. Results may differ from a real TNC control — never use for actual machining without verification. The 3D cut is a voxel grid — details smaller than the active cell size won't appear, even at High quality or after Refine (cells are ~1mm on Default). Desktop first, mobile friendly. · Not affiliated with HEIDENHAIN GmbH.</p>
+  <div class="footer-actions">
+    <p>TNC Sim &nbsp;·&nbsp; <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a></p>
+    <button onclick="openBugReport()" data-help="bug-report" class="ph-btn" style="white-space:nowrap;">🐛 Bug report</button>
+    <a href="https://buymeacoffee.com/slavozett" target="_blank" class="ph-btn" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;" title="Buy me a coffee">&#9749; Buy me a coffee</a>
+  </div>
 </footer>
 
 <div class="cycle-overlay" id="cycleOverlay" onclick="if(event.target===this)closeCyclePicker()">
@@ -1347,9 +1390,8 @@ var HELP_MAP = {
   'step':     {title:'▶▶ Step', desc:'Executes one block at a time. Each click advances to the next NC block. Useful for inspecting individual moves.', ex:''},
   'stop':     {title:'⏸ Stop', desc:'Pauses the simulation at the current position. Press Run to continue. After stopping you can also trigger Refine to see the high-resolution mesh.', ex:''},
   'reset':    {title:'↺ Reset', desc:'Resets the simulation back to the beginning. The workpiece returns to its original shape and the tool goes to the start position.', ex:''},
-  'q-low':    {title:'Quality: Low (100 vox)', desc:'Voxel grid 100×100. Each voxel ~1mm on a 100mm block. Very fast — good for testing program logic and tool paths. Fine features below ~1mm are not visible.', ex:''},
-  'q-med':    {title:'Quality: Med (200 vox)', desc:'Voxel grid 200×200. Each voxel ~0.5mm. Good balance of speed and detail. Default quality — most machining operations are clearly visible.', ex:''},
-  'q-high':   {title:'Quality: High (300 vox)', desc:'Voxel grid 300×300. Each voxel ~0.33mm. Slower but shows finer features. Use Refine after simulation for a high-resolution mesh at 600 voxels.', ex:''},
+  'q-low':    {title:'Quality: Default (100 vox)', desc:'Voxel grid 100×100. Each voxel ~1mm on a 100mm block. Very fast — smooth on any hardware. Good for testing program logic and tool paths. Fine features below ~1mm are not visible. Use Refine after simulation for a high-resolution mesh at 300 voxels.', ex:''},
+  'q-med':    {title:'Quality: High (200 vox)', desc:'Voxel grid 200×200. Each voxel ~0.5mm — shows most machining operations clearly. Slower than Default during an active run; smooth on most modern hardware. Use Refine after simulation for a high-resolution mesh at 500 voxels.', ex:''},
   'view-3d':  {title:'3D view', desc:'Interactive 3D rendering of the workpiece and tool. Drag to orbit, scroll to zoom, right-drag to pan. Use Refine after simulation for a high-resolution mesh.', ex:''},
   'view-2d':  {title:'XY toolpath', desc:'Top-down 2D view of the tool path. Orange = feed moves, blue = rapid moves. Useful for verifying the tool path geometry before running the full simulation.', ex:''},
   'view-tools':{title:'Tool Table', desc:'Define tools with their geometry: radius R, length L, cutting edge length, tip angle, ball nose radius R2, DL/DR offsets. Tools are referenced by number in TOOL CALL.', ex:'TOOL CALL 1 Z S3000 F800'},
@@ -1826,7 +1868,7 @@ function openHelp(){
   var groups=[
     {label:'Simulation controls',keys:['run','step','stop','reset','speed','path','measure']},
     {label:'Views',keys:['view-3d','view-2d','view-tools']},
-    {label:'Quality',keys:['q-low','q-med','q-high']},
+    {label:'Quality',keys:['q-low','q-med']},
     {label:'Editor',keys:['editor','line-nums','export','bug-report']},
     {label:'Motion commands',keys:['L','C','CC','CR','RND','CHF','LP','CP','P','I']},
     {label:'Program structure',keys:['BLK FORM','TOOL CALL','TOOL DEF','CYCL DEF','CYCL CALL','LBL','CALL LBL','M','M0','M3','M4','M5','M7','M8','M9','M30']},
@@ -5356,8 +5398,8 @@ var feedLine, rapidLine, feedBuf, rapidBuf;
 var _idleFrames = 0;
 // ---------- voxel + marching cubes ----------
 var VX = null; // voxel grid
-var VX_QUALITY = 0; // 0=low, 1=medium, 2=high
-var VX_RES_LEVELS = [100, 200, 300];
+var VX_QUALITY = 0; // 0=default, 1=high
+var VX_RES_LEVELS = [100, 200];
 var VX_RES = VX_RES_LEVELS[VX_QUALITY];
 
 // Marching Cubes lookup tables and implementation
@@ -5467,7 +5509,7 @@ function vxInit(prog){
   var cell = maxDim / (VX_RES - 1);
   // Large blanks must not lose detail: cap the cell size so resolution stays usable.
   // The cap scales with quality (low/med/high) but never lets a cell exceed it.
-  var CELL_CAP = [1.0, 0.6, 0.4][VX_QUALITY!==undefined?VX_QUALITY:0] || 1.0; // mm
+  var CELL_CAP = [1.0, 0.6][VX_QUALITY!==undefined?VX_QUALITY:0] || 1.0; // mm
   if(cell > CELL_CAP) cell = CELL_CAP;
   var nx=Math.max(4, Math.round(w/cell)+1);
   var ny=Math.max(4, Math.round(d/cell)+1);
@@ -5720,13 +5762,13 @@ function triggerRefine(){
   _showRefineIndicator('Refining mesh\u2026');
   updateStatus('\u2699\ufe0f Initialising refine\u2026', false);
 
-  var HI_LEVELS = [300, 400, 600];
+  var HI_LEVELS = [300, 500];
   var HI = HI_LEVELS[VX_QUALITY];
   var min = prog.blkMin, max = prog.blkMax;
   var w = max.x-min.x, d = max.y-min.y, h = max.z-min.z;
   // Isotropic cells, capped so large blanks keep detail (same logic as vxInit).
   var hiCell = Math.max(w, d, h) / (HI - 1);
-  var HI_CELL_CAP = [0.5, 0.35, 0.25][VX_QUALITY!==undefined?VX_QUALITY:0] || 0.5; // finer than live sim
+  var HI_CELL_CAP = [0.5, 0.3][VX_QUALITY!==undefined?VX_QUALITY:0] || 0.5; // finer than live sim
   if(hiCell > HI_CELL_CAP) hiCell = HI_CELL_CAP;
   var nx = Math.max(4, Math.round(w/hiCell)+1);
   var ny = Math.max(4, Math.round(d/hiCell)+1);
