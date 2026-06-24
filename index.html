@@ -2454,7 +2454,7 @@ function toolSave(oldNum){
   // Tool change invalidates parsed RC offsets — must re-parse
   // Auto-reset so next Run re-parses with new tool geometry
   if(mode==='done' || mode==='stepping' || mode==='idle'){
-    resetSim();
+    onReset();
     var _stale = document.getElementById('staleSimWarning');
     if(_stale) _stale.style.display='';
   }
@@ -7588,6 +7588,20 @@ if(THREE_OK){
   prepare();
   draw2dFull(false);
   updateStatus('3D unavailable — using XY view', false);
+  // loop() (which calls advance() to actually progress the simulation) is gated
+  // behind THREE_OK/renderer and is never started in this branch — without this,
+  // Run/Step would set mode='running'/'stepping' and just sit there forever.
+  // Drive playback independently here, redrawing the 2D canvas each frame.
+  (function loop2d(){
+    requestAnimationFrame(loop2d);
+    var now = performance.now();
+    var dt = Math.min((now - (loop2d._last || now)) / 1000, 0.1);
+    loop2d._last = now;
+    if(mode==='running' || mode==='stepping'){
+      advance(dt);
+      if(curView==='2d') draw2dFull(true);
+    }
+  })();
 }
 /* ===MAIN_END=== */
 
