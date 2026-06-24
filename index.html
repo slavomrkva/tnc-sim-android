@@ -56,6 +56,7 @@ html[data-theme="light"]{
 html[data-theme="light"] .btn,
 html[data-theme="light"] .tool-act-btn,
 html[data-theme="light"] #themeToggle,
+html[data-theme="light"] #aboutBtn,
 html[data-theme="light"] #kpHelpBtn{
   background:var(--surface2);
 }
@@ -125,13 +126,15 @@ html[data-theme="light"] .syn-tool{color:#c2440a;}
 html[data-theme="light"] .syn-lbl{color:#1a52a8;}
 html[data-theme="light"] .syn-qvar{color:#7a2db0;}
 html[data-theme="light"] .syn-cycle{color:#7a5520;}
-.toolbar{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;flex-wrap:nowrap;align-items:center;overflow:hidden;}
+.toolbar{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;flex-wrap:wrap;align-items:center;}
+.toolbar>*{flex-shrink:0;}
 .btn{font-family:var(--mono);font-size:11px;padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;touch-action:manipulation;}
 .btn:hover{border-color:var(--text3);color:var(--text);}
 .btn:active{transform:scale(.97);}
-.btn-run,.btn-step,.btn-stop{min-width:0;height:30px;padding:0 10px;justify-content:center;font-size:12px;border-radius:6px;gap:5px;}
-.btn-reset{min-width:0;width:30px;height:30px;padding:0;justify-content:center;font-size:12px;border-radius:6px;}
-@media(max-width:480px){.btn-label{display:none;}.btn-run,.btn-step,.btn-stop{width:30px;padding:0;}}
+.btn-run,.btn-step,.btn-stop{height:30px;padding:0 10px;justify-content:center;font-size:12px;border-radius:6px;gap:5px;}
+.btn-reset{width:30px;height:30px;padding:0;justify-content:center;font-size:12px;border-radius:6px;}
+@media(max-width:380px){.btn-label{display:none;}.btn-run,.btn-step,.btn-stop{width:30px;padding:0;}}
+@media(pointer:coarse) and (max-width:380px){.btn-run,.btn-step,.btn-stop{width:44px;padding:0;}}
 .btn-run{border-color:rgba(29,160,106,.5);color:rgba(29,160,106,.8);}
 .btn-run:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(29,160,106,.1);}
 .btn-step{border-color:rgba(74,158,255,.5);color:rgba(74,158,255,.8);}
@@ -213,12 +216,10 @@ canvas#sim2d{width:100%;height:100%;display:block;}
 .info-card p,.info-card li{font-size:13px;color:var(--text2);line-height:1.7;}
 .info-card ul{padding-left:16px;}
 .info-card code{font-family:var(--mono);font-size:11px;background:var(--surface2);padding:1px 6px;border-radius:4px;color:var(--accent3);}
-footer{background:var(--surface2);border-top:1px solid var(--border);padding:8px 24px;display:flex;flex-direction:column;gap:0;}
-.footer-disclaimer{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.5;background:var(--bg);margin:-8px -24px 0;padding:10px 24px 10px;border-bottom:1px solid var(--border);margin-bottom:0;}
-.footer-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-.footer-actions p{font-size:12px;color:var(--text3);}
-.footer-actions a{color:var(--accent3);text-decoration:none;}
-.footer-actions a:hover{text-decoration:underline;}
+footer{background:var(--surface2);border-top:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+footer p{font-size:12px;color:var(--text3);}
+footer a{color:var(--accent3);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
 .line-nums .ln.err{color:#ff5d5d;font-weight:500;}
 .line-nums .ln.warn{color:#e8a23a;}
 .line-nums .ln.fixed{color:#e8a23a;font-weight:500;}
@@ -388,7 +389,6 @@ footer{background:var(--surface2);border-top:1px solid var(--border);padding:8px
   #view3d, #view2d, #viewTools{position:absolute;inset:0;width:100%;height:100%;}
   .disclaimer-bar{padding:16px 16px 8px;}
   .disclaimer-bar p{text-align:center;font-size:10px;line-height:1.7;}
-  .footer-disclaimer{display:none;}
   .header-badges{display:flex;}
   .header-badges .badge{display:none;}
   .logo-text{font-size:13px;}
@@ -457,6 +457,7 @@ footer{background:var(--surface2);border-top:1px solid var(--border);padding:8px
     <button id="themeToggle" onclick="toggleTheme()" title="Toggle dark / light mode" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;">
       <span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span>
     </button>
+    <button id="aboutBtn" onclick="openAboutPopup()" title="About TNC Sim" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;">&#9432; About</button>
     <span class="badge green">● live</span>
     <span class="badge">v0.5 · 3D</span>
   </div>
@@ -470,6 +471,7 @@ footer{background:var(--surface2);border-top:1px solid var(--border);padding:8px
         <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
         <span style="display:flex;align-items:center;gap:8px;">
           <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help">? Help</button>
+          <button id="mCodesBtn" class="ph-btn" onclick="openMCodesList()" title="List all defined M functions">M list</button>
           <button class="ph-btn" onclick="exportProgram()" data-help="export" title="Download program.H">&#8595; Export</button>
           <button class="ph-btn" onclick="importProgram()" title="Load .H program file">&#8593; Import</button>
           <input type="file" id="importFileInput" accept="text/plain,.h,.H,.nc,.txt,.tap,.cnc" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onImportFile(event)">
@@ -500,14 +502,14 @@ BLK FORM 0.2 X+50 Y+50 Z+20
 ; Mill outer contour down to 20mm depth
 ;--------------------------------------------------
 TOOL CALL 1 Z S18000 F3500
-TOOL DEF 3
-M3 ; spindle clockwise
-M8 ; coolant on
+TOOL DEF 3 ; Pre-load tool in magazine for next TOOL CALL
+M3 ; Spindle ON — clockwise
+M8 ; Coolant ON — flood
 L X+0 Y+90 Z+50 FMAX R0
 L X+0 Y+90 Z+0 F2000
 L Y+100 RL ; activate left radius comp
-CC X+0 Y+75
-C X+0 Y+50 DR+
+CC X+0 Y+75 ; circle center for tangential entry arc
+C X+0 Y+50 DR+ ; sweeps tangentially onto the contour (avoids a straight-plunge tool mark)
 L X+50
 RND R20 ; corner rounding
 L Y-50
@@ -517,8 +519,8 @@ RND R20
 L Y+50
 RND R20
 L X+10
-CC X+10 Y+75
-C X+10 Y+100 DR+
+CC X+10 Y+75 ; circle center for tangential exit arc
+C X+10 Y+100 DR+ ; sweeps tangentially off the contour
 L Z+100 FMAX R0
 ; Mill central circular pocket D20
 CYCL DEF 208 ;Circular Pocket Milling
@@ -532,17 +534,17 @@ CYCL DEF 208 ;Circular Pocket Milling
   Q342=+0 ;Pre-drilled dia. [mm]
   Q351=+1 ;Milling mode
 L X+0 Y+0 FMAX M99
-M5 ; spindle stop
-M9 ; coolant off
+M5 ; Spindle OFF
+M9 ; Coolant OFF
 ;
 ;--------------------------------------------------
 ; T3 - Center drill D8 (spot drill hole centers)
 ; LBL 1 = right holes, LBL 2 = left holes
 ;--------------------------------------------------
 TOOL CALL 3 Z S18000 F300
-TOOL DEF 4
-M3
-M8
+TOOL DEF 4 ; Pre-load tool in magazine for next TOOL CALL
+M3 ; Spindle ON — clockwise
+M8 ; Coolant ON — flood
 CYCL DEF 200 ;Drilling
   Q200=+2 ;Safety clearance [mm]
   Q201=-1 ;Depth [mm]
@@ -562,17 +564,17 @@ LBL 2
 L X-30 Y-30 FMAX R0 M99
 L X-30 Y+30 FMAX R0 M99
 LBL 0
-M5
-M9
+M5 ; Spindle OFF
+M9 ; Coolant OFF
 ;
 ;--------------------------------------------------
 ; T4 - Drill D7 (drill before reaming and tapping)
 ; depth 24mm through full blank + breakthrough
 ;--------------------------------------------------
 TOOL CALL 4 Z S14000 F300
-TOOL DEF 5
-M3
-M8
+TOOL DEF 5 ; Pre-load tool in magazine for next TOOL CALL
+M3 ; Spindle ON — clockwise
+M8 ; Coolant ON — flood
 CYCL DEF 200 ;Drilling
   Q200=+2 ;Safety clearance [mm]
   Q201=-24 ;Depth [mm]
@@ -584,8 +586,8 @@ CYCL DEF 200 ;Drilling
   Q211=+0 ;Dwell time at depth [s]
 CALL LBL 1 ; drill right holes
 CALL LBL 2 ; drill left holes
-M5
-M9
+M5 ; Spindle OFF
+M9 ; Coolant OFF
 ;
 ;--------------------------------------------------
 ; T5 - Chamfer / countersink 90deg D8
@@ -593,14 +595,14 @@ M9
 ; Chamfer all hole edges with cycle 208
 ;--------------------------------------------------
 TOOL CALL 5 Z S18000 F1000 DL-2 DR+2
-TOOL DEF 6
-M3
-M8
+TOOL DEF 6 ; Pre-load tool in magazine for next TOOL CALL
+M3 ; Spindle ON — clockwise
+M8 ; Coolant ON — flood
 L X+0 Y+90 Z+50 FMAX R0
 L X+0 Y+90 Z+19 F2000
 L Y+100 RL
-CC X+0 Y+75
-C X+0 Y+50 DR+
+CC X+0 Y+75 ; circle center for tangential entry arc
+C X+0 Y+50 DR+ ; sweeps tangentially onto the contour (avoids a straight-plunge tool mark)
 L X+50
 RND R20
 L Y-50
@@ -610,8 +612,8 @@ RND R20
 L Y+50
 RND R20
 L X+10
-CC X+10 Y+75
-C X+10 Y+100 DR+
+CC X+10 Y+75 ; circle center for tangential exit arc
+C X+10 Y+100 DR+ ; sweeps tangentially off the contour
 L Z+100 FMAX R0
 ; Chamfer edge of central hole D20
 CYCL DEF 208 ;Circular Pocket Milling
@@ -649,17 +651,17 @@ CYCL DEF 208 ;Circular Pocket Milling
   Q342=+7.999 ;Pre-drilled dia. [mm]
   Q351=+1 ;Milling mode
 CALL LBL 2
-M5
-M9
+M5 ; Spindle OFF
+M9 ; Coolant OFF
 ;
 ;--------------------------------------------------
 ; T6 - Reamer D7 H7 (precision ream holes)
 ; right holes only (LBL 1)
 ;--------------------------------------------------
 TOOL CALL 6 Z S12200 F300
-TOOL DEF 7
-M3
-M8
+TOOL DEF 7 ; Pre-load tool in magazine for next TOOL CALL
+M3 ; Spindle ON — clockwise
+M8 ; Coolant ON — flood
 CYCL DEF 201 ;Reaming
   Q200=+2 ;Safety clearance [mm]
   Q201=-22 ;Depth [mm]
@@ -669,8 +671,8 @@ CYCL DEF 201 ;Reaming
   Q203=+20 ;Surface coordinate [mm]
   Q204=+50 ;2nd safety clearance [mm]
 CALL LBL 1
-M5
-M9
+M5 ; Spindle OFF
+M9 ; Coolant OFF
 ;
 ;--------------------------------------------------
 ; T7 - Tap M8 (thread tapping with chip breaking)
@@ -678,8 +680,8 @@ M9
 ; left holes only (LBL 2)
 ;--------------------------------------------------
 TOOL CALL 7 Z S350
-M3
-M8
+M3 ; Spindle ON — clockwise
+M8 ; Coolant ON — flood
 CYCL DEF 209 Q257=+11 Q256=+0 ;Tapping with Chip Breaking
   Q200=+2 ;Safety clearance [mm]
   Q201=-22 ;Thread depth [mm]
@@ -688,8 +690,8 @@ CYCL DEF 209 Q257=+11 Q256=+0 ;Tapping with Chip Breaking
   Q204=+50 ;2nd safety clearance [mm]
   Q336=+0 ;Spindle angle [deg]
 CALL LBL 2
-M5
-M9
+M5 ; Spindle OFF
+M9 ; Coolant OFF
 END PGM PROGRAM MM</textarea>
         </div>
       </div>
@@ -726,11 +728,13 @@ END PGM PROGRAM MM</textarea>
         <div id="viewTools"></div>
         <div class="view-hint" id="viewHint"></div>
 
-        <button id="pathToggle" onclick="togglePaths()" title="Show/hide toolpath" data-help="path" style="position:absolute;top:10px;left:192px;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">⛶ Path</button>
-        <button id="measureBtn" onclick="toggleMeasure()" data-help="measure" style="position:absolute;top:10px;left:10px;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">&#x25CE; Measure</button>
+        <div id="canvasTopButtons" style="position:absolute;top:10px;left:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;z-index:5;">
+          <button id="measureBtn" onclick="toggleMeasure()" data-help="measure" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">&#x25CE; Measure</button>
+          <button id="refineBtnCanvas" onclick="triggerRefine()" title="Compute high-precision mesh" style="display:none;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(74,158,255,.4);border-radius:5px;background:rgba(14,16,20,.7);color:rgba(74,158,255,.8);cursor:pointer;backdrop-filter:blur(4px);">&#x25C6; Refine</button>
+          <button id="pathToggle" onclick="togglePaths()" title="Show/hide toolpath" data-help="path" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">⛶ Path</button>
+        </div>
         <div id="simInfoPanel" style="position:absolute;top:38px;left:10px;font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.9;display:none;pointer-events:none;"></div>
         <div id="toolLegend" style="position:absolute;bottom:36px;left:10px;font-family:var(--mono);font-size:10px;background:rgba(14,16,20,.75);border:1px solid var(--border);border-radius:6px;padding:8px 12px;display:none;pointer-events:none;backdrop-filter:blur(4px);max-width:200px;"></div>
-        <button id="refineBtnCanvas" onclick="triggerRefine()" title="Compute high-precision mesh" style="display:none;position:absolute;top:10px;left:96px;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(74,158,255,.4);border-radius:5px;background:rgba(14,16,20,.7);color:rgba(74,158,255,.8);cursor:pointer;backdrop-filter:blur(4px);">&#x25C6; Refine</button>
         <div id="refineIndicator" style="display:none;position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;padding:6px 16px;border:1px solid rgba(74,158,255,.5);border-radius:20px;background:rgba(14,16,20,.85);color:rgba(74,158,255,.95);backdrop-filter:blur(4px);align-items:center;gap:8px;z-index:30;box-shadow:0 2px 12px rgba(0,0,0,.3);">
           <span id="refineSpinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(74,158,255,.3);border-top-color:rgba(74,158,255,1);border-radius:50%;animation:refine-spin 0.7s linear infinite;"></span>
           <span id="refineIndicatorText">Refining mesh&hellip;</span>
@@ -748,12 +752,9 @@ END PGM PROGRAM MM</textarea>
 </div>
 
 <footer>
-  <p class="footer-disclaimer">TNC Sim is an open-source independent Heidenhain TNC simulator — early release, bugs are expected. Results may differ from a real TNC control — never use for actual machining without verification. The 3D cut is a voxel grid — details smaller than the active cell size won't appear, even at High quality or after Refine (cells are ~1mm on Default). Desktop first, mobile friendly. · Not affiliated with HEIDENHAIN GmbH.</p>
-  <div class="footer-actions">
-    <p>TNC Sim &nbsp;·&nbsp; <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a></p>
-    <button onclick="openBugReport()" data-help="bug-report" class="ph-btn" style="white-space:nowrap;">🐛 Bug report</button>
-    <a href="https://buymeacoffee.com/slavozett" target="_blank" class="ph-btn" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;" title="Buy me a coffee">&#9749; Buy me a coffee</a>
-  </div>
+  <p>TNC Sim &nbsp;·&nbsp; <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a></p>
+  <button onclick="openBugReport()" data-help="bug-report" class="ph-btn" style="white-space:nowrap;">🐛 Bug report</button>
+  <a href="https://buymeacoffee.com/slavozett" target="_blank" class="ph-btn" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;" title="Buy me a coffee">&#9749; Buy me a coffee</a>
 </footer>
 
 <div class="cycle-overlay" id="cycleOverlay" onclick="if(event.target===this)closeCyclePicker()">
@@ -915,8 +916,18 @@ function openQPopup(lineIdx){
   var inp = document.getElementById('qPanelInput');
   if(inp){
     inp.addEventListener('keydown', function(e){
-      if(e.key==='Enter'){ e.preventDefault(); qPanelConfirm(); }
-      if(e.key==='Escape'){ closeQPopup(); }
+      if(e.key==='Enter'){ e.preventDefault(); qPanelConfirm(); return; }
+      if(e.key==='Escape'){ closeQPopup(); return; }
+      if(e.key==='-' || e.key==='+'){
+        // The input opens with its whole value selected — without this, the browser's
+        // default behavior would replace that selection with just "+"/"-", wiping the
+        // digits. Strip any existing sign and prepend the new one instead.
+        e.preventDefault();
+        var cur = inp.value.replace(/^[+-]/, '');
+        inp.value = (e.key==='-' ? '-' : '+') + cur;
+        try{ inp.setSelectionRange(inp.value.length, inp.value.length); }catch(err){}
+        return;
+      }
     });
     setTimeout(function(){ inp.focus(); inp.select(); }, 30);
   }
@@ -997,19 +1008,80 @@ var BLK_FIELDS_CYL = [
   {id:'cr',  lbl:'R',  prompt:'Radius of cylinder', key:'cr'},
 ];
 
-function openBlkFormPanel(lineText, editLineIdx){
+// Given a BLK FORM line's text and a caret offset within it, return which axis
+// letter (X/Y/Z) the click landed on/nearest to — looks only at the real value
+// tokens (X+50, not the bare "Z" axis-flag in "BLK FORM 0.1 Z X+0 Y+0 Z+0").
+function getBlkClickedAxis(lineText, posInLine){
+  var tokens=[], re=/\S+/g, m;
+  while((m=re.exec(lineText))!==null){
+    tokens.push({start:m.index, end:m.index+m[0].length, upper:m[0].toUpperCase()});
+  }
+  var valueToks = tokens.filter(function(t){ return /^[XYZ][+-]?\d/.test(t.upper); });
+  if(!valueToks.length) return null;
+  var clicked=null;
+  for(var i=0;i<valueToks.length;i++){
+    if(posInLine>=valueToks[i].start && posInLine<=valueToks[i].end){ clicked=valueToks[i]; break; }
+  }
+  if(!clicked){
+    var bestDist=Infinity;
+    valueToks.forEach(function(t){
+      var d=Math.abs(posInLine-(t.start+t.end)/2);
+      if(d<bestDist){ bestDist=d; clicked=t; }
+    });
+  }
+  return clicked.upper.charAt(0);
+}
+function openBlkFormPanel(lineText, editLineIdx, clickedAxis, clickedRole){
   // editLineIdx set => editing that existing BLK block in place; undefined => new insert at active line
+  // clickedAxis/clickedRole (optional) => jump straight to that field instead of the shape picker
+  //   clickedRole is 'first' (the 0.1 / CYLINDER line) or 'second' (the 0.2 line)
   BLK.editLine = (editLineIdx!==undefined && editLineIdx!==null) ? editLineIdx : null;
   // Read existing BLK FORM from code
   var code = codeEl.value;
-  var m1 = code.match(/BLK FORM 0\.1[^\n]*X([+-]?\d+\.?\d*)[^\n]*Y([+-]?\d+\.?\d*)[^\n]*Z([+-]?\d+\.?\d*)/i);
-  var m2 = code.match(/BLK FORM 0\.2[^\n]*X([+-]?\d+\.?\d*)[^\n]*Y([+-]?\d+\.?\d*)[^\n]*Z([+-]?\d+\.?\d*)/i);
-  if(m1){ BLK.x0=parseFloat(m1[1]); BLK.y0=parseFloat(m1[2]); BLK.z0=parseFloat(m1[3]); }
-  if(m2){ BLK.x1=parseFloat(m2[1]); BLK.y1=parseFloat(m2[2]); BLK.z1=parseFloat(m2[3]); }
-  // detect cylinder (0.1 has no Y in some syntaxes) — just default to BOX
-  BLK.shape = 'BOX';
-  BLK.step = 0;
+  var allLines = code.split('\n');
+  // Figure out the "first" line of the pair (0.1 / CYLINDER) to detect the real shape,
+  // even if the line that was clicked/edited is the second (0.2) one.
+  var firstLineIdx = BLK.editLine;
+  if(firstLineIdx!==null && /^\s*BLK FORM 0\.2/i.test(allLines[firstLineIdx]||'')){
+    firstLineIdx = firstLineIdx - 1;
+  }
+  var firstLineText = (firstLineIdx!==null && allLines[firstLineIdx]!==undefined) ? allLines[firstLineIdx] : lineText;
+  var isCyl = /^\s*BLK FORM CYLINDER/i.test(firstLineText);
+  BLK.shape = isCyl ? 'CYL' : 'BOX';
+
+  if(!isCyl){
+    var m1 = code.match(/BLK FORM 0\.1[^\n]*X([+-]?\d+\.?\d*)[^\n]*Y([+-]?\d+\.?\d*)[^\n]*Z([+-]?\d+\.?\d*)/i);
+    var m2 = code.match(/BLK FORM 0\.2[^\n]*X([+-]?\d+\.?\d*)[^\n]*Y([+-]?\d+\.?\d*)[^\n]*Z([+-]?\d+\.?\d*)/i);
+    if(m1){ BLK.x0=parseFloat(m1[1]); BLK.y0=parseFloat(m1[2]); BLK.z0=parseFloat(m1[3]); }
+    if(m2){ BLK.x1=parseFloat(m2[1]); BLK.y1=parseFloat(m2[2]); BLK.z1=parseFloat(m2[3]); }
+  } else {
+    var c1 = code.match(/BLK FORM CYLINDER[^\n]*X([+-]?\d+\.?\d*)[^\n]*Y([+-]?\d+\.?\d*)[^\n]*Z([+-]?\d+\.?\d*)/i);
+    var c2 = code.match(/BLK FORM 0\.2[^\n]*X([+-]?\d+\.?\d*)[^\n]*Y([+-]?\d+\.?\d*)[^\n]*Z([+-]?\d+\.?\d*)/i);
+    if(c1){ BLK.cx=parseFloat(c1[1]); BLK.cy=parseFloat(c1[2]); BLK.cz0=parseFloat(c1[3]); }
+    if(c2){ BLK.cr=parseFloat(c2[1]); BLK.cz1=parseFloat(c2[3]); }
+  }
   BLK.active = true;
+
+  var targetKey = null;
+  if(clickedAxis && clickedRole){
+    if(!isCyl){
+      targetKey = (clickedRole==='first')
+        ? (clickedAxis==='X'?'x0':clickedAxis==='Y'?'y0':'z0')
+        : (clickedAxis==='X'?'x1':clickedAxis==='Y'?'y1':'z1');
+    } else {
+      targetKey = (clickedRole==='first')
+        ? (clickedAxis==='X'?'cx':clickedAxis==='Y'?'cy':'cz0')
+        : ((clickedAxis==='X'||clickedAxis==='Y') ? 'cr' : 'cz1');
+    }
+  }
+  if(targetKey){
+    var fields = BLK.shape==='BOX' ? BLK_FIELDS_BOX : BLK_FIELDS_CYL;
+    var idx=-1;
+    for(var i=0;i<fields.length;i++){ if(fields[i].key===targetKey){ idx=i; break; } }
+    BLK.step = idx>=0 ? idx+1 : 0;
+  } else {
+    BLK.step = 0;
+  }
   renderBlkPanel();
 }
 
@@ -1060,6 +1132,9 @@ function renderBlkPanel(){
       crumbs += '<button class="fbar-crumb-btn'+(i===fi?' active':'')+'" onclick="BLK.step='+(i+1)+';renderBlkPanel()">'+ff.lbl+'</button>';
     });
     var isLast = fi === fields.length - 1;
+    var isEditingExisting = (BLK.editLine !== null);
+    var doneAction = isEditingExisting ? 'insertBlkForm()' : (isLast ? 'insertBlkForm()' : 'blkNextStep()');
+    var doneLabel  = isEditingExisting ? 'Done' : (isLast ? 'Insert' : 'Done');
     panel.innerHTML =
       '<div class="ctx-row1">' + crumbs
       +'<button style="font-family:var(--mono);font-size:11px;background:none;border:none;color:var(--text3);cursor:pointer;padding:2px 6px;margin-left:auto;" onclick="closeCtxPanel()">✕</button>'
@@ -1074,7 +1149,7 @@ function renderBlkPanel(){
       +' onkeydown="blkKeyDown(event)"'
       +'>'
       +'<button class="fbar-nav" onclick="blkStepRel(1)">&#9654;</button>'
-      +'<button class="fbar-done" onclick="'+(isLast?'insertBlkForm()':'blkNextStep()')+'">'+( isLast ? 'Insert' : 'Done')+'</button>'
+      +'<button class="fbar-done" onclick="'+doneAction+'">'+doneLabel+'</button>'
       +'</div>';
   }
   // focus input on mobile so keyboard appears
@@ -1114,8 +1189,13 @@ function blkRefresh(){
   var f = fields[BLK.step-1];
   if(f){ if(el.tagName==="INPUT") el.value=BLK[f.key]; else el.textContent=BLK[f.key]; }
 }
+function blkConfirmStep(){
+  // Editing an existing BLK FORM in place: Enter/Done always commits & closes,
+  // no matter which field you're on. Only the brand-new insert wizard steps through fields.
+  if(BLK.editLine !== null){ insertBlkForm(); } else { blkNextStep(); }
+}
 function blkKeyDown(e){
-  if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); e.shiftKey?blkStepRel(-1):blkNextStep(); return; }
+  if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); e.shiftKey?blkStepRel(-1):blkConfirmStep(); return; }
   if(e.key==='Escape'){ e.preventDefault(); closeCtxPanel(); return; }
   if(e.key==='-'||e.key==='+'){
     e.preventDefault();
@@ -1137,7 +1217,7 @@ document.addEventListener('keydown', function(e){
   if(!BLK.active || BLK.step < 1) return;
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||(e.target.tagName==='TEXTAREA'&&e.target!==codeEl)) return;
   if(e.key==='Escape'){ e.preventDefault(); closeCtxPanel(); return; }
-  if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); e.shiftKey?blkStepRel(-1):blkNextStep(); return; }
+  if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); e.shiftKey?blkStepRel(-1):blkConfirmStep(); return; }
   if(e.key==='ArrowRight'){ e.preventDefault(); blkStepRel(1); return; }
   if(e.key==='ArrowLeft'){ e.preventDefault(); blkStepRel(-1); return; }
   var fields = BLK.shape==='BOX' ? BLK_FIELDS_BOX : BLK_FIELDS_CYL;
@@ -1197,6 +1277,15 @@ function insertBlkForm(){
   var val = codeEl.value;
   var lines = val.split('\n');
 
+  // The line that was actually clicked/edited may be the SECOND line of the pair (0.2,
+  // e.g. clicking X1/Y1/Z1/cr/cz1) — normalize back to the first line (0.1/CYLINDER)
+  // so the in-place-edit check below still recognizes it.
+  if(editingLine !== undefined && editingLine !== null && editingLine > 0
+     && editingLine < lines.length && /^\s*BLK FORM 0\.2/i.test(lines[editingLine])
+     && /^\s*BLK FORM (0\.1|CYLINDER)/i.test(lines[editingLine-1])){
+    editingLine = editingLine - 1;
+  }
+
   // CASE 1 — editing an existing BLK FORM block in place (opened from that line).
   // Replace the 0.1/CYLINDER line and its following 0.2 line, keeping position.
   if(editingLine !== undefined && editingLine !== null && editingLine >= 0 && editingLine < lines.length
@@ -1235,15 +1324,100 @@ function insertBlkForm(){
 }
 
 var M_DEFS = [
-  {m:'M0',  desc:'Program stop (press Run to continue)'},
-  {m:'M3',  desc:'Spindle ON — clockwise'},
-  {m:'M4',  desc:'Spindle ON — counter-clockwise'},
-  {m:'M5',  desc:'Spindle OFF'},
-  {m:'M7',  desc:'Coolant ON — mist'},
-  {m:'M8',  desc:'Coolant ON — flood'},
-  {m:'M9',  desc:'Coolant OFF'},
-  {m:'M30', desc:'End of program'},
+  {m:'M0',   desc:'Program stop (press Run to continue)'},
+  {m:'M1',   desc:'Optional program stop (only if Single Block / opt. stop is active)'},
+  {m:'M2',   desc:'Program end — same as M30 (legacy)'},
+  {m:'M3',   desc:'Spindle ON — clockwise'},
+  {m:'M4',   desc:'Spindle ON — counter-clockwise'},
+  {m:'M5',   desc:'Spindle OFF'},
+  {m:'M6',   desc:'Tool change'},
+  {m:'M7',   desc:'Coolant ON — mist'},
+  {m:'M8',   desc:'Coolant ON — flood'},
+  {m:'M9',   desc:'Coolant OFF'},
+  {m:'M13',  desc:'Spindle ON clockwise + Coolant ON'},
+  {m:'M14',  desc:'Spindle ON counter-clockwise + Coolant ON'},
+  {m:'M30',  desc:'End of program'},
+  {m:'M89',  desc:'Vacant function / modal cycle call (machine-dependent)'},
+  {m:'M91',  desc:'Coordinates referenced to machine datum, not workpiece origin'},
+  {m:'M92',  desc:'Coordinates referenced to machine-builder reference point (e.g. tool change position)'},
+  {m:'M94',  desc:'Reduce rotary axis display to a value below 360°'},
+  {m:'M97',  desc:'Machine small contour steps cleanly'},
+  {m:'M98',  desc:'Machine open contour corners completely'},
+  {m:'M99',  desc:'Blockwise (non-modal) cycle call'},
+  {m:'M101', desc:'Auto tool change with replacement tool when tool life expires'},
+  {m:'M102', desc:'Reset M101'},
+  {m:'M103', desc:'Reduce feed rate during plunging, by factor F (%)'},
+  {m:'M104', desc:'Reactivate the last-defined datum'},
+  {m:'M105', desc:'Machining with the 2nd kv (servo gain) factor'},
+  {m:'M106', desc:'Machining with the 1st kv (servo gain) factor'},
+  {m:'M107', desc:'Suppress error message for oversized replacement tools'},
+  {m:'M108', desc:'Reset M107'},
+  {m:'M109', desc:'Constant contouring speed at tool cutting edge — increase & decrease feed'},
+  {m:'M110', desc:'Constant contouring speed at tool cutting edge — decrease feed only'},
+  {m:'M111', desc:'Reset M109/M110'},
+  {m:'M112', desc:'Round contour transitions within tolerance'},
+  {m:'M113', desc:'Reset M112'},
+  {m:'M114', desc:'Auto-compensate machine geometry when working with tilted axes'},
+  {m:'M115', desc:'Reset M114'},
+  {m:'M116', desc:'Rotary axis feed rate in mm/min instead of °/min'},
+  {m:'M117', desc:'Reset M116'},
+  {m:'M118', desc:'Superimpose handwheel positioning during program run'},
+  {m:'M120', desc:'Look-ahead — precalculate radius-compensated contour'},
+  {m:'M124', desc:'Contour filter — smooth small irregularities'},
+  {m:'M126', desc:'Shortest-path traverse of rotary axes'},
+  {m:'M127', desc:'Reset M126'},
+  {m:'M128', desc:'TCPM — keep tool-tip position when positioning tilted axes'},
+  {m:'M129', desc:'Reset M128'},
+  {m:'M130', desc:'Move to position in untilted system with tilted working plane'},
+  {m:'M134', desc:'Exact stop at non-tangential contour transitions with rotary axes'},
+  {m:'M135', desc:'Reset M134'},
+  {m:'M136', desc:'Feed rate F in mm per spindle revolution'},
+  {m:'M137', desc:'Reset M136'},
+  {m:'M138', desc:'Select which axes M128/M114 act on'},
+  {m:'M140', desc:'Retract from contour along the tool axis'},
+  {m:'M141', desc:'Suppress touch-probe monitoring'},
+  {m:'M142', desc:'Delete modal program information'},
+  {m:'M143', desc:'Delete basic rotation'},
+  {m:'M144', desc:'Compensate machine kinematics in ACTUAL/NOMINAL position at block end'},
+  {m:'M145', desc:'Reset M144'},
+  {m:'M148', desc:'Auto-retract tool from contour at an NC stop'},
+  {m:'M149', desc:'Reset M148'},
+  {m:'M150', desc:'Suppress limit-switch message'},
+  {m:'M200', desc:'Laser cutting — output programmed voltage directly'},
+  {m:'M201', desc:'Laser cutting — output voltage as a function of distance'},
+  {m:'M202', desc:'Laser cutting — output voltage as a function of speed'},
+  {m:'M203', desc:'Laser cutting — output voltage as a function of time (ramp)'},
+  {m:'M204', desc:'Laser cutting — output voltage as a function of time (pulse)'},
 ];
+
+// Popup listing every M function we have defined (the full M_DEFS table above) —
+// purely a reference list, opened from the "M list" toolbar button.
+function openMCodesList(){
+  var old = document.getElementById('_mCodesOverlay');
+  if(old){ old.remove(); return; }
+
+  var overlay = document.createElement('div');
+  overlay.id = '_mCodesOverlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:99998;display:flex;align-items:center;justify-content:center;';
+
+  var rows = M_DEFS.map(function(d){
+    return '<div style="display:flex;gap:14px;padding:8px 20px;border-bottom:1px solid rgba(255,255,255,.06);">'
+      +'<span style="font-family:var(--mono);font-size:12px;color:var(--accent3);width:46px;flex-shrink:0;">'+d.m+'</span>'
+      +'<span style="font-family:var(--mono);font-size:12px;color:var(--text2);">'+d.desc+'</span>'
+      +'</div>';
+  }).join('');
+
+  overlay.innerHTML = '<div style="background:var(--surface2);border-radius:14px;width:90%;max-width:460px;max-height:75vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.5);">'
+    +'<div style="position:sticky;top:0;background:var(--surface2);padding:14px 20px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;">'
+    +'<span>All defined M functions ('+M_DEFS.length+')</span>'
+    +'<button onclick="document.getElementById(\'_mCodesOverlay\').remove()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0 4px;">\u2715</button>'
+    +'</div>'
+    +rows
+    +'</div>';
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
 
 // ── Q parameter panel ────────────────────────────────────────────
 var QP = { num:'1', op:'=', val:'', fn:'', step:0 };
@@ -1445,15 +1619,15 @@ var HELP_MAP = {
   'tt-T':       {title:'T — Tool number', desc:'Tool number used in TOOL CALL. The currently active tool (selected by the last TOOL CALL in the program) is highlighted with ▶.', ex:'TOOL CALL 1 Z S3000 F800'},
   'tt-NAME':    {title:'NAME — Tool name', desc:'A short identifying label for the tool, e.g. END_MILL_D10. Max 16 characters, no spaces. Purely descriptive — not used by the NC program itself.', ex:''},
   'tt-L':       {title:'L — Tool length (mm)', desc:'Distance from the spindle gauge line to the tool tip. Used for Z-axis length compensation.', ex:''},
-  'tt-R':       {title:'R — Tool radius (mm)', desc:'Cutting radius = diameter / 2. This is the radius used for RL/RR radius compensation and for the basic cylindrical cutting shape.', ex:''},
+  'tt-R':       {title:'R — Tool radius (mm)', desc:'Cutting radius = diameter / 2. Used for RL/RR radius compensation and the basic cylindrical cutting shape. CHAMFER / COUNTERSINK tools: set R near 0 (e.g. 0.001) — the tool tip is the reference point and the DR value in TOOL CALL carries the working offset, exactly like on a real control.', ex:''},
   'tt-R2':      {title:'R2 — Corner radius (mm)', desc:'Radius of the rounded cutting corner (toroidal / ball-nose cutter). 0 = flat end mill. R2 = R makes a full ball-nose cutter.', ex:''},
   'tt-DL':      {title:'DL — Length oversize (mm)', desc:'Delta value added to the tool length L. Positive = tool cuts shallower, negative = tool cuts deeper. Used for wear / length compensation in TOOL CALL.', ex:'TOOL CALL 1 Z S3000 F800 DL-0.2'},
-  'tt-DR':      {title:'DR — Radius oversize (mm)', desc:'Delta value added to the tool radius R. Positive = oversize (cuts wider), negative = undersize (cuts narrower). Commonly used for finishing passes.', ex:'TOOL CALL 1 Z S3000 F800 DR+0.1'},
+  'tt-DR':      {title:'DR — Radius oversize (mm)', desc:'Delta value added to the tool radius R. Positive = oversize (cuts wider), negative = undersize (cuts narrower). Commonly used for finishing passes. For a chamfer tool (R\u22480) this is the value that positions the cutting edge against the contour.', ex:'TOOL CALL 1 Z S3000 F800 DR+0.1'},
   'tt-DR2':     {title:'DR2 — R2 oversize (mm)', desc:'Delta value added to the corner radius R2 — the same idea as DR, but for the rounded corner of a toroidal / ball-nose cutter.', ex:''},
   'tt-CUT':     {title:'CUT — Number of teeth', desc:'Number of cutting edges (flutes) on the tool. Used for chip-load style calculations; it does not change the cut geometry in the simulator.', ex:''},
-  'tt-LCUTS':   {title:'LCUTS — Tooth length (mm)', desc:'Cutting edge length along the tool axis — how far up the flutes actually cut. Limits how deep this tool can plunge before the shank would rub. Used e.g. in pocket-roughing cycles. Shown auto-computed (greyed out) for ball-nose and conical tools.', ex:''},
+  'tt-LCUTS':   {title:'LCUTS — Tooth length (mm)', desc:'Cutting-edge length along the tool axis — how far up the flutes actually cut. CHAMFER / COUNTERSINK tools (T-ANGLE > 0): LCUTS is the cone height and SETS the tool size — the cone\u2019s widest diameter = 2\u00d7LCUTS\u00d7tan(T-ANGLE/2). E.g. a 90\u00b0 tool with LCUTS 10 reaches \u230020 mm. A full ball-nose auto-uses R2.', ex:''},
   'tt-ANGLE':   {title:'ANGLE — Max ramp angle (°)', desc:'Maximum plunge / ramp-in angle for cycles like CYCL DEF 208 (bore milling). A standard end mill is around 3°; a drill can use 90° (straight plunge).', ex:''},
-  'tt-TANGLE':  {title:'T-ANGLE — Tool point angle (°)', desc:'Full included angle of a pointed tool tip — e.g. a drill is 118°, a center drill 142°, a countersink 90°. 0 disables the conical tip (flat end mill / ball nose).', ex:''},
+  'tt-TANGLE':  {title:'T-ANGLE — Tool point angle (°)', desc:'Full included angle of a pointed tool tip — drill 118°, center drill 142°, countersink/chamfer 90°. 0 disables the conical tip (flat end mill / ball nose). For chamfer & countersink tools set this to the real tool angle and use LCUTS to set the diameter; keep R near 0.', ex:''},
   'tt-TL':      {title:'TL — Tool locked', desc:'When set, this tool is locked and cannot be selected by TOOL CALL — useful for marking a broken or unavailable tool.', ex:''},
   'tt-RT':      {title:'RT — Replacement tool', desc:'Tool number of a twin / sister tool that should be swapped in automatically if this tool is locked or reaches its tool-life limit. 0 = no replacement.', ex:''},
   'tt-TIME2':   {title:'TIME2 — Tool life limit (min)', desc:'Maximum allowed cutting time for this tool before it should be replaced. Compared against CUR.TIME, the time accumulated so far.', ex:''},
@@ -1534,64 +1708,108 @@ function openMPanelEdit(lineIdx){
   _mEditLine = lineIdx;
   openMPanel();
 }
+// Look up the known description for an M code (e.g. 'M3' -> 'Spindle ON — clockwise'), or null.
+function _mDescFor(code){
+  var up = String(code).toUpperCase();
+  for(var i=0;i<M_DEFS.length;i++){ if(M_DEFS[i].m===up) return M_DEFS[i].desc; }
+  return null;
+}
+// M codes shown in the panel dropdown — the ones actually used on a 3-axis mill.
+// (M_DEFS above stays the full reference table — it's still used to look up a
+// description for whatever custom/non-standard M the person types by hand.)
+var M_PANEL_CODES = ['M0','M3','M4','M5','M7','M8','M9','M30'];
+
 function openMPanel(){
   var panel = document.getElementById('ctxPanel');
   panel.style.height = '';
-  var pick = (_mEditLine >= 0)
-    ? 'closeCtxPanel();_replaceMOnLine(\'%M%\');'   // edit mode: replace M on the tapped line
-    : 'exitFieldMode(true);closeCtxPanel();insertKey(\'%M%\');'; // insert mode
-  var btns = M_DEFS.map(function(d){
-    return '<button onclick="'+pick.replace(/%M%/g,d.m)+'" style="font-family:var(--mono);font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--accent3);cursor:pointer;white-space:nowrap;" title="'+d.desc+'">'+d.m+'</button>';
+  var panelDefs = M_PANEL_CODES.map(function(c){
+    return M_DEFS.filter(function(d){ return d.m===c; })[0];
+  }).filter(Boolean);
+
+  // Editing an existing line: preselect it in the dropdown if it's one of the curated
+  // codes, otherwise drop it into the manual field (it's a non-standard M).
+  var curCode = null;
+  if(_mEditLine >= 0){
+    var lines = codeEl.value.split('\n');
+    var cm = (lines[_mEditLine]||'').match(/^\s*(M\d+)/i);
+    curCode = cm ? cm[1].toUpperCase() : null;
+  }
+  var curInPanel = curCode && M_PANEL_CODES.indexOf(curCode) >= 0;
+  var curNum = (curCode && !curInPanel) ? curCode.replace(/^M/i,'') : '';
+
+  var opts = '<option value="">— Select M function —</option>' + panelDefs.map(function(d){
+    return '<option value="'+d.m+'"'+(curInPanel && d.m===curCode?' selected':'')+'>'+d.m+' — '+d.desc+'</option>';
   }).join('');
+
   panel.innerHTML =
     '<div class="ctx-row1">'
     +'<span style="font-family:var(--mono);font-size:11px;color:var(--text2);">M function</span>'
-    +'<button onclick="toggleMDesc()" style="font-family:var(--mono);font-size:10px;padding:2px 7px;border:1px solid var(--border);border-radius:4px;background:none;color:var(--text3);cursor:pointer;margin-left:6px;" title="Show descriptions">?</button>'
     +'<button style="margin-left:auto;font-family:var(--mono);font-size:11px;background:none;border:none;color:var(--text3);cursor:pointer;padding:2px 6px;" onclick="closeCtxPanel()">&#10005;</button>'
     +'</div>'
-    +'<div style="display:flex;flex-wrap:wrap;gap:5px;padding:4px 0 2px;" id="mBtnRow">'
-    +btns
+    +'<div class="ctx-row2" style="flex-direction:column;align-items:stretch;gap:6px;">'
+    +'<select id="mPicker" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:5px 8px;cursor:pointer;" onchange="if(this.value){document.getElementById(\'mCustomInput\').value=this.value.replace(/^M/i,\'\');} _mManualDescUpdate();">'
+    +opts
+    +'</select>'
     +'<div style="display:flex;align-items:center;gap:4px;">'
     +'<span style="font-family:var(--mono);font-size:11px;color:var(--text3);">M</span>'
-    +'<input id="mCustomInput" type="text" inputmode="numeric" placeholder="…" style="width:60px;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;outline:none;" onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v){closeCtxPanel();_mCommit(\'M\'+v);}}">'
-    +'<button class="fbar-done" onclick="var v=document.getElementById(\'mCustomInput\').value.trim();if(v){closeCtxPanel();_mCommit(\'M\'+v);}">'+(_mEditLine>=0?'OK':'Insert')+'</button>'
+    +'<input id="mCustomInput" type="text" inputmode="numeric" placeholder="…" value="'+curNum+'" style="width:60px;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;outline:none;" oninput="_mManualDescUpdate()" onkeydown="if(event.key===\'Enter\'){event.preventDefault();_mPanelConfirm();}">'
+    +'<button class="fbar-done" onclick="_mPanelConfirm()">'+(_mEditLine>=0?'Done':'Insert')+'</button>'
     +'</div>'
-    +'</div>'
-    +'<div id="mDescPanel" style="display:none;padding:4px 0 2px;font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.8;"></div>';
-  setTimeout(function(){ var i=document.getElementById('mCustomInput'); if(i) i.focus(); }, 30);
+    +'<span id="mManualDesc" style="font-family:var(--mono);font-size:11px;color:var(--text3);min-height:14px;"></span>'
+    +'</div>';
+  setTimeout(function(){ var i=document.getElementById('mCustomInput'); if(i){ i.focus(); } _mManualDescUpdate(); }, 30);
 }
 
-// Commit an M from the custom input — replace in edit mode, insert otherwise.
+// Keep the description line in sync with whatever M number is currently in the manual
+// field (typing) or was just picked from the dropdown — looks up the full M_DEFS table,
+// so it also resolves descriptions for codes outside the curated panel list.
+function _mManualDescUpdate(){
+  var input = document.getElementById('mCustomInput');
+  var descEl = document.getElementById('mManualDesc');
+  if(!input || !descEl) return;
+  var v = input.value.trim();
+  if(!v){ descEl.textContent = ''; return; }
+  var desc = _mDescFor('M'+v.replace(/^M/i,''));
+  descEl.textContent = desc ? desc : 'Unknown M function';
+}
+
+// Resolve the panel's current value — manual input wins if it has something typed,
+// otherwise fall back to whatever's selected in the dropdown — then commit it.
+function _mPanelConfirm(){
+  var picker = document.getElementById('mPicker');
+  var input  = document.getElementById('mCustomInput');
+  var v = (input && input.value.trim()) ? input.value.trim().replace(/^M/i,'') : (picker && picker.value ? picker.value.replace(/^M/i,'') : '');
+  if(!v) return;
+  closeCtxPanel();
+  _mCommit('M'+v);
+}
+// Commit an M code — replace in edit mode, insert otherwise. Looks up a description
+// in the full M_DEFS table (covers both the curated panel codes and any custom M).
 function _mCommit(code){
   if(_mEditLine >= 0){ _replaceMOnLine(code); }
-  else { exitFieldMode(true); insertKey(code); }
+  else {
+    exitFieldMode(true);
+    var desc = _mDescFor(code);
+    insertKey(desc ? code+' ; '+desc : code);
+  }
 }
-// Replace the M command on the currently-edited line, preserving any trailing comment.
+// Replace the M command on the currently-edited line.
+// - Known description for the new code → comment is always rewritten to match it
+//   (that's the point of picking an M here — the comment should describe the M you end up with).
+// - Unknown/custom new code → leave whatever comment was there (nothing better to put).
 function _replaceMOnLine(code){
   if(_mEditLine < 0) return;
   _undoPush();
   var lines = codeEl.value.split('\n');
   var orig = lines[_mEditLine] || '';
   var ci = orig.indexOf(';');
-  var comment = ci>=0 ? ' '+orig.slice(ci) : '';
-  lines[_mEditLine] = code + comment;
+  var comment = ci>=0 ? orig.slice(ci) : '';
+  var newDesc = _mDescFor(code);
+  if(newDesc){ comment = '; ' + newDesc; }
+  lines[_mEditLine] = code + (comment ? ' '+comment : '');
   codeEl.value = lines.join('\n');
   _mEditLine = -1;
   dirty=true; updateLineNums(); runValidation();
-}
-
-function toggleMDesc(){
-  var dp = document.getElementById('mDescPanel');
-  var panel = document.getElementById('ctxPanel');
-  if(!dp) return;
-  if(dp.style.display==='none'){
-    dp.innerHTML = M_DEFS.map(function(d){ return '<span style="color:var(--accent3);">'+d.m+'</span> — '+d.desc; }).join('<br>');
-    dp.style.display='';
-    if(panel) panel.style.height='auto';
-  } else {
-    dp.style.display='none';
-    if(panel) panel.style.height='';
-  }
 }
 
 function openCyclePicker(){
@@ -2133,10 +2351,15 @@ function renderToolForm(num){
       var _r  = isNew?5:(t.R||5);
       var _r2 = isNew?0:(t.R2||0);
       if(_ta > 0){
-        // chamfer: show computed value, read-only
+        // Cone (chamfer/countersink/drill): like a real control, R is ~0 (tip
+        // reference) and LCUTS = cutting-edge height. The cone's widest
+        // diameter is derived from LCUTS and T-ANGLE: Ø = 2·LCUTS·tan(angle/2).
+        // So LCUTS stays editable — it's how you set the tool's real size.
         var _h2 = (_ta/2)*Math.PI/180;
-        var _lc = Math.round(_r/Math.tan(_h2)*100)/100;
-        return '<div class="tool-field"><label>LCUTS — Tooth length</label><span style="font-family:var(--mono);font-size:12px;color:var(--text2);">'+_lc+' mm <span style="color:var(--text3);font-size:10px;">(auto: cone height)</span></span></div>';
+        var _lcVal = isNew?5:(t.LCUTS||5);
+        var _dia = (2*_lcVal*Math.tan(_h2));
+        return field('LCUTS', 'LCUTS — Tooth length (cone height)', _lcVal, 'number',
+          'Cutting-edge height of the cone. With R\u22480 (tip reference) and T-ANGLE set, the cone\u2019s widest diameter = 2\u00d7LCUTS\u00d7tan(T-ANGLE/2). For this tool: \u2300'+(_dia.toFixed(2))+' mm at full depth. Set R near 0 (e.g. 0.001) so DR in TOOL CALL carries the offset.', '0.1');
       } else if(_r2>0 && _r2>=_r){
         // ball nose: show R2, read-only
         return '<div class="tool-field"><label>LCUTS — Tooth length</label><span style="font-family:var(--mono);font-size:12px;color:var(--text2);">'+_r2+' mm <span style="color:var(--text3);font-size:10px;">(auto: ball radius)</span></span></div>';
@@ -2184,18 +2407,15 @@ function toolSave(oldNum){
   var CUT    = pInt(document.getElementById('tf_CUT').value)||2;
   var ANGLE   = pFloat(document.getElementById('tf_ANGLE').value)||3;
   var T_ANGLE = pFloat(document.getElementById('tf_T_ANGLE').value)||0;
-  // LCUTS is a real <input> only for flat-ish tools — renderToolForm shows a
-  // read-only computed <span> instead (no tf_LCUTS element) for cone and
-  // full-ball-nose tools, since those auto-calculate it below anyway.
+  // LCUTS: editable <input> for flat AND cone tools (renderToolForm renders a
+  // real input for both). For cone tools LCUTS = cone cutting-edge height and
+  // defines the cone's widest diameter (2·LCUTS·tan(angle/2)) — same as a real
+  // control — so we keep the user's value. Only a full ball nose auto-derives
+  // it (= R2), where the form shows a read-only span (no tf_LCUTS element).
   var _lcutsEl = document.getElementById('tf_LCUTS');
   var LCUTS  = _lcutsEl ? (pFloat(_lcutsEl.value)||0) : 0;
-  // Auto-calculate LCUTS based on tool type
-  if(T_ANGLE > 0){
-    // Chamfer/drill: LCUTS = height of cone = R / tan(halfAngle)
-    var _half = (T_ANGLE/2) * Math.PI/180;
-    LCUTS = Math.round((R / Math.tan(_half)) * 1000) / 1000;
-  } else if(R2 > 0 && R2 >= R){
-    // Full ball nose: LCUTS = R2
+  if(!_lcutsEl && R2 > 0 && R2 >= R){
+    // Full ball nose: LCUTS = R2 (form had no editable field for it)
     LCUTS = R2;
   }
   var TL     = document.getElementById('tf_TL').checked;
@@ -2310,7 +2530,7 @@ function renderToolsTab(){
   var activeNum = m ? parseInt(m[1]) : 0;
 
   var html = '';
-  html += '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:12px;">Select a tool to edit, or click <b style=\"color:var(--text2);\">+ Add tool</b> to create a new one. Click <b style=\"color:var(--text2);\">? Help</b> above, then any column header, for an explanation.</div>';
+  html += '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:12px;">Select a tool to edit, or click <b style=\"color:var(--text2);\">+ Add tool</b> to create a new one. Click <b style=\"color:var(--text2);\">? Help</b> above, then any column header, for an explanation.<br><span style="color:var(--text3);">Chamfer / countersink tools: set <b style=\"color:var(--text2);\">R\u22480.001</b> (tip reference), <b style=\"color:var(--text2);\">T-ANGLE</b> = real tool angle, and <b style=\"color:var(--text2);\">LCUTS</b> = cone height — the widest \u00d8 = 2\u00d7LCUTS\u00d7tan(T-ANGLE/2). The working offset comes from <b style=\"color:var(--text2);\">DR</b> in TOOL CALL.</span></div>';
   html += '<div>';
 
   // Left: table
@@ -2357,11 +2577,12 @@ function renderToolsTab(){
     html += '</tr>';
   });
   html += '</tbody></table>';
-  html += '<br><div style="display:flex;gap:8px;margin-top:4px;">'
+  html += '<br><div style="display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap;">'
     +'<button class="tool-act-btn" style="font-size:10px;padding:4px 12px;" onclick="toolEdit(null)">+ Add tool</button>'
     +'<button class="tool-act-btn" style="font-size:10px;padding:4px 10px;" onclick="toolTableExport()" title="Export as .tnt JSON">&#8595; Export</button>'
     +'<button class="tool-act-btn" style="font-size:10px;padding:4px 10px;" onclick="toolTableImport()" title="Import .tnt JSON">&#8593; Import</button>'
     +'<input type="file" id="toolImportInput" accept="application/json,text/plain,.json,.tnt,.txt" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onToolImportFile(event)">'
+    +'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">Export / Import is for this simulator only — it saves the table as a .tnt JSON file, not a real control tool table.</span>'
     +'</div>';
   html += '</div>';
 
@@ -2388,6 +2609,9 @@ function highlightActiveLine(lineIdx){
 
 function hasErrors(){ for(var i=0;i<problemsData.length;i++){ if(problemsData[i].sev==='err') return true; } return false; }
 
+// Fixed description for TOOL DEF — same text regardless of which tool number is picked.
+var TOOL_DEF_DESC = 'Pre-load tool in magazine for next TOOL CALL';
+
 function insertToolDef(){
   var code = codeEl.value;
   var pos = codeEl.selectionStart;
@@ -2398,7 +2622,7 @@ function insertToolDef(){
   var nextTool = null;
   for(var i=0;i<sorted.length;i++){ if(sorted[i].T > currentT){ nextTool = sorted[i]; break; } }
   if(!nextTool && sorted.length) nextTool = sorted[0];
-  var defaultT = nextTool ? nextTool.T : 2;
+  var defaultT = nextTool ? nextTool.T : null;
 
   var panel = document.getElementById('ctxPanel');
   var opts = sorted.map(function(t){
@@ -2413,18 +2637,19 @@ function insertToolDef(){
     +'</div>'
     +'<div class="ctx-row2">'
     +'<span class="fbar-label" style="color:var(--text3);font-size:11px;">Pre-load tool:</span>'
-    +(opts ? '<select id="toolDefPicker" style="flex:1;font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;">'+opts+'</select>'
-           : '<span class="fbar-val" id="toolDefVal">'+defaultT+'</span>')
-    +'<button class="fbar-done" onclick="confirmToolDef()">Insert</button>'
+    +(sorted.length
+        ? '<select id="toolDefPicker" style="flex:1;font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;">'+opts+'</select>'
+        : '<span style="font-family:var(--mono);font-size:11px;color:var(--text3);flex:1;">No tools in Tool Table yet</span>')
+    +'<button class="fbar-done" onclick="confirmToolDef()"'+(sorted.length?'':' disabled')+'>Insert</button>'
     +'</div>';
 }
 
 function confirmToolDef(){
   var picker = document.getElementById('toolDefPicker');
-  var valEl  = document.getElementById('toolDefVal');
-  var t = picker ? picker.value : (valEl ? valEl.textContent : '2');
+  var t = picker ? picker.value : '';
   closeCtxPanel();
-  insertKey('TOOL DEF '+t);
+  if(!t) return;
+  insertKey('TOOL DEF '+t+' ; '+TOOL_DEF_DESC);
 }
 
 // Edit an existing TOOL DEF line in place (tapped in the editor)
@@ -2447,20 +2672,20 @@ function openToolDefEdit(lineIdx){
     +'</div>'
     +'<div class="ctx-row2">'
     +'<span class="fbar-label" style="color:var(--text3);font-size:11px;">Pre-load tool:</span>'
-    +(opts ? '<select id="toolDefPicker" style="flex:1;font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;">'+opts+'</select>'
-           : '<input id="toolDefVal" type="text" inputmode="numeric" value="'+(curT||'')+'" style="width:60px;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;outline:none;">')
-    +'<button class="fbar-done" onclick="confirmToolDefEdit()">OK</button>'
+    +(sorted.length
+        ? '<select id="toolDefPicker" style="flex:1;font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;">'+opts+'</select>'
+        : '<span style="font-family:var(--mono);font-size:11px;color:var(--text3);flex:1;">No tools in Tool Table yet</span>')
+    +'<button class="fbar-done" onclick="confirmToolDefEdit()"'+(sorted.length?'':' disabled')+'>Done</button>'
     +'</div>';
 }
 function confirmToolDefEdit(){
   if(_toolDefEditLine < 0){ closeCtxPanel(); return; }
   var picker = document.getElementById('toolDefPicker');
-  var valEl  = document.getElementById('toolDefVal');
-  var t = picker ? picker.value : (valEl ? valEl.value.trim() : '');
+  var t = picker ? picker.value : '';
   if(!t){ closeCtxPanel(); return; }
   _undoPush();
   var lines = codeEl.value.split('\n');
-  lines[_toolDefEditLine] = (lines[_toolDefEditLine]||'').replace(/TOOL DEF\s+\d+/i, 'TOOL DEF '+t);
+  lines[_toolDefEditLine] = 'TOOL DEF '+t+' ; '+TOOL_DEF_DESC;
   codeEl.value = lines.join('\n');
   _toolDefEditLine = -1;
   closeCtxPanel();
@@ -2708,6 +2933,29 @@ function toggleTheme(){
 }
 _applyThemeUI(document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark');
 
+// About popup — shows the disclaimer text, opened from the "About" button next to the theme toggle.
+function openAboutPopup(){
+  var old = document.getElementById('_aboutOverlay');
+  if(old){ old.remove(); return; }
+
+  var overlay = document.createElement('div');
+  overlay.id = '_aboutOverlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+  overlay.innerHTML = '<div style="background:var(--surface2);border-radius:14px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.5);">'
+    +'<div style="padding:14px 20px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--text2);display:flex;justify-content:space-between;align-items:center;">'
+    +'<span>About TNC Sim</span>'
+    +'<button onclick="document.getElementById(\'_aboutOverlay\').remove()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0 4px;">\u2715</button>'
+    +'</div>'
+    +'<div style="padding:16px 20px;font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.7;">'
+    +'TNC Sim is an open-source independent Heidenhain TNC simulator \u2014 early release, bugs are expected. Results may differ from a real TNC control \u2014 never use for actual machining without verification. The 3D cut is a voxel grid \u2014 details smaller than the active cell size won\u2019t appear, even at High quality or after Refine (cells are ~1mm on Default). Desktop first, mobile friendly. \u00b7 Not affiliated with HEIDENHAIN GmbH.'
+    +'</div>'
+    +'</div>';
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
 // ---------- DOM ----------
 var codeEl = document.getElementById('code');
 var DEFAULT_CODE = codeEl ? codeEl.value : '';
@@ -2719,7 +2967,7 @@ var DEMO_PROGRAMS = [
   { name: 'Complete Part', code: DEFAULT_CODE },
   { name: 'Angle Mill', code: 'BEGIN PGM PROGRAM MM\n; Angle Mill - 30deg ramp, two passes\n; T1: end mill roughs a 22-step staircase approximating the ramp (X=Q2 0..21, Z=Q1),\n;     DL+0.2 leaves 0.2mm stock on the face for finishing.\n; T2: ball nose (R2=4) reuses the SAME staircase macro. DL-0.536 DR-2 shift the ball\n;     tip/center so it is exactly tangent to the ideal 30deg plane at each step\n;     (no gouge, no leftover stock) - see DL=-R2*(1-cos A), DR=-R2*(1-sin A).\n; Note: the milled surface still looks stepped/staircase in the 3D view because of\n;     the simulation resolution limit (voxel grid size), not the toolpath itself.\nBLK FORM 0.1 Z X+0.5 Y+0 Z+0\nBLK FORM 0.2 X+50 Y+50 Z+20\nCALL LBL 0\nTOOL CALL 1 Z S10000 F5000 DL+0.2   ; T1 end mill - roughing pass\nM8\nM3\nQ1=+10   ; Z start depth\nQ2=+0    ; X start position\nL X-10 Y-10 Z+40 FMAX R0\nLBL 1                                ; one ramp step: plunge, cut across Y, retract, return\nL X+Q2 Y-10 Z+Q1 FMAX RL\nL Y+60\nL Z+40 FMAX R0\nL Y-10 FMAX\nQ1 = Q1+0,5774   ; tan(30deg) Z step -> exact 30deg slope\nQ2 = Q2+1        ; 1mm X step\nLBL 0\nCALL LBL 1 REP 21                    ; 22 steps total (X=0..21)\nTOOL CALL 2 Z S2000 F5000 DL-0.536 DR-2   ; T2 ball nose - contact-point corrected finishing pass\nM3\nM8\nL X-10 Y-10 Z+40 FMAX R0\nQ1=+10\nQ2=+0\nCALL LBL 1 REP 21\nEND PGM PROGRAM MM' }
 ];
-var _currentDemoIdx = -1;
+var _currentDemoIdx = 0; // textarea starts out as DEMO_PROGRAMS[0] ("Complete Part")
 function loadDemo(idx){
   idx = parseInt(idx);
   if(isNaN(idx) || idx < 0 || idx >= DEMO_PROGRAMS.length) return;
@@ -2925,7 +3173,7 @@ function editorReset(){
   _editorConfirm('Reset to default program?', function(){
     _undoPush();
     codeEl.value = DEFAULT_CODE;
-    _currentDemoIdx = -1;
+    _currentDemoIdx = 0; // DEFAULT_CODE is the "Complete Part" demo's code
     dirty=true; updateLineNums(); runValidation();
     renderIdlePanel();
   });
@@ -3582,10 +3830,15 @@ function enterFieldModeOnLine(info){
   closeQPopup();
   // Snapshot for undo — one snapshot per field-editing session
   if(codeEl && (_undoStack.length===0 || _undoStack[_undoStack.length-1]!==codeEl.value)) _undoPush();
-  // BLK FORM lines: open BLK wizard instead of fbar (pass line index for in-place edit)
+  // BLK FORM lines: open BLK wizard instead of fbar (pass line index for in-place edit),
+  // jumping straight to the field that was clicked (same as clicking an X/Y/Z on any other line).
   if(/^BLK FORM/i.test(info.lineText.trim())){
     var _blkLineIdx = codeEl.value.slice(0, info.lineStart).split('\n').length - 1;
-    openBlkFormPanel(info.lineText.trim(), _blkLineIdx);
+    var _blkLineTrim = info.lineText.trim();
+    var _blkRole = /^BLK FORM 0\.2/i.test(_blkLineTrim) ? 'second' : 'first';
+    var _blkPosInLine = codeEl.selectionStart - info.lineStart;
+    var _blkAxis = getBlkClickedAxis(info.lineText, _blkPosInLine);
+    openBlkFormPanel(_blkLineTrim, _blkLineIdx, _blkAxis, _blkRole);
     return;
   }
   var schema=BUILDERS[info.builderKey];
@@ -3940,18 +4193,29 @@ codeEl.addEventListener('click', function(){
   }
 
   // Tap ON the token → open the right editor for this line type.
-  // BLK FORM → blank-size wizard
+  // BLK FORM → blank-size wizard, jump straight to the tapped field
   if(/^BLK FORM/.test(lt)){
-    openBlkFormPanel(lineText.trim(), lineIdxNow);
+    var _blkRoleM = /^BLK FORM 0\.2/i.test(lt) ? 'second' : 'first';
+    var _blkAxisM = getBlkClickedAxis(lineText, posInLine);
+    openBlkFormPanel(lineText.trim(), lineIdxNow, _blkAxisM, _blkRoleM);
     return;
   }
   // M function line (M, M3, M8, M0 …) → M picker (edit in place)
   if(/^M\d*(\s|$|\/)/.test(lt) || lt==='M'){
     if(typeof openMPanelEdit==='function'){ openMPanelEdit(lineIdxNow); return; }
   }
-  // TOOL DEF → open the tool picker to change the tool number
+  // TOOL DEF → open the tool picker. Same model as CALL LBL and the other builder
+  // commands below: a click anywhere on the command text opens the editor. We also
+  // explicitly highlight the command text here (same mechanism selectField uses for
+  // CALL LBL) so the native caret can't just sit blinking wherever was clicked.
   if(/^TOOL DEF/.test(lt)){
-    if(typeof openToolDefEdit==='function'){ openToolDefEdit(lineIdxNow); return; }
+    if(typeof openToolDefEdit==='function'){
+      if(!isMobile()){
+        var _tdEnd = ci>=0 ? ci : trimmedEnd;
+        try{ codeEl.setSelectionRange(ls, ls+_tdEnd); }catch(e){}
+      }
+      openToolDefEdit(lineIdxNow); return;
+    }
   }
   // Command with a builder → field editor
   var info = getCaretLine();
