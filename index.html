@@ -39,7 +39,7 @@
 :root{
   --bg:#100f0d; --surface:#1a1814; --surface2:#22201c; --border:#2c2a26;
   --accent:#e8530a; --accent2:#1da06a; --accent3:#4a9eff;
-  --text:#e8eaf0; --text2:#8a90a0; --text3:#555c6e;
+  --text:#e8eaf0; --text2:#c2c6d1; --text3:#9da3b0;
   --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif; --radius:8px;
   --editor-fs:12px;
 }
@@ -3928,8 +3928,16 @@ document.addEventListener('mouseout', function(e){
 // click on data-help: show popup but don't block the action
 document.addEventListener('click', function(e){
   if(!kpHelpMode) return;
+  // The Help toggle button manages kpHelpMode itself via its own onclick — don't
+  // let this generic handler immediately undo that on the same click.
+  if(e.target.closest && e.target.closest('#kpHelpBtn')) return;
   var h = _getHelpElAndKey(e.target);
   if(h) showKpHelp(h.key, h.el);
+  // Clicking an actual control means the person is done exploring and wants to
+  // use it — turn help mode off so this and subsequent clicks act normally
+  // instead of staying stuck with the "?" cursor.
+  var isControl = e.target.closest && e.target.closest('button, .tab, a[href], select, input');
+  if(isControl) toggleKpHelp();
 });
 codeEl.addEventListener('click', updateSelectedLine);
 codeEl.addEventListener('click', saveLastSel);
