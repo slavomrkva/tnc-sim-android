@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "org.tncsim.twa",
+        "sha256_cert_fingerprints": ["B0:AA:1C:C8:BF:EC:0B:38:4E:86:94:6A:57:C1:22:CD:F4:E0:6D:81:37:8A:FB:6A:B6:D5:2B:A9:9D:31:EE:5A"]
+      }
+    }]
