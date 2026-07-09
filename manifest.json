@@ -21,5 +21,28 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-3d.jpg",
+      "sizes": "720x1346",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "3D toolpath simulation view"
+    },
+    {
+      "src": "/screenshot-editor.jpg",
+      "sizes": "720x1349",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Klartext code editor"
+    },
+    {
+      "src": "/screenshot-learn.jpg",
+      "sizes": "720x1349",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Interactive lessons"
+    }
   ]
 }
