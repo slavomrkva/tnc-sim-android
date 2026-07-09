@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#14b8a6">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <title>TNC Sim — Free online Heidenhain TNC simulator with lessons</title>
 <meta name="description" content="Free browser-based Heidenhain TNC simulator with 3D toolpath visualization and 15 interactive Klartext programming lessons — from the basics to full contours and cycles. Works on desktop and mobile. No installation, open source.">
 <meta name="keywords" content="heidenhain online simulator, tnc simulator online, heidenhain tnc programming online, learn heidenhain programming, heidenhain tutorial, heidenhain klartext tutorial, heidenhain programming lessons, cnc heidenhain online, tnc640 online, heidenhain simulator free, tnc programming simulator, cnc simulator online free, cnc simulator mobile, heidenhain simulator phone, 3d cnc simulator">
@@ -10011,6 +10014,25 @@ function learnRender(){
     }
     if(typeof window._growCode==='function') requestAnimationFrame(window._growCode);
   }
+}
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/service-worker.js').then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var newWorker = reg.installing;
+        if(!newWorker) return;
+        newWorker.addEventListener('statechange', function(){
+          if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+            // A new version is cached and will take over on the next launch.
+            console.log('TNC Sim: update ready, will be used next launch.');
+          }
+        });
+      });
+    }).catch(function(err){ console.warn('Service worker registration failed:', err); });
+  });
 }
 </script>
 

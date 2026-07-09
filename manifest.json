@@ -1,0 +1,23 @@
+{
+  "name": "TNC Sim — Heidenhain TNC Simulator",
+  "short_name": "TNC Sim",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#100f0d",
+  "theme_color": "#14b8a6",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
