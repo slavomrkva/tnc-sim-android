@@ -9522,47 +9522,6 @@ var LESSONS = [
     }
   ]
 },
-{
-  id:'L24', title:'Final exam \u2014 make the part from the drawing',
-  slides:[
-    { html:function(){ return ''
-      + '<p><b>The exam:</b> only the blank is given. Write the complete program for this part \u2014 no steps, no help. Hints appear only after Check.</p>'
-      + learnSvgDrawing(); } },
-    { html:function(){ return ''
-      + '<p>Reading the drawing:</p>'
-      + learnSnippet('blank    100 x 100 x 25   (given)\ncontour  80 x 80, R10 corners, 3 deep\nholes    4x \u00d86.8 THRU, on a 50 grid\npocket   \u00d830, 8 deep, in the centre\nfinish   retract high, spindle+coolant off')
-      + '<p>Everything you need is in lessons 1\u201316. Good luck! &#127942;</p>'; } }
-  ],
-  tasks:[
-    {
-      prompt:'Make the part from the drawing \u2014 write the whole program yourself',
-      starter:'BEGIN PGM EXAM MM\nBLK FORM 0.1 Z X+0 Y+0 Z-25\nBLK FORM 0.2 X+100 Y+100 Z+0\n; the drawing is in the THEORY panel\n\nEND PGM EXAM MM',
-      sol:'TOOL CALL 1 Z S3000 F500\nM3\nM8\nL X+10 Y-10 Z+50 FMAX R0\nL Z-3 FMAX\nL Y+90 RL F300\nRND R10\nL X+90\nRND R10\nL Y+10\nRND R10\nL X+10\nL Y-10 R0\nL Z+50 FMAX\nM5\nM9\nTOOL CALL 4 Z S2500 F150\nM3\nM8\nCYCL DEF 200\n  Q200=+2 ;set-up clearance\n  Q201=-27 ;depth\n  Q206=+150 ;plunge feed rate\n  Q202=+8 ;plunging depth\n  Q210=+0 ;dwell at top\n  Q203=+0 ;surface coordinate\n  Q204=+30 ;2nd set-up clearance\n  Q211=+0 ;dwell at bottom\nLBL 1\nL X+25 Y+25 FMAX M99\nL X+75 Y+25 FMAX M99\nL X+75 Y+75 FMAX M99\nL X+25 Y+75 FMAX M99\nLBL 0\nM5\nM9\nTOOL CALL 1 Z S3000 F500\nM3\nM8\nCYCL DEF 208\n  Q200=+2 ;set-up clearance\n  Q201=-8 ;depth\n  Q206=+150 ;plunge feed rate\n  Q334=+2 ;infeed per helix turn\n  Q203=+0 ;surface coordinate\n  Q204=+30 ;2nd set-up clearance\n  Q335=+30 ;nominal DIAMETER\n  Q342=+0 ;pre-drilled diameter\n  Q351=+1 ;milling mode (+1 climb)\nL X+50 Y+50 FMAX M99\nL Z+100 FMAX\nM5\nM9',
-      checks:[
-        {t:'uses', re:/\bRL\b/, label:'Contour milled with radius compensation',
-         hint:'Approach outside with R0, activate RL on the first contour block (lesson 7).'},
-        {t:'uses', re:/RND\s+R10\b/, label:'Contour corners R10',
-         hint:'RND R10 between the straight blocks (lesson 6).'},
-        {t:'reach', cut:true, x:5, y:50, z:-3, tol:0.9, label:'Contour wall X+10 at depth 3 (tool centre X+5)',
-         hint:'Square 80 \u00d7 80 means walls at 10 and 90 \u2014 the D10 centre runs 5 outside.'},
-        {t:'reach', cut:true, x:50, y:95, z:-3, tol:0.9, label:'Contour wall Y+90 at depth 3 (tool centre Y+95)',
-         hint:'Go around: Y+90, X+90, Y+10, X+10 (lesson 16 shows the pattern).'},
-        {t:'reach', cut:true, x:25, y:25, z:-27, tol:2, label:'Hole X+25 Y+25 drilled THRU',
-         hint:'Through 25 mm needs Q201 about -27 (lesson 8).'},
-        {t:'reach', cut:true, x:75, y:25, z:-27, tol:2, label:'Hole X+75 Y+25 drilled THRU',
-         hint:'Four positions \u2014 a LBL keeps it tidy (lesson 9).'},
-        {t:'reach', cut:true, x:75, y:75, z:-27, tol:2, label:'Hole X+75 Y+75 drilled THRU',
-         hint:'One M99 block per hole.'},
-        {t:'reach', cut:true, x:25, y:75, z:-27, tol:2, label:'Hole X+25 Y+75 drilled THRU',
-         hint:'L X+25 Y+75 FMAX M99'},
-        {t:'reach', cut:true, x:60, y:50, tol:0.9, label:'Pocket \u00d830 in the centre (wall reached)',
-         hint:'Cycle 208 with Q335=+30, called at X+50 Y+50 (lesson 11).'},
-        {t:'order', a:/M99[\s\S]*Z\+/, b:/\bM5\b/, label:'Clean finish: retract, then M5 (and M9)',
-         hint:'End with L Z+100 FMAX, M5, M9 \u2014 like a real program.'}
-      ]
-    }
-  ]
-}
 ];
 
 /* ── Check engine (pure: code string + task -> results) ─────── */
