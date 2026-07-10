@@ -181,7 +181,7 @@ html[data-theme="light"] .syn-cycle{color:#7a5520;}
 .tab.active{color:var(--accent);border-bottom:3px solid var(--accent);background:rgba(20,184,166,.06);}
 .tab:hover:not(.active){color:var(--text2);background:var(--border);}
 .view-area{flex:1;position:relative;min-height:0;}
-#view3d{position:absolute;inset:0;width:100%;height:100%;}
+#view3d{position:absolute;inset:0;width:100%;height:100%;background:var(--bg);}
 #view3d canvas{display:block;width:100%;height:100%;}
 #view2d{position:absolute;inset:0;width:100%;height:100%;display:none;}
 canvas#sim2d{width:100%;height:100%;display:block;}
@@ -6216,20 +6216,73 @@ function bufClear(buf){ buf.count=0; buf.geo.setDrawRange(0,0); buf.geo.attribut
 function _scene3dBgColor(){
   return document.documentElement.getAttribute('data-theme')==='light' ? 0xf5f2ee : 0x100f0d;
 }
+function show3DError(msg){
+  try{
+    if(!view3dEl) return;
+    // clear any partial canvas
+    var c = view3dEl.querySelector('canvas'); if(c) c.remove();
+    var box = document.getElementById('view3dError');
+    if(!box){
+      box = document.createElement('div');
+      box.id = 'view3dError';
+      box.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;'
+        + 'justify-content:center;text-align:center;padding:24px;box-sizing:border-box;'
+        + 'font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--text2);'
+        + 'background:var(--bg);z-index:2;';
+      view3dEl.appendChild(box);
+    }
+    box.innerHTML = '<div><div style="font-size:22px;margin-bottom:10px;">\u26A0\uFE0F</div>'
+      + '<div>' + (msg||'3D view is not available on this device.') + '</div></div>';
+    box.style.display = 'flex';
+  }catch(e){}
+}
+function hide3DError(){
+  var box = document.getElementById('view3dError');
+  if(box) box.style.display = 'none';
+}
 function init3D(){
-  if(!THREE_OK) return;
+  if(!THREE_OK){
+    show3DError('Could not load the 3D engine. Check your internet connection once, then reload \u2014 the 3D files are cached for offline use afterwards. The editor and lessons work regardless.');
+    return;
+  }
   scene = new THREE.Scene();
   scene.background = new THREE.Color(_scene3dBgColor());
 
   camera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
   camera.up.set(0,0,1);
 
-  renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+  // Create the WebGL renderer defensively. Some mobile GPUs/drivers reject a
+  // 'high-performance' context (returns null) even though a default WebGL
+  // context works fine — which is why the get.webgl.org test cube can spin while
+  // this view stays blank. Try progressively simpler options, and if every
+  // attempt fails, show a clear message instead of a blank canvas.
+  renderer = null;
+  var _rOpts = [
+    {antialias:true,  powerPreference:'high-performance'},
+    {antialias:true},
+    {antialias:false},
+    {antialias:false, failIfMajorPerformanceCaveat:false}
+  ];
+  for(var _oi=0; _oi<_rOpts.length && !renderer; _oi++){
+    try{
+      var _r = new THREE.WebGLRenderer(_rOpts[_oi]);
+      if(_r && _r.getContext && _r.getContext()) renderer = _r;
+    }catch(_e){ renderer = null; }
+  }
+  if(!renderer){
+    show3DError('3D view could not start on this device. Try updating your browser, or enable hardware acceleration / WebGL. The editor and lessons still work.');
+    return;
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
   // Prevent the browser from hijacking orbit/pinch gestures as page scroll/zoom on mobile.
   renderer.domElement.style.touchAction = 'none';
   renderer.domElement.style.webkitTapHighlightColor = 'transparent';
   view3dEl.appendChild(renderer.domElement);
+  // If the GPU context is lost later (backgrounding, driver reset), surface it.
+  renderer.domElement.addEventListener('webglcontextlost', function(ev){
+    ev.preventDefault();
+    show3DError('3D rendering was interrupted (graphics context lost). Reload the page to restore the 3D view.');
+  }, false);
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
