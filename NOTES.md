@@ -146,6 +146,13 @@ tweak or you'll forget it exists and debug the wrong file.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Synced `www/index.html` from `tnc-sim` v0.802 (APP_VERSION single-sourcing;
+  SW registration in the shared file is now gated with `!window.Capacitor`, so
+  it can never register inside this app). Added `manifest.json`, `icon-192.png`
+  and `icon-512.png` to `www/` — `index.html` references them and they 404'd
+  inside the app. Deliberately did NOT add `service-worker.js` to `www/` (see
+  rule about SW masking app updates in the web repo's NOTES.md rule #8).
+  Re-ran `npx cap sync android`.
 - Bumped `versionCode` to 2, `versionName` to "1.0.1" for the first Capacitor
   release (replaces the old PWABuilder TWA build under the same
   `org.tncsim.twa` package, as a Play Store update). `applicationId` confirmed
