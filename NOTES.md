@@ -146,6 +146,11 @@ tweak or you'll forget it exists and debug the wrong file.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Synced `www/` from `tnc-sim` v0.803: Three.js is now vendored in
+  `www/vendor/` (web repo dropped the jsDelivr CDN dependency), so the app's
+  3D works fully offline from first launch — previously the WebView loaded
+  Three.js from the CDN and needed network once. When syncing future web
+  updates, remember `vendor/` alongside `index.html`.
 - Synced `www/index.html` from `tnc-sim` v0.802 (APP_VERSION single-sourcing;
   SW registration in the shared file is now gated with `!window.Capacitor`, so
   it can never register inside this app). Added `manifest.json`, `icon-192.png`
