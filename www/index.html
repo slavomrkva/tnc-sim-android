@@ -676,7 +676,6 @@ footer a:hover{text-decoration:underline;}
           <button class="ph-btn" onclick="exportProgram()" data-help="export" title="Download program.H">Export</button>
           <button class="ph-btn" onclick="importProgram()" title="Load .H program file">Import</button>
           <input type="file" id="importFileInput" accept="text/plain,.h,.H,.nc,.txt,.tap,.cnc" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onImportFile(event)">
-          <span id="blockCount" class="ph-blocks">0 blocks</span>
         </span>
         <span class="ph-hdr-actions">
           <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span></button>
@@ -2073,11 +2072,14 @@ function renderIdlePanel(){ var panel = document.getElementById('ctxPanel');
     +'<button class="btn" id="_idleClear" data-help="editor-clear" style="font-size:10px;padding:3px 8px;">Clear</button>'
     +'<button class="btn" id="_idleZoomOut" data-help="editor-zoom" title="Smaller text" onclick="editorFsBy(-1)" style="font-size:10px;padding:3px 7px;"'+(_editorFs<=_EDITOR_FS_MIN?' disabled':'')+'>A&#8722;</button>'
     +'<button class="btn" id="_idleZoomIn" data-help="editor-zoom" title="Larger text" onclick="editorFsBy(1)" style="font-size:10px;padding:3px 7px;"'+(_editorFs>=_EDITOR_FS_MAX?' disabled':'')+'>A+</button>'
+    +'</div>'
+    +'<div class="ctx-row2">'
     +'<span style="font-size:9px;font-family:var(--mono);color:var(--text3);align-self:center;">Demo programs:</span>'
     +'<select id="_idleDemo" title="Load a demo program" style="font-size:10px;font-family:var(--mono);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:5px;padding:3px 4px;cursor:pointer;" onchange="loadDemo(this.value)">'
     +'<option value="" disabled'+(_currentDemoIdx<0?' selected':'')+'>Load\u2026</option>'
     + DEMO_PROGRAMS.map(function(d,i){ return '<option value="'+i+'"'+(i===_currentDemoIdx?' selected':'')+'>'+d.name+'</option>'; }).join('')
     +'</select>'
+    +'<span id="_idleBlocks" style="margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--text3);white-space:nowrap;">'+(_blockCountText||'0 blocks')+'</span>'
     +'</div>';
   var bu=document.getElementById('_idleUndo');
   var br=document.getElementById('_idleRedo');
@@ -3524,7 +3526,7 @@ function editorClear(){
   renderIdlePanel();
 }
 var lineNums = document.getElementById('lineNums');
-var blockCountEl = document.getElementById('blockCount');
+var _blockCountText = '0 blocks';
 var statusMsg = document.getElementById('statusMsg');
 var statusDot = document.getElementById('statusDot');
 var posDisplay = document.getElementById('posDisplay');
@@ -3615,7 +3617,8 @@ function updateLineNums(){
     html += '<div class="'+cls+'"><button class="ln-del" onclick="deleteLineN('+i+')" tabindex="-1">&#10005;</button>'+numLabel+'</div>';
   }
   lineNums.innerHTML = '<div style="padding:10px 0 200px;">' + html + '</div>';
-  blockCountEl.textContent = lines.length + ' blocks';
+  _blockCountText = lines.length + ' blocks';
+  var _ib = document.getElementById('_idleBlocks'); if(_ib) _ib.textContent = _blockCountText;
   var _progTitleEl = document.getElementById('progTitleName');
   if(_progTitleEl) _progTitleEl.textContent = _progFileName(codeEl.value);
   // restore highlights
