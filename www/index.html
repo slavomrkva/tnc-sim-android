@@ -654,6 +654,24 @@ footer a:hover{text-decoration:underline;}
   body.practice-on[data-mtab="editor"] .panel-header{display:none;}
 }
 
+/* ── First-launch onboarding tour (app only; add ?onboard=1 to force in a browser) ── */
+.onboard-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;}
+.onboard-overlay.on{display:flex;}
+.onboard-card{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+.onboard-view{overflow:hidden;}
+.onboard-track{display:flex;align-items:flex-start;transition:transform .28s ease;}
+.onboard-track img{width:100%;flex:0 0 100%;height:auto;max-height:62vh;object-fit:contain;background:#fff;}
+.onboard-ctrl{display:flex;flex-direction:column;gap:10px;padding:12px 16px 14px;border-top:1px solid #eee;background:#fff;}
+.onboard-dots{display:flex;justify-content:center;gap:7px;}
+.onboard-dots i{width:7px;height:7px;border-radius:50%;background:#ccc;transition:background .2s,width .2s;}
+.onboard-dots i.on{background:#14b8a6;width:18px;border-radius:4px;}
+.onboard-btns{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.onboard-btns button{font-family:var(--mono);font-size:13px;padding:9px 16px;border-radius:8px;cursor:pointer;}
+.onboard-skip{background:none;border:none;color:#888;}
+.onboard-next{background:#14b8a6;color:#fff;font-weight:700;border:none;min-width:104px;}
+.onboard-dont{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:12px;color:#666;cursor:pointer;user-select:none;}
+.onboard-dont input{width:15px;height:15px;accent-color:#14b8a6;}
+
 </style>
 <script>
   // Apply saved theme before the page paints, to avoid a flash of the wrong theme.
@@ -980,6 +998,26 @@ END PGM PROGRAM MM</textarea>
     <a href="https://buymeacoffee.com/slavozett" target="_blank" title="Buy me a coffee" aria-label="Buy me a coffee">&#9749;</a>
   </div>
 </footer>
+
+<div class="onboard-overlay" id="onboardOverlay" role="dialog" aria-label="Welcome tour">
+  <div class="onboard-card">
+    <div class="onboard-view">
+      <div class="onboard-track" id="onboardTrack">
+        <img src="onboarding/1.png" alt="Editor — write TNC code">
+        <img src="onboarding/2.png" alt="3D simulation — simulate toolpaths">
+        <img src="onboarding/3.png" alt="Learn — interactive lessons">
+      </div>
+    </div>
+    <div class="onboard-ctrl">
+      <div class="onboard-dots" id="onboardDots"></div>
+      <div class="onboard-btns">
+        <button class="onboard-skip" id="onboardSkip" onclick="obClose()">Skip</button>
+        <button class="onboard-next" id="onboardNext" onclick="obNext()">Next</button>
+      </div>
+      <label class="onboard-dont"><input type="checkbox" id="onboardDont" checked> Don't show this again</label>
+    </div>
+  </div>
+</div>
 
 <div class="cycle-overlay" id="cycleOverlay" onclick="if(event.target===this)closeCyclePicker()">
   <div class="cycle-modal">
@@ -10137,6 +10175,51 @@ function learnRender(){
     if(typeof window._growCode==='function') requestAnimationFrame(window._growCode);
   }
 }
+</script>
+
+<script>
+/* First-launch onboarding tour. Shows automatically only inside the app
+   (window.Capacitor) on the first launch, then remembers via localStorage.
+   Add ?onboard=1 to the URL to force it in a browser (for previewing). */
+(function(){
+  var N = 3, idx = 0;
+  window.obGo = function(i){
+    idx = Math.max(0, Math.min(N-1, i));
+    var t = document.getElementById('onboardTrack');
+    if(t) t.style.transform = 'translateX(-' + (idx*100) + '%)';
+    var dots = document.getElementById('onboardDots');
+    if(dots){ var h=''; for(var k=0;k<N;k++){ h += '<i class="'+(k===idx?'on':'')+'"></i>'; } dots.innerHTML = h; }
+    var nx = document.getElementById('onboardNext');
+    if(nx) nx.textContent = (idx===N-1) ? 'Get started' : 'Next';
+  };
+  window.obNext = function(){ if(idx < N-1) window.obGo(idx+1); else window.obClose(); };
+  window.obClose = function(){
+    var dont = document.getElementById('onboardDont');
+    if(!dont || dont.checked){ try{ localStorage.setItem('tnc_onboarded','1'); }catch(e){} }
+    var ov = document.getElementById('onboardOverlay');
+    if(ov) ov.classList.remove('on');
+  };
+  function obShow(){ var ov = document.getElementById('onboardOverlay'); if(!ov) return; window.obGo(0); ov.classList.add('on'); }
+  // swipe between slides
+  var track = document.getElementById('onboardTrack');
+  if(track){
+    var x0 = null;
+    track.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+    track.addEventListener('touchend', function(e){
+      if(x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if(Math.abs(dx) < 40) return;
+      if(dx < 0) window.obNext(); else window.obGo(idx-1);
+    }, {passive:true});
+  }
+  function maybeShow(){
+    var force = /[?&]onboard=1/.test(location.search);
+    var seen = false; try{ seen = !!localStorage.getItem('tnc_onboarded'); }catch(e){}
+    if(force || (window.Capacitor && !seen)) obShow();
+  }
+  if(document.readyState === 'loading') window.addEventListener('load', maybeShow);
+  else setTimeout(maybeShow, 60);
+})();
 </script>
 
 <script>
