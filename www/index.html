@@ -664,11 +664,7 @@ footer a:hover{text-decoration:underline;}
     <div class="editor-panel">
       <div class="panel-resize" id="panelResize"></div>
       <div class="panel-header">
-        <span class="ph-left">
-          <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
-          <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel" class="ph-hdr-lbl">Dark</span></button>
-          <button id="aboutBtn" class="ph-btn" onclick="openAboutPopup()" title="About TNC Sim" style="display:inline-flex;align-items:center;gap:4px;"><span>&#9432;</span><span class="ph-hdr-lbl">About</span></button>
-        </span>
+        <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
         <span style="display:flex;align-items:center;gap:8px;">
           <button id="learnBtn" class="ph-btn learn-cta" onclick="openLearn()" title="Interactive lessons for beginners">Learn</button>
           <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help">Help</button>
@@ -677,6 +673,8 @@ footer a:hover{text-decoration:underline;}
           <button class="ph-btn" onclick="importProgram()" title="Load .H program file">Import</button>
           <input type="file" id="importFileInput" accept="text/plain,.h,.H,.nc,.txt,.tap,.cnc" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onImportFile(event)">
           <span id="blockCount" class="ph-blocks">0 blocks</span>
+          <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span></button>
+          <button id="aboutBtn" class="ph-btn" onclick="openAboutPopup()" title="About TNC Sim" style="display:inline-flex;align-items:center;gap:4px;"><span>&#9432;</span><span>About</span></button>
         </span>
       </div>
 
