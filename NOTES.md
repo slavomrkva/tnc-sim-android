@@ -146,6 +146,10 @@ tweak or you'll forget it exists and debug the wrong file.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Bumped `versionCode` to 3, `versionName` to "1.0.2" for the closed-testing
+  release carrying the v0.803 www sync (vendored Three.js → offline 3D,
+  manifest/icons in www, APP_VERSION in About). versionCode 3 is safe whether
+  or not a versionCode-2 .aab was ever uploaded (higher is always accepted).
 - Synced `www/` from `tnc-sim` v0.803: Three.js is now vendored in
   `www/vendor/` (web repo dropped the jsDelivr CDN dependency), so the app's
   3D works fully offline from first launch — previously the WebView loaded
