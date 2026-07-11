@@ -585,6 +585,12 @@ footer a:hover{text-decoration:underline;}
   .mtab-bar button .mi svg{width:23px;height:23px;display:block;}
   .mtab-bar button.on{color:var(--accent);background:rgba(var(--accent-rgb),.14);border-top-color:var(--accent);font-weight:700;}
   .mtab-bar button.on .mi svg{transform:scale(1.08);}
+  /* Hide the bottom tab bar whenever a text field is focused (keyboard open).
+     The visualViewport check misses this in the Capacitor WebView, which
+     resizes window.innerHeight on keyboard show — so the fixed bottom bar would
+     otherwise sit right above the keyboard. Focus-based hiding works in both the
+     app and the browser. */
+  html.editing-field .mtab-bar{visibility:hidden !important;}
   body{padding-bottom:50px;}
   /* tab visibility */
   body[data-mtab="editor"] .canvas-panel{display:none !important;}
@@ -9929,6 +9935,37 @@ document.body.setAttribute('data-mtab','editor');
   window.addEventListener('touchmove', kick, {passive:true});
   window.addEventListener('orientationchange', function(){ setTimeout(kick, 50); });
   kick();
+})();
+
+/* Hide the bottom mobile tab bar while a text field is focused (soft keyboard
+   open). This is the reliable cross-environment signal: the Capacitor WebView
+   resizes on keyboard show, which defeats the visualViewport-offset check
+   above, leaving the fixed bottom bar stuck over the keyboard. Focus/blur fire
+   the same in the app and the browser. */
+(function(){
+  function isEditable(el){
+    if(!el) return false;
+    if(el.tagName === 'TEXTAREA') return true;
+    if(el.tagName === 'INPUT'){
+      var ty = (el.getAttribute('type') || 'text').toLowerCase();
+      return ['text','search','number','tel','url','email','password'].indexOf(ty) >= 0;
+    }
+    return !!el.isContentEditable;
+  }
+  var tmr = null;
+  document.addEventListener('focusin', function(e){
+    if(isEditable(e.target)){
+      if(tmr){ clearTimeout(tmr); tmr = null; }
+      document.documentElement.classList.add('editing-field');
+    }
+  });
+  document.addEventListener('focusout', function(){
+    // small delay so switching directly between fields doesn't flash the bar
+    if(tmr) clearTimeout(tmr);
+    tmr = setTimeout(function(){
+      if(!isEditable(document.activeElement)) document.documentElement.classList.remove('editing-field');
+    }, 120);
+  });
 })();
 
 function learnResetProgress(){
