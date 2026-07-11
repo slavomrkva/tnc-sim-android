@@ -161,6 +161,13 @@ OLD content. Always sync after changing anything in `www/`.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Replaced the default Capacitor launcher icons with the app's own teal
+  grid+ring icon. Regenerated `android/app/src/main/res/mipmap-*/ic_launcher*.png`
+  (legacy square + round, all densities) and adaptive `ic_launcher_foreground.png`
+  (design in the ~72% safe zone) from a 512px source; set the adaptive
+  `ic_launcher_background` colour to `#14B8A6`. New icon shows after the next
+  build+install (native asset — NOT visible in the htmlpreview). The Play Store
+  *store* icon is separate (set in Play Console) and was already correct.
 - Made the repo self-contained / standalone. Removed unused web leftovers from
   the root (`index.html`, `manifest.json`, `service-worker.js`, `_headers`,
   `robots.txt`, `sitemap.xml`, `og-image.png`, `screenshot-*.jpg`,
