@@ -12,6 +12,12 @@
 > as a new numbered rule under "NON-OBVIOUS RULES" below.** These rules are how
 > the project protects itself across sessions that have no shared memory —
 > growing this list is expected and encouraged.
+>
+> **Also: if the change is user-visible or important, add a short user-facing
+> line to `RELEASE_NOTES.md`** under the release's `versionName (versionCode)`.
+> That file's top entry is what gets pasted into the Play Console "What's new"
+> box. `NOTES.md` Changelog = detailed technical log; `RELEASE_NOTES.md` = the
+> short, user-facing history. Purely internal tweaks go only in NOTES.md.
 
 ---
 
@@ -161,6 +167,9 @@ OLD content. Always sync after changing anything in `www/`.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Added `RELEASE_NOTES.md` — user-facing per-release "What's new" history
+  (top entry = Play Console "What's new"). Added a developer note in this file's
+  header and CLAUDE.md to keep it updated for user-visible changes.
 - Replaced the default Capacitor launcher icons with the app's own teal
   grid+ring icon. Regenerated `android/app/src/main/res/mipmap-*/ic_launcher*.png`
   (legacy square + round, all densities) and adaptive `ic_launcher_foreground.png`
