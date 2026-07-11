@@ -13,6 +13,10 @@ user-facing history.
 ---
 
 ## 1.0.2 (versionCode 3)
+- New welcome tour on first launch.
+- Cleaner top bar and editor toolbar.
+- Full-width layout on tablets — the 3D simulation is no longer cramped.
+- The bottom tab bar no longer gets in the way when the keyboard is open.
 - The app now uses its own icon.
 - 3D engine is bundled — full offline support from the first launch.
 - App version is shown in the About dialog.

@@ -97,6 +97,17 @@ Android/Gradle build (produces the `.aab` for Play Store).
 ## NON-OBVIOUS RULES — do not break these
 <!-- Add a new numbered rule here whenever a new critical pitfall is found. -->
 
+### 0. The app is ALWAYS single-column/mobile — never desktop side-by-side
+`www/index.html` here forces the mobile (single-column, bottom Editor/3D/Learn
+tabs) layout unconditionally, so the 3D sim always gets full width — even on a
+tablet where the width would otherwise trigger the desktop editor-beside-3D
+layout. This is done by: the ~9 layout media queries are `@media all` (not
+`@media(max-width:700px)` like the web repo), and the JS predicates `_isMTab()`
+and `isMob()` return `true`, and the two help-popup `innerWidth > 700` checks
+are hard-`false`. If you re-sync content from the web repo (which uses a 1024px
+breakpoint), you MUST re-apply these four things or the app will show the
+cramped desktop layout on tablets.
+
 ### 1. `applicationId` must stay `org.tncsim.twa` forever
 This app replaces a prior TWA release under the same package name, as a Play
 Store *update*, not a new listing. Changing `applicationId` in
@@ -167,6 +178,16 @@ OLD content. Always sync after changing anything in `www/`.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Forced the app to always use the single-column mobile layout (rule #0): 9
+  layout media queries → `@media all`, `_isMTab()`/`isMob()` → `true`, help-popup
+  `innerWidth > 700` → `false`. Fixes the cramped desktop layout on tablets so
+  the 3D sim always gets full width. (Web repo instead uses a 1024px breakpoint.)
+  [branch: app-onboarding]
+- Removed the top web header and moved Light/About into the panel header
+  (right-aligned), moved the block count into the editor toolbar, and fixed the
+  bottom tab bar riding over the soft keyboard; added a first-launch onboarding
+  tour (`www/onboarding/`, `?onboard=1` to force in a browser). [branch:
+  app-onboarding]
 - Added `RELEASE_NOTES.md` — user-facing per-release "What's new" history
   (top entry = Play Console "What's new"). Added a developer note in this file's
   header and CLAUDE.md to keep it updated for user-visible changes.
