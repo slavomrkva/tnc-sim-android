@@ -654,22 +654,28 @@ footer a:hover{text-decoration:underline;}
   body.practice-on[data-mtab="editor"] .panel-header{display:none;}
 }
 
-/* ── First-launch onboarding tour (app only; add ?onboard=1 to force in a browser) ── */
-.onboard-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;}
+/* ── First-launch onboarding tour (app only; add ?onboard=1 to force in a browser)
+   Fixed dark styling regardless of the app's light/dark theme. ── */
+.onboard-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;}
 .onboard-overlay.on{display:flex;}
-.onboard-card{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+.onboard-card{background:#14181c;border:1px solid #262c31;border-radius:18px;width:100%;max-width:420px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.6);}
 .onboard-view{overflow:hidden;}
-.onboard-track{display:flex;align-items:flex-start;transition:transform .28s ease;}
-.onboard-track img{width:100%;flex:0 0 100%;height:auto;max-height:62vh;object-fit:contain;background:#fff;}
-.onboard-ctrl{display:flex;flex-direction:column;gap:10px;padding:12px 16px 14px;border-top:1px solid #eee;background:#fff;}
+.onboard-track{display:flex;align-items:stretch;transition:transform .28s ease;}
+.onboard-slide{flex:0 0 100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 20px 4px;box-sizing:border-box;}
+.onboard-slide img{height:44vh;max-height:420px;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 10px 24px rgba(0,0,0,.55));}
+.ob-cap{padding:16px 6px 2px;}
+.ob-cap h3{font-family:var(--mono);font-size:22px;font-weight:800;color:#2dd4bf;margin:0 0 6px;letter-spacing:.3px;}
+.ob-cap .ob-sub{font-family:var(--sans);font-size:15px;color:#e8ebee;margin:0 0 6px;}
+.ob-cap .ob-desc{font-family:var(--sans);font-size:13px;line-height:1.5;color:#9aa2a9;margin:0;}
+.onboard-ctrl{display:flex;flex-direction:column;gap:12px;padding:14px 18px 16px;border-top:1px solid #262c31;}
 .onboard-dots{display:flex;justify-content:center;gap:7px;}
-.onboard-dots i{width:7px;height:7px;border-radius:50%;background:#ccc;transition:background .2s,width .2s;}
-.onboard-dots i.on{background:#14b8a6;width:18px;border-radius:4px;}
+.onboard-dots i{width:7px;height:7px;border-radius:50%;background:#3a4249;transition:background .2s,width .2s;}
+.onboard-dots i.on{background:#2dd4bf;width:18px;border-radius:4px;}
 .onboard-btns{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .onboard-btns button{font-family:var(--mono);font-size:13px;padding:9px 16px;border-radius:8px;cursor:pointer;}
-.onboard-skip{background:none;border:none;color:#888;}
-.onboard-next{background:#14b8a6;color:#fff;font-weight:700;border:none;min-width:104px;}
-.onboard-dont{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:12px;color:#666;cursor:pointer;user-select:none;}
+.onboard-skip{background:none;border:none;color:#8a9299;}
+.onboard-next{background:#14b8a6;color:#04110e;font-weight:700;border:none;min-width:108px;}
+.onboard-dont{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:12px;color:#8a9299;cursor:pointer;user-select:none;}
 .onboard-dont input{width:15px;height:15px;accent-color:#14b8a6;}
 
 </style>
@@ -1003,9 +1009,18 @@ END PGM PROGRAM MM</textarea>
   <div class="onboard-card">
     <div class="onboard-view">
       <div class="onboard-track" id="onboardTrack">
-        <img src="onboarding/1.png" alt="Editor — write TNC code">
-        <img src="onboarding/2.png" alt="3D simulation — simulate toolpaths">
-        <img src="onboarding/3.png" alt="Learn — interactive lessons">
+        <div class="onboard-slide">
+          <img src="onboarding/1.png" alt="Editor screen">
+          <div class="ob-cap"><h3>Editor</h3><p class="ob-sub">Write TNC code</p><p class="ob-desc">Compose and edit Heidenhain CNC programs</p></div>
+        </div>
+        <div class="onboard-slide">
+          <img src="onboarding/2.png" alt="3D simulation screen">
+          <div class="ob-cap"><h3>3D Simulation</h3><p class="ob-sub">Simulate toolpaths</p><p class="ob-desc">Visualize and inspect the machining process in 3D</p></div>
+        </div>
+        <div class="onboard-slide">
+          <img src="onboarding/3.png" alt="Learn screen">
+          <div class="ob-cap"><h3>Learn</h3><p class="ob-sub">Learn &amp; practice</p><p class="ob-desc">Interactive lessons and hands-on exercises</p></div>
+        </div>
       </div>
     </div>
     <div class="onboard-ctrl">
