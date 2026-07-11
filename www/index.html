@@ -482,9 +482,12 @@ footer a:hover{text-decoration:underline;}
 }
 /* ── Safe area insets — notch / home indicator (iOS & Android) */
 @supports(padding:env(safe-area-inset-bottom)){
-  header{
-    padding-left:max(20px,env(safe-area-inset-left));
-    padding-right:max(20px,env(safe-area-inset-right));
+  /* panel-header is now the top bar (the old <header> was removed) — keep it
+     clear of the status bar / notch. */
+  .panel-header{
+    padding-top:max(8px,env(safe-area-inset-top));
+    padding-left:max(12px,env(safe-area-inset-left));
+    padding-right:max(12px,env(safe-area-inset-right));
   }
   .status-bar{
     padding-bottom:max(6px,env(safe-area-inset-bottom));
@@ -654,23 +657,6 @@ footer a:hover{text-decoration:underline;}
 
 
 <body>
-<header>
-  <div class="logo">
-    <div class="logo-icon"><svg width="32" height="32" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="34" height="34" rx="6" fill="var(--accent)"/><line x1="8" y1="11" x2="26" y2="11" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="8" y1="17" x2="26" y2="17" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="8" y1="23" x2="26" y2="23" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="11" y1="8" x2="11" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="17" y1="8" x2="17" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="23" y1="8" x2="23" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><circle cx="17" cy="17" r="4" fill="white"/><circle cx="17" cy="17" r="1.5" fill="var(--accent)"/></svg></div>
-    <div>
-      <div class="logo-text">TNC Sim</div>
-      <div class="logo-sub">Online CNC simulator for Heidenhain TNC</div>
-    </div>
-  </div>
-  <div class="header-badges">
-    <button id="themeToggle" onclick="toggleTheme()" title="Toggle dark / light mode" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;">
-      <span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span>
-    </button>
-    <button id="aboutBtn" onclick="openAboutPopup()" title="About TNC Sim" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;">&#9432; About</button>
-    <span class="badge green">● live</span>
-    <span class="badge" id="verBadge">v0.8 · 3D</span>
-  </div>
-</header>
 
 <div class="sim-container">
   <div class="sim-main">
@@ -678,7 +664,11 @@ footer a:hover{text-decoration:underline;}
     <div class="editor-panel">
       <div class="panel-resize" id="panelResize"></div>
       <div class="panel-header">
-        <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
+        <span class="ph-left">
+          <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
+          <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel" class="ph-hdr-lbl">Dark</span></button>
+          <button id="aboutBtn" class="ph-btn" onclick="openAboutPopup()" title="About TNC Sim" style="display:inline-flex;align-items:center;gap:4px;"><span>&#9432;</span><span class="ph-hdr-lbl">About</span></button>
+        </span>
         <span style="display:flex;align-items:center;gap:8px;">
           <button id="learnBtn" class="ph-btn learn-cta" onclick="openLearn()" title="Interactive lessons for beginners">Learn</button>
           <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help">Help</button>
