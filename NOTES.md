@@ -204,13 +204,22 @@ stale blank/black composited tile instead of fully hiding.
 `APP_VERSION` (top of the main `<script>` in `www/index.html`, shown in the
 About popup) exists so a human can visually confirm, on the device, that a
 fresh build/install/sync actually contains their latest edit — nothing more.
-**Bump it on every change, no matter how small** (a one-line CSS tweak still
-gets a bump). It is intentionally decoupled from
-`android/app/build.gradle`'s `versionCode`/`versionName`, which are the Play
-Store release identifiers and only bump once per actual release (rule #1/#2
-territory) — don't try to keep the two numbers in sync, they answer different
-questions ("did my edit make it into this build?" vs. "which Play Store
-release is this?").
+
+**The app stays in the `1.0.x` series — `1.0.3`, `1.0.4`, `1.0.5`… — a
+deliberate, permanent convention paired with the web repo's separate `0.80x`
+series (see that repo's NOTES.md), so the two numbering schemes never collide
+or get confused with each other.**
+
+**Every single push must bump `APP_VERSION` by +1 on the last segment — no
+exceptions, no "this one's too small to count".** This is how you (or an AI
+session with no memory of prior work) confirm on-device that a given build
+actually contains a specific push: pull, sync, build, install, check About.
+
+It is intentionally decoupled from `android/app/build.gradle`'s
+`versionCode`/`versionName`, which are the Play Store release identifiers and
+only bump once per actual release (rule #1/#2 territory) — don't try to keep
+the two numbers in sync, they answer different questions ("did my edit make
+it into this build?" vs. "which Play Store release is this?").
 
 ---
 
@@ -226,6 +235,11 @@ release is this?").
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.5`. Formalized versioning: the app stays in
+  the `1.0.x` series permanently (paired with the web repo's separate `0.80x`
+  series — never confuse the two), and every single push must bump
+  `APP_VERSION`, with no "too small to count" exceptions. Documented in this
+  section (rule #8) and CLAUDE.md.
 - `APP_VERSION` bumped to `1.0.4`. Fixed the real regression from the previous
   fix: the bottom tab bar could stay permanently hidden after the keyboard
   closed, blocking tab navigation entirely. Root cause: `#mobileInput` stays
