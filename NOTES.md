@@ -13,11 +13,17 @@
 > the project protects itself across sessions that have no shared memory —
 > growing this list is expected and encouraged.
 >
-> **Also: if the change is user-visible or important, add a short user-facing
-> line to `RELEASE_NOTES.md`** under the release's `versionName (versionCode)`.
-> That file's top entry is what gets pasted into the Play Console "What's new"
-> box. `NOTES.md` Changelog = detailed technical log; `RELEASE_NOTES.md` = the
-> short, user-facing history. Purely internal tweaks go only in NOTES.md.
+> **Also bump `APP_VERSION`** (near the top of the main `<script>` in
+> `www/index.html`) **on every change, however small** — it's the on-device
+> build marker shown in the About popup, and it's how you confirm a fresh
+> install/sync actually picked up your latest edit. See rule #8.
+>
+> **Only add a line to `RELEASE_NOTES.md` for a meaningful or user-visible
+> change** (not every small fix) — under the release's `versionName
+> (versionCode)`. That file's top entry is what gets pasted into the Play
+> Console "What's new" box. `NOTES.md` Changelog = detailed technical log,
+> updated for every change; `RELEASE_NOTES.md` = the short, user-facing
+> history, updated only for changes worth telling a user about.
 
 ---
 
@@ -181,6 +187,18 @@ was fighting the focus/blur-based `editing-field` mechanism with conflicting
 inline style writes. If you touch keyboard-open handling again, keep it to
 that one focus/blur mechanism inside the app.
 
+### 8. `APP_VERSION` is a build marker, separate from `versionCode`/`versionName`
+`APP_VERSION` (top of the main `<script>` in `www/index.html`, shown in the
+About popup) exists so a human can visually confirm, on the device, that a
+fresh build/install/sync actually contains their latest edit — nothing more.
+**Bump it on every change, no matter how small** (a one-line CSS tweak still
+gets a bump). It is intentionally decoupled from
+`android/app/build.gradle`'s `versionCode`/`versionName`, which are the Play
+Store release identifiers and only bump once per actual release (rule #1/#2
+territory) — don't try to keep the two numbers in sync, they answer different
+questions ("did my edit make it into this build?" vs. "which Play Store
+release is this?").
+
 ---
 
 ## Testing checklist before shipping a release
@@ -195,6 +213,13 @@ that one focus/blur mechanism inside the app.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.3` (was stale at `0.803`, a leftover from
+  before the repo went standalone — never bumped since). Added rule #8:
+  bump `APP_VERSION` on every change, however small, as an on-device build
+  marker; `RELEASE_NOTES.md` entries stay reserved for meaningful/user-visible
+  changes only. Documented the header note accordingly.
+- Fixed the bottom tab bar leaving a black artifact when the keyboard opens/
+  closes (real-device bug, not visible in browser testing) — see rule #7.
 - Reworked the light theme (ported deliberately from the web repo's
   light-theme-rework, adapted for no standalone `<header>`): dark chrome
   (.toolbar/.panel-header/.view-tabs/.status-bar/.ctx-panel/.keypad/.mtab-bar)
