@@ -249,6 +249,13 @@ behaves normally there) — only on a real device or emulator.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.7`. Found a second, independent cause of the
+  black gap above the keyboard: `.editor-panel` always reserves
+  `padding-bottom:calc(46px + safe-area)` to clear the fixed tab bar — but
+  while the keyboard is open that bar is hidden (rule #7/#9), so the
+  reservation just left an unstyled gap right above the keyboard regardless
+  of the manifest fix. Added `html.kbd-open body[data-mtab="editor"]
+  .editor-panel{padding-bottom:0 !important;}`.
 - `APP_VERSION` bumped to `1.0.6`. Found the real root cause of the
   persistent "black bar above the keyboard" report: `AndroidManifest.xml`'s
   `<activity>` had no `android:windowSoftInputMode`, so Android was panning

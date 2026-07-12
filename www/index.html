@@ -712,6 +712,11 @@ footer a:hover{text-decoration:underline;}
     overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
     padding-bottom:calc(46px + env(safe-area-inset-bottom));box-sizing:border-box;touch-action:pan-y;width:100%;}
   html.kbd-open body[data-mtab="editor"]{height:var(--vvh,100svh);}
+  /* .editor-panel always reserves bottom padding to clear the fixed tab bar —
+     but while the keyboard is open that bar is hidden (translated off-screen,
+     see rule #7/#9), so the reservation just leaves a bare, unstyled gap
+     right above the keyboard. Drop it while kbd-open. */
+  html.kbd-open body[data-mtab="editor"] .editor-panel{padding-bottom:0 !important;}
   /* code grows to content so it scrolls as part of the container (no inner trap) */
   body[data-mtab="editor"] .editor-wrap{display:flex;height:auto !important;min-height:300px;max-height:none !important;overflow:visible !important;overscroll-behavior:auto !important;}
   body[data-mtab="editor"] .code-area-wrap{overflow:visible;position:relative;}
@@ -1186,7 +1191,7 @@ END PGM PROGRAM MM</textarea>
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.6';
+var APP_VERSION = '1.0.7';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
