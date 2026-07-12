@@ -178,6 +178,16 @@ OLD content. Always sync after changing anything in `www/`.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- Reworked the light theme (ported deliberately from the web repo's
+  light-theme-rework, adapted for no standalone `<header>`): dark chrome
+  (.toolbar/.panel-header/.view-tabs/.status-bar/.ctx-panel/.keypad/.mtab-bar)
+  over a light workspace with a pure-white editor. Two chrome shades give
+  panel-to-panel contrast (.panel-header/.toolbar/.ctx-panel one step lighter
+  than their neighbors). Path-function/program keys and editor toolbar buttons
+  get a pale fill so they read against the dark chrome. Workpiece darkened in
+  light theme (`_stockRGB`/`_stockHex`) so it doesn't blend into the light 3D
+  stage. This is exactly the kind of deliberate hand-port rule #5 describes —
+  not a wholesale sync.
 - Forced the app to always use the single-column mobile layout (rule #0): 9
   layout media queries → `@media all`, `_isMTab()`/`isMob()` → `true`, help-popup
   `innerWidth > 700` → `false`. Fixes the cramped desktop layout on tablets so

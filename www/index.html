@@ -55,47 +55,130 @@
   --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif; --radius:8px;
   --editor-fs:12px;
 }
+/* ── LIGHT THEME — high-contrast: dark chrome (toolbars/panels) over a light
+   content area, with a pure-white editor. Not a "day/brightness" mode.
+   (Ported from the web repo's light-theme-rework; the app has no standalone
+   <header> element — Light/About live in .panel-header instead.) ── */
 html[data-theme="light"]{
-  --bg:#e4ddd2; --surface:#ffffff; --surface2:#e8e2d8; --border:#c2b6a6;
-  --accent:#0b7d72; --accent2:#0f6b47; --accent3:#1a56b0; --accent-warm:#c96410;
-  --accent-rgb:11,125,114;
-  --key-pale:#efe9df;
-  --text:#120e0a; --text2:#3a3128; --text3:#665849;
+  /* light content context (main area, editor, cards, modals) */
+  --bg:#eef0f3; --surface:#ffffff; --surface2:#e3e6ed; --border:#c7cbd6;
+  --accent:#14b8a6; --accent2:#0f9d76; --accent3:#1558d4; --accent-warm:#c96410;
+  --accent-rgb:20,184,166;
+  --key-pale:#e3e6ed;
+  --text:#171a20; --text2:#454c5c; --text3:#5c6373;
+  --stage:#c7cdd8;
 }
-/* Buttons that rely on a transparent/none background read as washed-out on a
-   light page (no fill, only a faint border) — give the common interactive
-   classes a visible fill in light mode. Colored action buttons (Run/Stop/...)
-   layer their own background on top via a second class, so this doesn't
-   wash those out. */
+/* Dark chrome regions (a touch lighter than pure black): re-scope the tokens
+   here so descendants flip to the light-on-dark palette automatically.
+   Two shades create panel-to-panel contrast: .keypad/.view-tabs/.status-bar/
+   .mtab-bar sit at the darker base tone, while .panel-header (program.H +
+   Learn row), .ctx-panel (Undo/Redo row) and .toolbar (Run/Stop row) sit one
+   step lighter so they visually pop against their neighbors. */
+html[data-theme="light"] .toolbar,
+html[data-theme="light"] .panel-header,
+html[data-theme="light"] .view-tabs,
+html[data-theme="light"] .status-bar,
+html[data-theme="light"] .ctx-panel,
+html[data-theme="light"] .keypad,
+html[data-theme="light"] .mtab-bar{
+  color:#e8ebf1;
+  --surface:#3a414f; --surface2:#3a414f; --key-pale:#333b48;
+  --border:#414956;
+  --text:#e8ebf1; --text2:#c6ccd6; --text3:#9aa3b2;
+}
+html[data-theme="light"] .view-tabs,
+html[data-theme="light"] .status-bar,
+html[data-theme="light"] .keypad,
+html[data-theme="light"] .mtab-bar{
+  background:#272d38 !important;
+}
+html[data-theme="light"] .panel-header,
+html[data-theme="light"] .toolbar,
+html[data-theme="light"] .ctx-panel{
+  background:#353d4c !important;
+}
+/* Header/toolbar action buttons — filled fill on the dark chrome */
 html[data-theme="light"] .btn,
 html[data-theme="light"] .tool-act-btn,
 html[data-theme="light"] #themeToggle,
 html[data-theme="light"] #aboutBtn{
-  background:var(--surface2);
+  background:#3a414f; color:#e8ebf1; border-color:#4a5260;
 }
 html[data-theme="light"] .btn:hover,
-html[data-theme="light"] .tool-act-btn:hover{
-  background:var(--border);
+html[data-theme="light"] .tool-act-btn:hover,
+html[data-theme="light"] #themeToggle:hover,
+html[data-theme="light"] #aboutBtn:hover{ background:#464e5d; color:#fff; }
+/* ── PALE controls: editor control panel — path-function & program keys and the
+   editor toolbar buttons — get a light fill so they pop against the dark chrome. ── */
+html[data-theme="light"] .keypad .key,
+html[data-theme="light"] .ctx-panel .btn,
+html[data-theme="light"] .ph-btn{
+  background:#d3d8e1; color:#1b222c; border-color:#aeb6c4;
 }
-html[data-theme="light"] .btn-run{background:rgba(15,107,71,.14);}
-html[data-theme="light"] .btn-run:hover{background:var(--accent2);color:#fff;}
-html[data-theme="light"] .btn-step{background:rgba(26,86,176,.14);}
-html[data-theme="light"] .btn-step:hover{background:var(--accent3);color:#fff;}
-html[data-theme="light"] .btn-stop{background:rgba(200,45,45,.14);color:#c82d2d;border-color:#c82d2d;}
-html[data-theme="light"] .btn-stop:hover{background:#c82d2d;color:#fff;}
-html[data-theme="light"] .btn-reset{background:var(--surface2);}
-html[data-theme="light"] .btn-reset:hover{background:var(--border);}
-/* Floating buttons/panels over the 3D viewport (Measure, Path, Refine, tool
-   legend, measure readout) have a hardcoded dark translucent background
-   meant to float over a dark canvas — flip them to a light translucent fill
-   to match the now-white 3D background. */
+html[data-theme="light"] .keypad .key:hover,
+html[data-theme="light"] .ctx-panel .btn:hover:not(:disabled),
+html[data-theme="light"] .ph-btn:hover{ background:#e6eaf0; color:#0d1116; border-color:#98a1b2; }
+html[data-theme="light"] .ctx-panel .btn:disabled{ background:#464e5d; color:#8a93a3; border-color:#4a5260; }
+html[data-theme="light"] .keypad .key.off{ background:#c6ccd7; color:#2b313c; border-color:#a7afbd; }
+html[data-theme="light"] .keypad .key.off:hover{ background:#dde1e9; color:#12161c; }
+html[data-theme="light"] .keypad .key.prog{ background:#c7ece6; color:#0c5148; border-color:#8fd6ca; }
+html[data-theme="light"] .keypad .key.prog:hover{ background:#d7f1ec; color:#083b34; }
+html[data-theme="light"] .keypad .key.pi-key{ background:#f6ddc9; color:#9a4a12; border-color:#ecb98f; }
+html[data-theme="light"] .keypad .key.pi-key:hover{ background:#fbe8d8; }
+html[data-theme="light"] .keypad .key.pi{ background:#14b8a6; color:#062420; border-color:transparent; }
+html[data-theme="light"] .keypad .key.on{ background:#14b8a6; color:#062420; border-color:transparent; }
+/* semantic action buttons (Run / Step / Stop / Reset) — filled, readable */
+html[data-theme="light"] .btn-run{ background:#1aa77e; color:#04150f; border-color:transparent; }
+html[data-theme="light"] .btn-run:hover{ background:#22c493; color:#04150f; }
+html[data-theme="light"] .btn-step{ background:#3f83e6; color:#04101f; border-color:transparent; }
+html[data-theme="light"] .btn-step:hover{ background:#5a97f0; color:#04101f; }
+html[data-theme="light"] .btn-stop{ background:#e0574f; color:#1a0402; border-color:transparent; }
+html[data-theme="light"] .btn-stop:hover{ background:#ef6a62; color:#1a0402; }
+html[data-theme="light"] .btn-reset{ background:#3a414f; color:#e8ebf1; border-color:#4a5260; }
+html[data-theme="light"] .btn-reset:hover{ background:#464e5d; }
+html[data-theme="light"] .learn-cta{ background:#14b8a6 !important; color:#062420 !important; border-color:#14b8a6 !important; }
+/* segmented toggles (quality Def/High) */
+html[data-theme="light"] .btn-group{ background:#2f3540; border-color:#414956; }
+html[data-theme="light"] .btn-group .btn-tog{ color:#c6ccd6; border-right-color:#414956; }
+html[data-theme="light"] .btn-group .btn-tog:hover{ background:#3a414f; color:#fff; }
+html[data-theme="light"] .btn-group .btn-tog.active{ background:#14b8a6; color:#062420; font-weight:600; }
+/* speed control */
+html[data-theme="light"] .speed-ctrl{ background:#2f3540; border-color:#414956; }
+html[data-theme="light"] .speed-btn{ color:#c6ccd6; }
+html[data-theme="light"] .speed-btn:hover{ background:#3a414f; color:#fff; }
+html[data-theme="light"] .speed-val{ color:#6df3dd; border-color:#414956; }
+/* view tabs (3D view / XY toolpath / Tool Table) */
+html[data-theme="light"] .tab{ background:#2f3540; color:#9aa3b2; }
+html[data-theme="light"] .tab:hover{ color:#c6ccd6; }
+html[data-theme="light"] .tab.active{ background:rgba(20,184,166,.18); color:#6df3dd; border-bottom-color:#14b8a6; }
+/* badges (incl. the "live" badge) */
+html[data-theme="light"] .badge{ background:#3a414f; color:#c6ccd6; border-color:#4a5260; }
+html[data-theme="light"] .badge.green{ background:#0e5148; color:#6df3dd; border-color:transparent; }
+html[data-theme="light"] .badge.blue{ background:#123a6b; color:#84b6ff; border-color:transparent; }
+/* logo text (unused now that <header> is gone, kept harmless) */
+html[data-theme="light"] .logo-text{ color:#f2f4f8; }
+html[data-theme="light"] .logo-sub{ color:#9aa3b2; }
+/* editor stays pure white; number gutter light */
+html[data-theme="light"] .code-area-wrap{ background:#ffffff; }
+html[data-theme="light"] .line-nums{ background:#e9ebf0; }
+html[data-theme="light"] .line-nums .ln.selected{ border-left-color:#14b8a6; }
+/* 3D stage background (CSS fallback; JS sets the WebGL scene bg to match) */
+html[data-theme="light"] #view3d{ background:var(--stage); }
+/* syntax colours on the white editor (Q-params = info blue) */
+html[data-theme="light"] .syn-comment{color:#2f9e57;}
+html[data-theme="light"] .syn-tool{color:#c2440a;}
+html[data-theme="light"] .syn-lbl{color:#1a52a8;}
+html[data-theme="light"] .syn-qvar{color:#1558d4;}
+html[data-theme="light"] .syn-cycle{color:#8a5a12;}
+/* floating controls over the (light-gray) 3D stage — dark translucent + light text */
 html[data-theme="light"] #pathToggle,
 html[data-theme="light"] #measureBtn,
 html[data-theme="light"] #refineBtnCanvas,
 html[data-theme="light"] #toolLegend,
 html[data-theme="light"] #measureOverlay{
-  background:rgba(255,255,255,0.88) !important;
-  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  background:rgba(39,45,56,0.86) !important;
+  color:#e8ebf1 !important;
+  box-shadow:0 1px 6px rgba(0,0,0,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;}
@@ -6282,8 +6365,12 @@ function bufRefresh(buf, partialA, partialB){
 function bufClear(buf){ buf.count=0; buf.geo.setDrawRange(0,0); buf.geo.attributes.position.needsUpdate=true; }
 
 function _scene3dBgColor(){
-  return document.documentElement.getAttribute('data-theme')==='light' ? 0xf5f2ee : 0x100f0d;
+  return document.documentElement.getAttribute('data-theme')==='light' ? 0xc7cdd8 : 0x100f0d;
 }
+// Uncut stock (workpiece) colour — darker in light theme so it stands out
+// against the light 3D stage instead of blending into it.
+function _stockRGB(){ return document.documentElement.getAttribute('data-theme')==='light' ? [0.44,0.46,0.50] : [0.61,0.62,0.65]; }
+function _stockHex(){ return document.documentElement.getAttribute('data-theme')==='light' ? 0x70747d : 0x9a9da6; }
 function show3DError(msg){
   try{
     if(!view3dEl) return;
@@ -6649,7 +6736,7 @@ function vxBuildMesh(){
       var tc=TOOL_CUT_COLORS[(isCut-1)%TOOL_CUT_COLORS.length];
       r=tc[0];g=tc[1];b=tc[2];
     } else {
-      r=0.61;g=0.62;b=0.65;
+      var _s=_stockRGB(); r=_s[0];g=_s[1];b=_s[2];
     }
     colors.push(r,g,b, r,g,b, r,g,b);
   }
@@ -6823,7 +6910,7 @@ function _applyRefinedMesh(vertsArr, normsArr, triColors){
   var colors = [];
   for(var ti=0; ti<(triColors?triColors.length:0); ti++){
     var toolNum = triColors[ti];
-    var r=0.61, g=0.62, b=0.65;
+    var _s0=_stockRGB(); var r=_s0[0], g=_s0[1], b=_s0[2];
     if(toolNum>0 && toolNum<255){
       var tc = TOOL_CUT_COLORS[(toolNum-1)%TOOL_CUT_COLORS.length];
       r=tc[0]; g=tc[1]; b=tc[2];
@@ -6869,7 +6956,7 @@ function buildScene(prog){
     var bg = new THREE.CylinderGeometry(cyl.r, cyl.r, cylH, 64);
     bg.rotateX(Math.PI/2); // Y-up → Z-up
     bg.translate(cyl.cx, cyl.cy, cyl.zMin + cylH/2);
-    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:0x9a9da6}));
+    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:_stockHex()}));
     scene.add(blockMesh);
     // edge circle outlines (top + bottom)
     var edgeMat = new THREE.LineBasicMaterial({color:0x3a3e48});
@@ -6885,7 +6972,7 @@ function buildScene(prog){
   } else {
     var bg = new THREE.BoxGeometry(w, d, h);
     bg.translate(min.x+w/2, min.y+d/2, min.z+h/2);
-    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:0x9a9da6}));
+    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:_stockHex()}));
     scene.add(blockMesh);
     blockEdges = new THREE.LineSegments(new THREE.EdgesGeometry(bg), new THREE.LineBasicMaterial({color:0x3a3e48}));
     scene.add(blockEdges);
