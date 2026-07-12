@@ -1186,7 +1186,7 @@ END PGM PROGRAM MM</textarea>
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.3';
+var APP_VERSION = '1.0.4';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -10037,88 +10037,43 @@ document.body.setAttribute('data-mtab','editor');
   setTimeout(grow, 60);
 })();
 
-/* Keep the mobile bottom tab bar pinned to the true visible viewport.
-   position:fixed tracks the *layout* viewport, but mobile browsers resize it
-   only after the address-bar show/hide animation finishes — that lag is the
-   visible "jump". We follow visualViewport continuously with a rAF loop that
-   runs while scrolling/resizing, so the bar stays glued the whole time.
-   Skip entirely inside the Capacitor app: there is no browser address bar to
-   chase, its own keyboard-open detection is unreliable in the app's WebView
-   (which resizes window.innerHeight together with visualViewport), and its
-   inline style writes (visibility/transform) were fighting the focus/blur
-   based keyboard-hide mechanism below — see that block's comment. */
+/* Hide the bottom mobile tab bar (and pin the true visible viewport) while the
+   on-screen keyboard is actually covering the screen.
+   Detected by comparing visualViewport.height against a REMEMBERED "no
+   keyboard" baseline — NOT against the live window.innerHeight. Two earlier
+   approaches were tried and both failed:
+   1. offset = window.innerHeight - visualViewport.height: reads ~0 forever
+      inside the Capacitor WebView, because it resizes window.innerHeight
+      together with the keyboard, so the two live values never actually
+      diverge.
+   2. focus/blur on the hidden #mobileInput: this app deliberately keeps that
+      input focused after the on-screen keyboard is dismissed (see the "keep
+      mobileInput focused when FM is active" blur handler, so the next quick
+      edit doesn't need a re-tap) — so blur does not reliably fire when the
+      keyboard actually closes, leaving the bar permanently hidden and the
+      app stuck (confirmed on a real device).
+   This approach avoids both problems: `baseline` is captured once (and
+   silently re-synced any time the viewport is at least as tall as it —
+   i.e. whenever we're confident no keyboard is covering anything, including
+   after rotation), so the keyboard's shrink amount is always measured
+   against a stable reference instead of two numbers that move together. */
 (function(){
-  if(!window.visualViewport || window.Capacitor) return;
-  var bar = null, raf = 0, idleTicks = 0, last = -1;
+  if(!window.visualViewport) return;
+  var vv = window.visualViewport;
+  var bar = null;
+  var baseline = vv.height;
   function apply(){
     if(!bar) bar = document.querySelector('.mtab-bar');
-    var vv = window.visualViewport;
-    var offset = window.innerHeight - (vv.height + vv.offsetTop);
-    if(offset < 0.5) offset = 0;
-    offset = Math.round(offset);
-    var kbdOpen = offset > 140;
-    // expose the true visible height + keyboard state to CSS so the editor
-    // layout can shrink to fit the space actually left above the keyboard
+    if(vv.height >= baseline - 2) baseline = vv.height; // no keyboard right now — keep the reference fresh
+    var kbdOpen = (baseline - vv.height) > 140;
     document.documentElement.style.setProperty('--vvh', vv.height + 'px');
     document.documentElement.classList.toggle('kbd-open', kbdOpen);
-    if(!bar) return;
-    if(kbdOpen !== bar._kbdHidden){
-      bar._kbdHidden = kbdOpen;
-      bar.style.visibility = kbdOpen ? 'hidden' : '';
-      idleTicks = 0;
-    }
-    if(kbdOpen){ return; }
-    // Do NOT transform the bar during scrolling. Plain position:fixed tracks
-    // the layout viewport smoothly on its own (the Learn tab proves this) —
-    // chasing visualViewport with transforms is what caused the jitter. The
-    // only thing we handle is hiding the bar while the keyboard is open.
-    if(last !== 0){ last = 0; bar.style.transform = ''; }
+    document.documentElement.classList.toggle('editing-field', kbdOpen);
   }
-  function loop(){
-    apply();
-    // keep looping briefly after the last change so we ride out the
-    // browser's URL-bar animation, then stop to save battery
-    if(++idleTicks < 30){ raf = requestAnimationFrame(loop); }
-    else { raf = 0; }
-  }
-  function kick(){ idleTicks = 0; if(!raf) raf = requestAnimationFrame(loop); }
-  window.visualViewport.addEventListener('resize', kick);
-  window.visualViewport.addEventListener('scroll', kick);
-  window.addEventListener('scroll', kick, {passive:true});
-  window.addEventListener('touchmove', kick, {passive:true});
-  window.addEventListener('orientationchange', function(){ setTimeout(kick, 50); });
-  kick();
-})();
-
-/* Hide the bottom mobile tab bar while a text field is focused (soft keyboard
-   open). This is the reliable cross-environment signal: the Capacitor WebView
-   resizes on keyboard show, which defeats the visualViewport-offset check
-   above, leaving the fixed bottom bar stuck over the keyboard. Focus/blur fire
-   the same in the app and the browser. */
-(function(){
-  function isEditable(el){
-    if(!el) return false;
-    if(el.tagName === 'TEXTAREA') return true;
-    if(el.tagName === 'INPUT'){
-      var ty = (el.getAttribute('type') || 'text').toLowerCase();
-      return ['text','search','number','tel','url','email','password'].indexOf(ty) >= 0;
-    }
-    return !!el.isContentEditable;
-  }
-  var tmr = null;
-  document.addEventListener('focusin', function(e){
-    if(isEditable(e.target)){
-      if(tmr){ clearTimeout(tmr); tmr = null; }
-      document.documentElement.classList.add('editing-field');
-    }
-  });
-  document.addEventListener('focusout', function(){
-    // small delay so switching directly between fields doesn't flash the bar
-    if(tmr) clearTimeout(tmr);
-    tmr = setTimeout(function(){
-      if(!isEditable(document.activeElement)) document.documentElement.classList.remove('editing-field');
-    }, 120);
-  });
+  vv.addEventListener('resize', apply);
+  vv.addEventListener('scroll', apply);
+  window.addEventListener('orientationchange', function(){ setTimeout(function(){ baseline = vv.height; apply(); }, 300); });
+  apply();
 })();
 
 function learnResetProgress(){

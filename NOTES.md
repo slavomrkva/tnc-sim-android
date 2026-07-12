@@ -170,22 +170,35 @@ for the htmlpreview preview); otherwise app-only code can live here freely.
 `npx cap sync android`. Editing `www/` and building without syncing ships the
 OLD content. Always sync after changing anything in `www/`.
 
-### 7. Don't toggle `visibility` on the `.mtab-bar` (bottom tab bar) — use `transform`
-`.mtab-bar` is `position:fixed` + `transform:translateZ(0)` (a promoted GPU
-layer). On real Android WebView, flipping `visibility` on a layered fixed
-element while the soft keyboard opens/closes can leave a stale blank/black
-composited tile on screen instead of fully hiding — this bit us once already
-(confirmed on a real device, not visible in desktop/browser testing). The fix
-that works: keep the layer always composited and just move it off-screen via
-`transform:translateY(120%) translateZ(0)` (see the `html.editing-field
-.mtab-bar` rule). Also: only ONE mechanism should ever control this bar's
-hide/show — the old `visualViewport`-based rAF loop (meant for chasing a
-*browser* address-bar animation) is explicitly skipped when `window.Capacitor`
-is set, because its own keyboard-open detection is broken inside the app's
-WebView (which resizes `window.innerHeight` together with the viewport) and it
-was fighting the focus/blur-based `editing-field` mechanism with conflicting
-inline style writes. If you touch keyboard-open handling again, keep it to
-that one focus/blur mechanism inside the app.
+### 7. Keyboard-open detection: compare visualViewport height to a remembered baseline — not to window.innerHeight, and not to focus/blur
+Two earlier approaches to detecting "the soft keyboard is covering the
+`.mtab-bar` bottom tab bar" both failed on a real device (bugs only showed up
+there, never in desktop/browser testing — always verify this specific class of
+fix on a physical phone):
+- **`window.innerHeight - visualViewport.height` offset**: reads ~0 forever
+  inside the Capacitor WebView, because it resizes `window.innerHeight`
+  together with the keyboard — the two live values never diverge.
+- **focus/blur on the hidden `#mobileInput`**: this app deliberately keeps
+  that input focused after the on-screen keyboard is dismissed (see the "keep
+  mobileInput focused when FM is active" blur handler, so the next quick edit
+  doesn't need a re-tap), so `blur` does not reliably fire when the keyboard
+  actually closes — the bar stayed hidden and unreachable forever, breaking
+  tab navigation.
+
+**What works**: capture `baseline = visualViewport.height` once, and
+re-sync it any time the viewport is at least as tall as `baseline` (i.e.
+whenever there's confidently no keyboard, including after rotation).
+`kbdOpen = (baseline - visualViewport.height) > 140`. This measures the
+keyboard's actual on-screen occlusion against a stable reference instead of
+two numbers that move together, and is completely independent of DOM focus
+state. Also: only ONE mechanism drives this — the `editing-field`/`kbd-open`
+classes are set from this single IIFE. Don't reintroduce a second
+mechanism (old rAF/address-bar-chasing loop, or focus/blur) alongside it —
+that's exactly the "two things fighting" bug this rule replaced twice now.
+`.mtab-bar` also stays `transform:translateY(120%) translateZ(0)` (not
+`visibility:hidden`) to avoid a separate real-device-only bug: flipping
+`visibility` on a `transform:translateZ(0)`-promoted GPU layer can leave a
+stale blank/black composited tile instead of fully hiding.
 
 ### 8. `APP_VERSION` is a build marker, separate from `versionCode`/`versionName`
 `APP_VERSION` (top of the main `<script>` in `www/index.html`, shown in the
@@ -213,6 +226,14 @@ release is this?").
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.4`. Fixed the real regression from the previous
+  fix: the bottom tab bar could stay permanently hidden after the keyboard
+  closed, blocking tab navigation entirely. Root cause: `#mobileInput` stays
+  focused after the keyboard visually closes (by design, for fast re-entry),
+  so the focus/blur-based hide mechanism never fired the "keyboard closed"
+  side. Replaced with a baseline-vs-visualViewport-height comparison that
+  doesn't depend on focus state at all — see rewritten rule #7. Verified with
+  a simulated-viewport test reproducing the exact "input stays focused" case.
 - `APP_VERSION` bumped to `1.0.3` (was stale at `0.803`, a leftover from
   before the repo went standalone — never bumped since). Added rule #8:
   bump `APP_VERSION` on every change, however small, as an on-device build
