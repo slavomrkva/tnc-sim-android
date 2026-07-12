@@ -164,6 +164,23 @@ for the htmlpreview preview); otherwise app-only code can live here freely.
 `npx cap sync android`. Editing `www/` and building without syncing ships the
 OLD content. Always sync after changing anything in `www/`.
 
+### 7. Don't toggle `visibility` on the `.mtab-bar` (bottom tab bar) — use `transform`
+`.mtab-bar` is `position:fixed` + `transform:translateZ(0)` (a promoted GPU
+layer). On real Android WebView, flipping `visibility` on a layered fixed
+element while the soft keyboard opens/closes can leave a stale blank/black
+composited tile on screen instead of fully hiding — this bit us once already
+(confirmed on a real device, not visible in desktop/browser testing). The fix
+that works: keep the layer always composited and just move it off-screen via
+`transform:translateY(120%) translateZ(0)` (see the `html.editing-field
+.mtab-bar` rule). Also: only ONE mechanism should ever control this bar's
+hide/show — the old `visualViewport`-based rAF loop (meant for chasing a
+*browser* address-bar animation) is explicitly skipped when `window.Capacitor`
+is set, because its own keyboard-open detection is broken inside the app's
+WebView (which resizes `window.innerHeight` together with the viewport) and it
+was fighting the focus/blur-based `editing-field` mechanism with conflicting
+inline style writes. If you touch keyboard-open handling again, keep it to
+that one focus/blur mechanism inside the app.
+
 ---
 
 ## Testing checklist before shipping a release

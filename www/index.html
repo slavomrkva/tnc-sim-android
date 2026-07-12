@@ -662,7 +662,7 @@ footer a:hover{text-decoration:underline;}
 .mtab-bar{display:none;}
 #learnMobileBar{display:none;}
 @media all{
-  .mtab-bar{position:fixed;left:0;right:0;bottom:0;z-index:8000;display:flex;background:var(--surface2);border-top:1px solid var(--border);height:calc(46px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;transform:translateZ(0);}
+  .mtab-bar{position:fixed;left:0;right:0;bottom:0;z-index:8000;display:flex;background:var(--surface2);border-top:1px solid var(--border);height:calc(46px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;transform:translateZ(0);transition:transform .16s ease;}
   .mtab-bar button{flex:1;background:none;border:none;border-top:3px solid transparent;color:var(--text3);font-family:var(--mono);font-size:9.5px;padding:3px 4px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:background .15s,color .15s;}
   .mtab-bar button .mi{font-size:0;line-height:0;display:flex;}
   .mtab-bar button .mi svg{width:23px;height:23px;display:block;}
@@ -672,8 +672,13 @@ footer a:hover{text-decoration:underline;}
      The visualViewport check misses this in the Capacitor WebView, which
      resizes window.innerHeight on keyboard show — so the fixed bottom bar would
      otherwise sit right above the keyboard. Focus-based hiding works in both the
-     app and the browser. */
-  html.editing-field .mtab-bar{visibility:hidden !important;}
+     app and the browser.
+     Slide off-screen via transform rather than toggling visibility: .mtab-bar
+     is a promoted GPU layer (transform:translateZ(0)) and on Android WebView,
+     flipping visibility on a layered position:fixed element can leave a stale
+     blank/black composited tile behind instead of fully disappearing. Moving
+     the same layer keeps it composited the whole time, avoiding that glitch. */
+  html.editing-field .mtab-bar{transform:translateY(120%) translateZ(0) !important;}
   body{padding-bottom:50px;}
   /* tab visibility */
   body[data-mtab="editor"] .canvas-panel{display:none !important;}
@@ -10033,9 +10038,14 @@ document.body.setAttribute('data-mtab','editor');
    position:fixed tracks the *layout* viewport, but mobile browsers resize it
    only after the address-bar show/hide animation finishes — that lag is the
    visible "jump". We follow visualViewport continuously with a rAF loop that
-   runs while scrolling/resizing, so the bar stays glued the whole time. */
+   runs while scrolling/resizing, so the bar stays glued the whole time.
+   Skip entirely inside the Capacitor app: there is no browser address bar to
+   chase, its own keyboard-open detection is unreliable in the app's WebView
+   (which resizes window.innerHeight together with visualViewport), and its
+   inline style writes (visibility/transform) were fighting the focus/blur
+   based keyboard-hide mechanism below — see that block's comment. */
 (function(){
-  if(!window.visualViewport) return;
+  if(!window.visualViewport || window.Capacitor) return;
   var bar = null, raf = 0, idleTicks = 0, last = -1;
   function apply(){
     if(!bar) bar = document.querySelector('.mtab-bar');
