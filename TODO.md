@@ -1,26 +1,27 @@
 # TODO / known open items
 
-## NEEDS ON-DEVICE VERIFICATION: keyboard fix rewritten to use @capacitor/keyboard
-`www/android/keyboard.js` was rewritten (`APP_VERSION 1.0.9`) to use the
-native `@capacitor/keyboard` plugin's `keyboardDidShow`/`keyboardDidHide`
-events instead of the `visualViewport`-baseline-polling workaround (see
-NOTES.md rule #7 for the full history and why). `npm install
-@capacitor/keyboard` + `npx cap sync android` were run — the native Gradle
-module (`capacitor-keyboard`) is wired into `android/settings.gradle` via
-the auto-generated `android/capacitor.settings.gradle`, and
-`AndroidManifest.xml`'s `windowSoftInputMode="adjustResize"` (rule #9) is
-already in place and still required.
+## RESOLVED: @capacitor/keyboard plugin attempt reverted (real-device tested)
+`www/android/keyboard.js` was briefly rewritten (`APP_VERSION 1.0.9`) to use
+the native `@capacitor/keyboard` plugin's `keyboardDidShow`/`keyboardDidHide`
+events instead of the `visualViewport`-baseline approach. **Tested on a real
+device and confirmed broken**: on keyboard open the bottom tab bar visibly
+slid up together with the keyboard before hiding, leaving a black gap above
+the keyboard in between; on keyboard close the gap stayed black for a moment
+before the bar slid back in — a real UX regression, not just cosmetic.
 
-**This has NOT been verified on a real device or emulator** — this class of
-bug (and the plugin itself) doesn't exist in browser/htmlpreview preview at
-all, only a real Android build can confirm it actually works (rule #9).
-Before shipping a release built on this: `npx cap sync android` (if not
-already fresh), build + install on a real device, open the editor tab, tap
-into the code area to bring up the soft keyboard, confirm the bottom tab bar
-hides cleanly (no black gap, no stuck-hidden-after-close), and confirm it
-still works after rotating the device with the keyboard open. If it
-misbehaves, rule #7 documents the old (working, shipped in `1.0.4`–`1.0.8`)
-`visualViewport`-baseline approach as a fallback to revert to.
+Reverted in `1.0.10`: `www/android/keyboard.js` restored byte-for-byte to
+the `1.0.4`–`1.0.8` `visualViewport`-baseline implementation, and
+`@capacitor/keyboard` was fully uninstalled (`npm uninstall
+@capacitor/keyboard` + `npx cap sync android`) rather than left installed
+but unused. See NOTES.md rule #7 for the full writeup — **do not retry the
+native-events approach without the ability to iterate directly on a real
+device**; it can't be debugged from source or in browser preview, and it
+already failed once in exactly the way rule #9 warns about (timing/ordering
+issues that only show up on-device).
+
+If keyboard behavior needs further work in the future, the current
+`visualViewport`-baseline approach is the known-working baseline — start
+from understanding *why* it works (rule #7) before changing it.
 
 ## Housekeeping from the module-split refactor (2026-07-12)
 - The web repo's `core/*.js` and this repo's `www/core/*.js` are byte-for-

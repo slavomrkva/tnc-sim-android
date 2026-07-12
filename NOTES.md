@@ -119,12 +119,10 @@ split (2026-07-12 refactor, no functionality changed) into:
   - `panels.js`: `renderIdlePanel`/`updateLineNums` — android added a
     `#_idleBlocks` block-count span to the idle toolbar that web doesn't
     have; the two functions are a linked pair, kept together.
-  - `keyboard.js`: the `kbd-open` keyboard-handling logic — see rule #7.
-    **Materially different from web's**, not a constant swap — android uses
-    the native `@capacitor/keyboard` plugin's `keyboardDidShow`/
-    `keyboardDidHide` events (no such plugin exists in a plain browser, so
-    web can't use this); web instead infers keyboard state from
-    `visualViewport`, since `window.innerHeight` doesn't diverge from
+  - `keyboard.js`: the `visualViewport`/`kbd-open` keyboard-handling IIFE —
+    see rule #7. **Materially different from web's**, not a constant swap —
+    android tracks a re-synced baseline height because
+    `window.innerHeight` doesn't diverge from
     `visualViewport.height` inside the Capacitor WebView the way it does in
     a real mobile browser (web's own approach would read ~0 forever here).
   - `onboarding.js` — the first-launch onboarding tour IIFE
@@ -275,22 +273,22 @@ for the htmlpreview preview); otherwise app-only code can live here freely.
 `npx cap sync android`. Editing `www/` and building without syncing ships the
 OLD content. Always sync after changing anything in `www/`.
 
-### 7. Keyboard-open detection: use the native `@capacitor/keyboard` plugin events — not visualViewport polling, and not focus/blur
-**Current approach (as of `APP_VERSION 1.0.9`):** `www/android/keyboard.js`
-listens for the native `keyboardDidShow`/`keyboardDidHide` events from the
-`@capacitor/keyboard` plugin (`window.addEventListener('keyboardDidShow', …)`
-— Cordova-compatible global events, no need to touch
-`Capacitor.Plugins.Keyboard` directly) and toggles `html.kbd-open`/
-`html.editing-field` directly from those two booleans. No polling, no
-baseline, no height math. Requires
-`android:windowSoftInputMode="adjustResize"` (rule #9) so
-`window.innerHeight` is already correctly resized by the time
-`keyboardDidShow` fires — `keyboardDidShow` (not `keyboardWillShow`) is used
-specifically so the resize has already happened when `--vvh` is read from
-`window.innerHeight`. Guarded behind `if(!window.Capacitor) return;` — a
-no-op in plain-browser preview, where the plugin doesn't exist.
+### 7. Keyboard-open detection: compare visualViewport height to a remembered baseline — not to window.innerHeight, not to focus/blur, and not to the native @capacitor/keyboard plugin events
+**Current approach (restored in `APP_VERSION 1.0.10`, originally shipped
+`1.0.4`–`1.0.8`):** `www/android/keyboard.js` captures `baseline =
+visualViewport.height` once, re-syncs it any time the viewport is at least
+as tall as `baseline` (i.e. whenever there's confidently no keyboard,
+including after rotation), and compares the live height against it:
+`kbdOpen = (baseline - visualViewport.height) > 140`. This measures the
+keyboard's actual on-screen occlusion continuously (on every
+`visualViewport` `resize`/`scroll`) against a stable reference, instead of
+relying on a single discrete event. This is a proven, real-device-tested
+fix — do not replace it without on-device testing (see the failed attempt
+below).
 
-**Why not visualViewport polling (the old approach, two failed attempts before it):**
+**Three earlier/alternative approaches were tried and all failed on a real
+device** (bugs only showed up there, never in desktop/browser testing —
+always verify this specific class of fix on a physical phone):
 - **`window.innerHeight - visualViewport.height` offset**: reads ~0 forever
   inside the Capacitor WebView, because it resizes `window.innerHeight`
   together with the keyboard — the two live values never diverge.
@@ -300,25 +298,30 @@ no-op in plain-browser preview, where the plugin doesn't exist.
   doesn't need a re-tap), so `blur` does not reliably fire when the keyboard
   actually closes — the bar stayed hidden and unreachable forever, breaking
   tab navigation.
-- **baseline-vs-`visualViewport.height` polling** (worked, shipped in
-  `1.0.4`–`1.0.8`, replaced in `1.0.9`): capture `baseline =
-  visualViewport.height` once, re-sync it whenever the viewport is at least
-  as tall as `baseline`, and compare the live height against it
-  (`kbdOpen = (baseline - visualViewport.height) > 140`). This was correct
-  and shipped for a while, but was an inherent workaround (inferring an
-  on/off event from continuous height comparisons) — replaced once the
-  module-split refactor (rule #10) made it practical to revisit, per TODO.md.
-  If the native-events approach above ever needs to be reverted, this is
-  the fallback to reach for — do not reintroduce the two *broken* approaches
-  above it.
+- **Native `@capacitor/keyboard` plugin events** (`keyboardDidShow`/
+  `keyboardDidHide`, tried and reverted same-day in `1.0.9`→`1.0.10`): looked
+  like the "correct" fix on paper (a real native event instead of inferring
+  state from height math) and was even documented as the recommended next
+  step in an earlier version of this file. **Confirmed broken on a real
+  device**: on keyboard open, the tab bar visibly slid up together with the
+  keyboard and only hid a moment later, leaving a black empty gap above the
+  keyboard in between; on keyboard close, the gap stayed black for a moment
+  before the bar slid back in. Root cause (inferred, not device-debugged
+  further): the discrete `Did`-suffixed events don't reliably fire in sync
+  with the actual keyboard/resize animation completing, unlike a continuous
+  `visualViewport` listener which can't drift out of sync with reality
+  because it's measuring the real, current height on every tick. **Do not
+  retry this approach without a way to iterate directly on a real device** —
+  it cannot be debugged or verified from source alone or in browser preview.
+  The npm dependency was fully removed (`npm uninstall @capacitor/keyboard`
+  + `npx cap sync android`) rather than left installed-but-unused.
 
-**Still true regardless of detection mechanism:** only ONE mechanism should
-ever drive the `editing-field`/`kbd-open` classes at a time — don't
-reintroduce a second one (old rAF/address-bar-chasing loop, or focus/blur)
-alongside the current one, that's exactly the "two things fighting" bug this
-rule has replaced multiple times now. `.mtab-bar` also stays
-`transform:translateY(120%) translateZ(0)` (not `visibility:hidden`) to
-avoid a separate real-device-only bug: flipping `visibility` on a
+**Regardless of detection mechanism:** only ONE mechanism should ever drive
+the `editing-field`/`kbd-open` classes at a time — don't reintroduce a second
+one alongside the current one, that's exactly the "two things fighting" bug
+this rule has been rewritten to fix multiple times now. `.mtab-bar` also
+stays `transform:translateY(120%) translateZ(0)` (not `visibility:hidden`)
+to avoid a separate real-device-only bug: flipping `visibility` on a
 `transform:translateZ(0)`-promoted GPU layer can leave a stale blank/black
 composited tile instead of fully hiding.
 
@@ -347,21 +350,15 @@ it into this build?" vs. "which Play Store release is this?").
 `android/app/src/main/AndroidManifest.xml`'s `<activity>` must have
 `android:windowSoftInputMode="adjustResize"`. Without it, Android defaults to
 panning the whole window under the keyboard instead of shrinking the
-available space — which means `window.innerHeight` never actually changes
-when the keyboard opens. Rule #7's current native-events detection
-(`keyboardDidShow`/`keyboardDidHide`) will likely still fire either way (the
-plugin has its own native signal for keyboard visibility, independent of
-this setting), but `--vvh` (read from `window.innerHeight` right when
-`keyboardDidShow` fires) would be wrong without it, and the CSS that sizes
-the editor panel to `var(--vvh)` would be sizing against the un-resized
-window. (This was also true, more severely, of the older `visualViewport`-
-based detection this rule originally documented — without `adjustResize`,
-`visualViewport` never changed either, so the whole detection silently never
-fired at all, not just the sizing.) This is a **native config change**: it
+available space — which means `visualViewport` (and `window.innerHeight`)
+never actually change when the keyboard opens, so rule #7's keyboard-open
+detection (and anything else built on `visualViewport`) silently never fires.
+Symptom: the bottom tab bar just sits there, unmoved, right above/behind the
+keyboard, no matter what the JS does — because from the JS's point of view
+the keyboard never "opened" at all. This is a **native config change**: it
 requires `npx cap sync android` + a real rebuild to take effect, and can
-never be fully verified via the browser/htmlpreview preview — only on a real
-device or emulator (rule #7's mechanism also doesn't exist at all outside
-the native app, so browser preview can't exercise it regardless).
+never be verified via the browser/htmlpreview preview (`window.visualViewport`
+behaves normally there) — only on a real device or emulator.
 
 ### 10. `www/index.html` is now split into `core/`/`android/` modules — see "Module map" above
 As of 2026-07-12, the JS/CSS that used to be one giant inline `<script>`/
@@ -391,6 +388,19 @@ the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.10`. **Reverted `1.0.9`'s
+  `@capacitor/keyboard`-plugin approach** after real-device testing showed a
+  genuine regression: on keyboard open the tab bar visibly slid up with the
+  keyboard before hiding, leaving a black gap above the keyboard in between;
+  on close the gap stayed black before the bar slid back in. Restored the
+  proven `visualViewport`-baseline detection (`1.0.4`–`1.0.8`) byte-for-byte.
+  Fully removed the npm dependency (`npm uninstall @capacitor/keyboard` +
+  `npx cap sync android`, confirmed no `capacitor-keyboard` references left
+  in the native Gradle files) rather than leaving it installed-but-unused.
+  Updated NOTES.md rules #7/#9 and the "Module map" `keyboard.js` entry back
+  to describe the restored approach, with the plugin attempt documented as a
+  third failed approach in rule #7 (do not retry without real-device
+  iteration capability). See TODO.md.
 - `APP_VERSION` bumped to `1.0.9`. Replaced the `visualViewport`-baseline
   keyboard-detection workaround (rule #7, shipped in `1.0.4`) with the native
   `@capacitor/keyboard` plugin's `keyboardDidShow`/`keyboardDidHide` events —
