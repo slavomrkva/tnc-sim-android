@@ -55,47 +55,130 @@
   --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif; --radius:8px;
   --editor-fs:12px;
 }
+/* ── LIGHT THEME — high-contrast: dark chrome (toolbars/panels) over a light
+   content area, with a pure-white editor. Not a "day/brightness" mode.
+   (Ported from the web repo's light-theme-rework; the app has no standalone
+   <header> element — Light/About live in .panel-header instead.) ── */
 html[data-theme="light"]{
-  --bg:#e4ddd2; --surface:#ffffff; --surface2:#e8e2d8; --border:#c2b6a6;
-  --accent:#0b7d72; --accent2:#0f6b47; --accent3:#1a56b0; --accent-warm:#c96410;
-  --accent-rgb:11,125,114;
-  --key-pale:#efe9df;
-  --text:#120e0a; --text2:#3a3128; --text3:#665849;
+  /* light content context (main area, editor, cards, modals) */
+  --bg:#eef0f3; --surface:#ffffff; --surface2:#e3e6ed; --border:#c7cbd6;
+  --accent:#14b8a6; --accent2:#0f9d76; --accent3:#1558d4; --accent-warm:#c96410;
+  --accent-rgb:20,184,166;
+  --key-pale:#e3e6ed;
+  --text:#171a20; --text2:#454c5c; --text3:#5c6373;
+  --stage:#c7cdd8;
 }
-/* Buttons that rely on a transparent/none background read as washed-out on a
-   light page (no fill, only a faint border) — give the common interactive
-   classes a visible fill in light mode. Colored action buttons (Run/Stop/...)
-   layer their own background on top via a second class, so this doesn't
-   wash those out. */
+/* Dark chrome regions (a touch lighter than pure black): re-scope the tokens
+   here so descendants flip to the light-on-dark palette automatically.
+   Two shades create panel-to-panel contrast: .keypad/.view-tabs/.status-bar/
+   .mtab-bar sit at the darker base tone, while .panel-header (program.H +
+   Learn row), .ctx-panel (Undo/Redo row) and .toolbar (Run/Stop row) sit one
+   step lighter so they visually pop against their neighbors. */
+html[data-theme="light"] .toolbar,
+html[data-theme="light"] .panel-header,
+html[data-theme="light"] .view-tabs,
+html[data-theme="light"] .status-bar,
+html[data-theme="light"] .ctx-panel,
+html[data-theme="light"] .keypad,
+html[data-theme="light"] .mtab-bar{
+  color:#e8ebf1;
+  --surface:#3a414f; --surface2:#3a414f; --key-pale:#333b48;
+  --border:#414956;
+  --text:#e8ebf1; --text2:#c6ccd6; --text3:#9aa3b2;
+}
+html[data-theme="light"] .view-tabs,
+html[data-theme="light"] .status-bar,
+html[data-theme="light"] .keypad,
+html[data-theme="light"] .mtab-bar{
+  background:#272d38 !important;
+}
+html[data-theme="light"] .panel-header,
+html[data-theme="light"] .toolbar,
+html[data-theme="light"] .ctx-panel{
+  background:#353d4c !important;
+}
+/* Header/toolbar action buttons — filled fill on the dark chrome */
 html[data-theme="light"] .btn,
 html[data-theme="light"] .tool-act-btn,
 html[data-theme="light"] #themeToggle,
 html[data-theme="light"] #aboutBtn{
-  background:var(--surface2);
+  background:#3a414f; color:#e8ebf1; border-color:#4a5260;
 }
 html[data-theme="light"] .btn:hover,
-html[data-theme="light"] .tool-act-btn:hover{
-  background:var(--border);
+html[data-theme="light"] .tool-act-btn:hover,
+html[data-theme="light"] #themeToggle:hover,
+html[data-theme="light"] #aboutBtn:hover{ background:#464e5d; color:#fff; }
+/* ── PALE controls: editor control panel — path-function & program keys and the
+   editor toolbar buttons — get a light fill so they pop against the dark chrome. ── */
+html[data-theme="light"] .keypad .key,
+html[data-theme="light"] .ctx-panel .btn,
+html[data-theme="light"] .ph-btn{
+  background:#d3d8e1; color:#1b222c; border-color:#aeb6c4;
 }
-html[data-theme="light"] .btn-run{background:rgba(15,107,71,.14);}
-html[data-theme="light"] .btn-run:hover{background:var(--accent2);color:#fff;}
-html[data-theme="light"] .btn-step{background:rgba(26,86,176,.14);}
-html[data-theme="light"] .btn-step:hover{background:var(--accent3);color:#fff;}
-html[data-theme="light"] .btn-stop{background:rgba(200,45,45,.14);color:#c82d2d;border-color:#c82d2d;}
-html[data-theme="light"] .btn-stop:hover{background:#c82d2d;color:#fff;}
-html[data-theme="light"] .btn-reset{background:var(--surface2);}
-html[data-theme="light"] .btn-reset:hover{background:var(--border);}
-/* Floating buttons/panels over the 3D viewport (Measure, Path, Refine, tool
-   legend, measure readout) have a hardcoded dark translucent background
-   meant to float over a dark canvas — flip them to a light translucent fill
-   to match the now-white 3D background. */
+html[data-theme="light"] .keypad .key:hover,
+html[data-theme="light"] .ctx-panel .btn:hover:not(:disabled),
+html[data-theme="light"] .ph-btn:hover{ background:#e6eaf0; color:#0d1116; border-color:#98a1b2; }
+html[data-theme="light"] .ctx-panel .btn:disabled{ background:#464e5d; color:#8a93a3; border-color:#4a5260; }
+html[data-theme="light"] .keypad .key.off{ background:#c6ccd7; color:#2b313c; border-color:#a7afbd; }
+html[data-theme="light"] .keypad .key.off:hover{ background:#dde1e9; color:#12161c; }
+html[data-theme="light"] .keypad .key.prog{ background:#c7ece6; color:#0c5148; border-color:#8fd6ca; }
+html[data-theme="light"] .keypad .key.prog:hover{ background:#d7f1ec; color:#083b34; }
+html[data-theme="light"] .keypad .key.pi-key{ background:#f6ddc9; color:#9a4a12; border-color:#ecb98f; }
+html[data-theme="light"] .keypad .key.pi-key:hover{ background:#fbe8d8; }
+html[data-theme="light"] .keypad .key.pi{ background:#14b8a6; color:#062420; border-color:transparent; }
+html[data-theme="light"] .keypad .key.on{ background:#14b8a6; color:#062420; border-color:transparent; }
+/* semantic action buttons (Run / Step / Stop / Reset) — filled, readable */
+html[data-theme="light"] .btn-run{ background:#1aa77e; color:#04150f; border-color:transparent; }
+html[data-theme="light"] .btn-run:hover{ background:#22c493; color:#04150f; }
+html[data-theme="light"] .btn-step{ background:#3f83e6; color:#04101f; border-color:transparent; }
+html[data-theme="light"] .btn-step:hover{ background:#5a97f0; color:#04101f; }
+html[data-theme="light"] .btn-stop{ background:#e0574f; color:#1a0402; border-color:transparent; }
+html[data-theme="light"] .btn-stop:hover{ background:#ef6a62; color:#1a0402; }
+html[data-theme="light"] .btn-reset{ background:#3a414f; color:#e8ebf1; border-color:#4a5260; }
+html[data-theme="light"] .btn-reset:hover{ background:#464e5d; }
+html[data-theme="light"] .learn-cta{ background:#14b8a6 !important; color:#062420 !important; border-color:#14b8a6 !important; }
+/* segmented toggles (quality Def/High) */
+html[data-theme="light"] .btn-group{ background:#2f3540; border-color:#414956; }
+html[data-theme="light"] .btn-group .btn-tog{ color:#c6ccd6; border-right-color:#414956; }
+html[data-theme="light"] .btn-group .btn-tog:hover{ background:#3a414f; color:#fff; }
+html[data-theme="light"] .btn-group .btn-tog.active{ background:#14b8a6; color:#062420; font-weight:600; }
+/* speed control */
+html[data-theme="light"] .speed-ctrl{ background:#2f3540; border-color:#414956; }
+html[data-theme="light"] .speed-btn{ color:#c6ccd6; }
+html[data-theme="light"] .speed-btn:hover{ background:#3a414f; color:#fff; }
+html[data-theme="light"] .speed-val{ color:#6df3dd; border-color:#414956; }
+/* view tabs (3D view / XY toolpath / Tool Table) */
+html[data-theme="light"] .tab{ background:#2f3540; color:#9aa3b2; }
+html[data-theme="light"] .tab:hover{ color:#c6ccd6; }
+html[data-theme="light"] .tab.active{ background:rgba(20,184,166,.18); color:#6df3dd; border-bottom-color:#14b8a6; }
+/* badges (incl. the "live" badge) */
+html[data-theme="light"] .badge{ background:#3a414f; color:#c6ccd6; border-color:#4a5260; }
+html[data-theme="light"] .badge.green{ background:#0e5148; color:#6df3dd; border-color:transparent; }
+html[data-theme="light"] .badge.blue{ background:#123a6b; color:#84b6ff; border-color:transparent; }
+/* logo text (unused now that <header> is gone, kept harmless) */
+html[data-theme="light"] .logo-text{ color:#f2f4f8; }
+html[data-theme="light"] .logo-sub{ color:#9aa3b2; }
+/* editor stays pure white; number gutter light */
+html[data-theme="light"] .code-area-wrap{ background:#ffffff; }
+html[data-theme="light"] .line-nums{ background:#e9ebf0; }
+html[data-theme="light"] .line-nums .ln.selected{ border-left-color:#14b8a6; }
+/* 3D stage background (CSS fallback; JS sets the WebGL scene bg to match) */
+html[data-theme="light"] #view3d{ background:var(--stage); }
+/* syntax colours on the white editor (Q-params = info blue) */
+html[data-theme="light"] .syn-comment{color:#2f9e57;}
+html[data-theme="light"] .syn-tool{color:#c2440a;}
+html[data-theme="light"] .syn-lbl{color:#1a52a8;}
+html[data-theme="light"] .syn-qvar{color:#1558d4;}
+html[data-theme="light"] .syn-cycle{color:#8a5a12;}
+/* floating controls over the (light-gray) 3D stage — dark translucent + light text */
 html[data-theme="light"] #pathToggle,
 html[data-theme="light"] #measureBtn,
 html[data-theme="light"] #refineBtnCanvas,
 html[data-theme="light"] #toolLegend,
 html[data-theme="light"] #measureOverlay{
-  background:rgba(255,255,255,0.88) !important;
-  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  background:rgba(39,45,56,0.86) !important;
+  color:#e8ebf1 !important;
+  box-shadow:0 1px 6px rgba(0,0,0,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;}
@@ -190,7 +273,7 @@ canvas#sim2d{width:100%;height:100%;display:block;}
 /* ── Tools tab ── */
 #viewTools{position:absolute;inset:0;width:100%;height:100%;display:none;overflow-y:auto;background:var(--bg);padding:16px;}
 .tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-@media(max-width:700px){.tools-grid{grid-template-columns:1fr;}}
+@media all{.tools-grid{grid-template-columns:1fr;}}
 .tools-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;}
 .tools-table th{text-align:left;padding:6px 10px;border-bottom:2px solid var(--border);color:var(--text3);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.05em;}
 .tools-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
@@ -333,10 +416,10 @@ footer a:hover{text-decoration:underline;}
 .help-popup-desc{font-size:11px;color:var(--text2);line-height:1.6;}
 .help-popup-ex{margin-top:6px;font-size:10px;color:var(--text3);}
 .help-popup-ex code{color:var(--accent3);}
-@media(max-width:700px){
+@media all{
   .help-popup{bottom:12px;left:12px;right:12px;max-width:none;top:auto !important;}
 }
-@media(max-width:700px){
+@media all{
   /* iOS Safari auto-zooms when a focused input has font-size < 16px. Force 16px on touch.
      Editor (#code) is excluded — its size is controlled by the A-/A+ buttons. */
   input[type="text"], input[type="number"], input[type="search"] {
@@ -410,7 +493,7 @@ footer a:hover{text-decoration:underline;}
 .fbar-crumb-btn{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text3);cursor:pointer;}
 .fbar-crumb-btn.active{background:var(--accent);color:#fff;border-color:transparent;}
 .fbar-crumb-btn:hover:not(.active){color:var(--text);border-color:var(--text3);}
-@media(max-width:700px){
+@media all{
   /* Mobile = one long naturally-scrolling page. Override desktop's fixed-viewport layout. */
   html{height:auto;overflow:visible;}
   body{height:auto;min-height:100%;display:block;overflow-x:hidden;overflow-y:visible;}
@@ -482,9 +565,12 @@ footer a:hover{text-decoration:underline;}
 }
 /* ── Safe area insets — notch / home indicator (iOS & Android) */
 @supports(padding:env(safe-area-inset-bottom)){
-  header{
-    padding-left:max(20px,env(safe-area-inset-left));
-    padding-right:max(20px,env(safe-area-inset-right));
+  /* panel-header is now the top bar (the old <header> was removed) — keep it
+     clear of the status bar / notch. */
+  .panel-header{
+    padding-top:max(8px,env(safe-area-inset-top));
+    padding-left:max(12px,env(safe-area-inset-left));
+    padding-right:max(12px,env(safe-area-inset-right));
   }
   .status-bar{
     padding-bottom:max(6px,env(safe-area-inset-bottom));
@@ -534,7 +620,7 @@ footer a:hover{text-decoration:underline;}
 .lp-slides{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 12px 8px;}
 .lp-sec-cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:8px;}
 .lp-slide-view{height:390px;overflow-y:auto;padding-right:4px;}
-@media(max-width:700px){ .lp-slide-view{height:300px;} }
+@media all{ .lp-slide-view{height:300px;} }
 .lp-slides-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 .lp-slides-nav .lp-btn{padding:6px 14px;font-size:16px;font-weight:700;color:var(--accent);border-color:var(--accent);line-height:1;}
 .lp-slides-nav .lp-btn:hover:not(:disabled){background:var(--accent);color:#fff;}
@@ -545,14 +631,14 @@ footer a:hover{text-decoration:underline;}
 .lp-divider span{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--accent);font-weight:600;}
 .lp-practice-btns{display:flex;gap:8px;margin-top:12px;}
 @media(pointer:coarse){ .lp-btn{min-height:40px;padding:8px 12px;} .learn-li{padding:13px 12px;} }
-@media(max-width:700px){
+@media all{
   #learnPanel{width:100%;min-width:0;max-width:none;border-right:none;border-bottom:2px solid var(--accent);}
   .lp-body{max-height:52vh;}
 }
 
 
 .ft-mini{display:none;}
-@media(max-width:700px){
+@media all{
   footer .ft-full{display:none !important;}
   footer{display:none;}
   .ft-mini{display:none;}
@@ -560,24 +646,34 @@ footer a:hover{text-decoration:underline;}
 /* Scroll rail removed — the mobile 3D tab is a fixed (non-scrolling) layout now. */
 .scroll-rail{display:none !important;}
 /* ── Mobile bottom tabs: Editor / 3D / Learn (desktop untouched) ── */
-@media(max-width:700px){
+@media all{
   /* overflow-x:clip (unlike hidden) does NOT create a scroll container,
      so page scrolling stays with the document */
   html, body{overflow-x:clip;}
   .panel-header{flex-wrap:wrap;gap:6px 8px;justify-content:flex-start;}
   .panel-header > *{min-width:0;max-width:100%;}
+  /* Row 1: program.H (left) + Light/About (right). Tools drop to row 2 so the
+     header buttons are always fully visible (never pushed off-screen). */
+  .ph-hdr-actions{order:1;margin-left:auto;flex:0 0 auto;}
+  .ph-tools{order:2;flex:1 1 100%;flex-wrap:wrap;justify-content:flex-start;margin-top:3px;}
   .toolbar{max-width:100%;}
 }
 
 .mtab-bar{display:none;}
 #learnMobileBar{display:none;}
-@media(max-width:700px){
+@media all{
   .mtab-bar{position:fixed;left:0;right:0;bottom:0;z-index:8000;display:flex;background:var(--surface2);border-top:1px solid var(--border);height:calc(46px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;transform:translateZ(0);}
   .mtab-bar button{flex:1;background:none;border:none;border-top:3px solid transparent;color:var(--text3);font-family:var(--mono);font-size:9.5px;padding:3px 4px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:background .15s,color .15s;}
   .mtab-bar button .mi{font-size:0;line-height:0;display:flex;}
   .mtab-bar button .mi svg{width:23px;height:23px;display:block;}
   .mtab-bar button.on{color:var(--accent);background:rgba(var(--accent-rgb),.14);border-top-color:var(--accent);font-weight:700;}
   .mtab-bar button.on .mi svg{transform:scale(1.08);}
+  /* Hide the bottom tab bar whenever a text field is focused (keyboard open).
+     The visualViewport check misses this in the Capacitor WebView, which
+     resizes window.innerHeight on keyboard show — so the fixed bottom bar would
+     otherwise sit right above the keyboard. Focus-based hiding works in both the
+     app and the browser. */
+  html.editing-field .mtab-bar{visibility:hidden !important;}
   body{padding-bottom:50px;}
   /* tab visibility */
   body[data-mtab="editor"] .canvas-panel{display:none !important;}
@@ -641,6 +737,30 @@ footer a:hover{text-decoration:underline;}
   body.practice-on[data-mtab="editor"] .panel-header{display:none;}
 }
 
+/* ── First-launch onboarding tour (app only; add ?onboard=1 to force in a browser)
+   Fixed light card regardless of the app's light/dark theme. ── */
+.onboard-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;}
+.onboard-overlay.on{display:flex;}
+.onboard-card{background:#fff;border-radius:18px;width:100%;max-width:420px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.5);}
+.onboard-view{overflow:hidden;}
+.onboard-track{display:flex;align-items:stretch;transition:transform .28s ease;}
+.onboard-slide{flex:0 0 100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 20px 4px;box-sizing:border-box;}
+.onboard-slide img{height:44vh;max-height:420px;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.35));}
+.ob-cap{padding:16px 6px 2px;}
+.ob-cap h3{font-family:var(--mono);font-size:22px;font-weight:800;color:#0d9488;margin:0 0 6px;letter-spacing:.3px;}
+.ob-cap .ob-sub{font-family:var(--sans);font-size:15px;color:#1a1f24;margin:0 0 6px;}
+.ob-cap .ob-desc{font-family:var(--sans);font-size:13px;line-height:1.5;color:#667;margin:0;}
+.onboard-ctrl{display:flex;flex-direction:column;gap:12px;padding:14px 18px 16px;border-top:1px solid #eee;}
+.onboard-dots{display:flex;justify-content:center;gap:7px;}
+.onboard-dots i{width:7px;height:7px;border-radius:50%;background:#ccc;transition:background .2s,width .2s;}
+.onboard-dots i.on{background:#14b8a6;width:18px;border-radius:4px;}
+.onboard-btns{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.onboard-btns button{font-family:var(--mono);font-size:13px;padding:9px 16px;border-radius:8px;cursor:pointer;}
+.onboard-skip{background:none;border:none;color:#888;}
+.onboard-next{background:#14b8a6;color:#fff;font-weight:700;border:none;min-width:108px;}
+.onboard-dont{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:12px;color:#666;cursor:pointer;user-select:none;}
+.onboard-dont input{width:15px;height:15px;accent-color:#14b8a6;}
+
 </style>
 <script>
   // Apply saved theme before the page paints, to avoid a flash of the wrong theme.
@@ -654,23 +774,6 @@ footer a:hover{text-decoration:underline;}
 
 
 <body>
-<header>
-  <div class="logo">
-    <div class="logo-icon"><svg width="32" height="32" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="34" height="34" rx="6" fill="var(--accent)"/><line x1="8" y1="11" x2="26" y2="11" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="8" y1="17" x2="26" y2="17" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="8" y1="23" x2="26" y2="23" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="11" y1="8" x2="11" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="17" y1="8" x2="17" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="23" y1="8" x2="23" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><circle cx="17" cy="17" r="4" fill="white"/><circle cx="17" cy="17" r="1.5" fill="var(--accent)"/></svg></div>
-    <div>
-      <div class="logo-text">TNC Sim</div>
-      <div class="logo-sub">Online CNC simulator for Heidenhain TNC</div>
-    </div>
-  </div>
-  <div class="header-badges">
-    <button id="themeToggle" onclick="toggleTheme()" title="Toggle dark / light mode" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;">
-      <span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span>
-    </button>
-    <button id="aboutBtn" onclick="openAboutPopup()" title="About TNC Sim" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;">&#9432; About</button>
-    <span class="badge green">● live</span>
-    <span class="badge" id="verBadge">v0.8 · 3D</span>
-  </div>
-</header>
 
 <div class="sim-container">
   <div class="sim-main">
@@ -679,14 +782,17 @@ footer a:hover{text-decoration:underline;}
       <div class="panel-resize" id="panelResize"></div>
       <div class="panel-header">
         <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
-        <span style="display:flex;align-items:center;gap:8px;">
+        <span class="ph-tools">
           <button id="learnBtn" class="ph-btn learn-cta" onclick="openLearn()" title="Interactive lessons for beginners">Learn</button>
           <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help">Help</button>
           <button id="mCodesBtn" class="ph-btn" onclick="openMCodesList()" title="List all defined M functions">M list</button>
           <button class="ph-btn" onclick="exportProgram()" data-help="export" title="Download program.H">Export</button>
           <button class="ph-btn" onclick="importProgram()" title="Load .H program file">Import</button>
           <input type="file" id="importFileInput" accept="text/plain,.h,.H,.nc,.txt,.tap,.cnc" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onImportFile(event)">
-          <span id="blockCount" class="ph-blocks">0 blocks</span>
+        </span>
+        <span class="ph-hdr-actions">
+          <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span></button>
+          <button id="aboutBtn" class="ph-btn" onclick="openAboutPopup()" title="About TNC Sim" style="display:inline-flex;align-items:center;gap:4px;"><span>&#9432;</span><span>About</span></button>
         </span>
       </div>
 
@@ -981,6 +1087,35 @@ END PGM PROGRAM MM</textarea>
     <a href="https://buymeacoffee.com/slavozett" target="_blank" title="Buy me a coffee" aria-label="Buy me a coffee">&#9749;</a>
   </div>
 </footer>
+
+<div class="onboard-overlay" id="onboardOverlay" role="dialog" aria-label="Welcome tour">
+  <div class="onboard-card">
+    <div class="onboard-view">
+      <div class="onboard-track" id="onboardTrack">
+        <div class="onboard-slide">
+          <img src="onboarding/1.png" alt="Editor screen">
+          <div class="ob-cap"><h3>Editor</h3><p class="ob-sub">Write TNC code</p><p class="ob-desc">Compose and edit Heidenhain CNC programs</p></div>
+        </div>
+        <div class="onboard-slide">
+          <img src="onboarding/2.png" alt="3D simulation screen">
+          <div class="ob-cap"><h3>3D Simulation</h3><p class="ob-sub">Simulate toolpaths</p><p class="ob-desc">Visualize and inspect the machining process in 3D</p></div>
+        </div>
+        <div class="onboard-slide">
+          <img src="onboarding/3.png" alt="Learn screen">
+          <div class="ob-cap"><h3>Learn</h3><p class="ob-sub">Learn &amp; practice</p><p class="ob-desc">Interactive lessons and hands-on exercises</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="onboard-ctrl">
+      <div class="onboard-dots" id="onboardDots"></div>
+      <div class="onboard-btns">
+        <button class="onboard-skip" id="onboardSkip" onclick="obClose()">Skip</button>
+        <button class="onboard-next" id="onboardNext" onclick="obNext()">Next</button>
+      </div>
+      <label class="onboard-dont"><input type="checkbox" id="onboardDont" checked> Don't show this again</label>
+    </div>
+  </div>
+</div>
 
 <div class="cycle-overlay" id="cycleOverlay" onclick="if(event.target===this)closeCyclePicker()">
   <div class="cycle-modal">
@@ -1919,7 +2054,7 @@ function showKpHelp(key, anchorEl){
   _helpPopup = pop;
 
   // Position near anchor or center — on mobile CSS handles it via fixed bottom
-  if(anchorEl && window.innerWidth > 700){
+  if(anchorEl && false){
     var r = anchorEl.getBoundingClientRect();
     var top = r.bottom + 8;
     var left = r.left;
@@ -1928,7 +2063,7 @@ function showKpHelp(key, anchorEl){
     if(top + 150 > window.innerHeight) top = r.top - 158;
     pop.style.top = top + 'px';
     pop.style.left = left + 'px';
-  } else if(window.innerWidth > 700){
+  } else if(false){
     pop.style.top = '50%';
     pop.style.left = '50%';
     pop.style.transform = 'translate(-50%,-50%)';
@@ -2079,11 +2214,14 @@ function renderIdlePanel(){ var panel = document.getElementById('ctxPanel');
     +'<button class="btn" id="_idleClear" data-help="editor-clear" style="font-size:10px;padding:3px 8px;">Clear</button>'
     +'<button class="btn" id="_idleZoomOut" data-help="editor-zoom" title="Smaller text" onclick="editorFsBy(-1)" style="font-size:10px;padding:3px 7px;"'+(_editorFs<=_EDITOR_FS_MIN?' disabled':'')+'>A&#8722;</button>'
     +'<button class="btn" id="_idleZoomIn" data-help="editor-zoom" title="Larger text" onclick="editorFsBy(1)" style="font-size:10px;padding:3px 7px;"'+(_editorFs>=_EDITOR_FS_MAX?' disabled':'')+'>A+</button>'
+    +'</div>'
+    +'<div class="ctx-row2">'
     +'<span style="font-size:9px;font-family:var(--mono);color:var(--text3);align-self:center;">Demo programs:</span>'
     +'<select id="_idleDemo" title="Load a demo program" style="font-size:10px;font-family:var(--mono);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:5px;padding:3px 4px;cursor:pointer;" onchange="loadDemo(this.value)">'
     +'<option value="" disabled'+(_currentDemoIdx<0?' selected':'')+'>Load\u2026</option>'
     + DEMO_PROGRAMS.map(function(d,i){ return '<option value="'+i+'"'+(i===_currentDemoIdx?' selected':'')+'>'+d.name+'</option>'; }).join('')
     +'</select>'
+    +'<span id="_idleBlocks" style="margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--text3);white-space:nowrap;">'+(_blockCountText||'0 blocks')+'</span>'
     +'</div>';
   var bu=document.getElementById('_idleUndo');
   var br=document.getElementById('_idleRedo');
@@ -3530,7 +3668,7 @@ function editorClear(){
   renderIdlePanel();
 }
 var lineNums = document.getElementById('lineNums');
-var blockCountEl = document.getElementById('blockCount');
+var _blockCountText = '0 blocks';
 var statusMsg = document.getElementById('statusMsg');
 var statusDot = document.getElementById('statusDot');
 var posDisplay = document.getElementById('posDisplay');
@@ -3621,7 +3759,8 @@ function updateLineNums(){
     html += '<div class="'+cls+'"><button class="ln-del" onclick="deleteLineN('+i+')" tabindex="-1">&#10005;</button>'+numLabel+'</div>';
   }
   lineNums.innerHTML = '<div style="padding:10px 0 200px;">' + html + '</div>';
-  blockCountEl.textContent = lines.length + ' blocks';
+  _blockCountText = lines.length + ' blocks';
+  var _ib = document.getElementById('_idleBlocks'); if(_ib) _ib.textContent = _blockCountText;
   var _progTitleEl = document.getElementById('progTitleName');
   if(_progTitleEl) _progTitleEl.textContent = _progFileName(codeEl.value);
   // restore highlights
@@ -6226,8 +6365,12 @@ function bufRefresh(buf, partialA, partialB){
 function bufClear(buf){ buf.count=0; buf.geo.setDrawRange(0,0); buf.geo.attributes.position.needsUpdate=true; }
 
 function _scene3dBgColor(){
-  return document.documentElement.getAttribute('data-theme')==='light' ? 0xf5f2ee : 0x100f0d;
+  return document.documentElement.getAttribute('data-theme')==='light' ? 0xc7cdd8 : 0x100f0d;
 }
+// Uncut stock (workpiece) colour — darker in light theme so it stands out
+// against the light 3D stage instead of blending into it.
+function _stockRGB(){ return document.documentElement.getAttribute('data-theme')==='light' ? [0.44,0.46,0.50] : [0.61,0.62,0.65]; }
+function _stockHex(){ return document.documentElement.getAttribute('data-theme')==='light' ? 0x70747d : 0x9a9da6; }
 function show3DError(msg){
   try{
     if(!view3dEl) return;
@@ -6593,7 +6736,7 @@ function vxBuildMesh(){
       var tc=TOOL_CUT_COLORS[(isCut-1)%TOOL_CUT_COLORS.length];
       r=tc[0];g=tc[1];b=tc[2];
     } else {
-      r=0.61;g=0.62;b=0.65;
+      var _s=_stockRGB(); r=_s[0];g=_s[1];b=_s[2];
     }
     colors.push(r,g,b, r,g,b, r,g,b);
   }
@@ -6767,7 +6910,7 @@ function _applyRefinedMesh(vertsArr, normsArr, triColors){
   var colors = [];
   for(var ti=0; ti<(triColors?triColors.length:0); ti++){
     var toolNum = triColors[ti];
-    var r=0.61, g=0.62, b=0.65;
+    var _s0=_stockRGB(); var r=_s0[0], g=_s0[1], b=_s0[2];
     if(toolNum>0 && toolNum<255){
       var tc = TOOL_CUT_COLORS[(toolNum-1)%TOOL_CUT_COLORS.length];
       r=tc[0]; g=tc[1]; b=tc[2];
@@ -6813,7 +6956,7 @@ function buildScene(prog){
     var bg = new THREE.CylinderGeometry(cyl.r, cyl.r, cylH, 64);
     bg.rotateX(Math.PI/2); // Y-up → Z-up
     bg.translate(cyl.cx, cyl.cy, cyl.zMin + cylH/2);
-    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:0x9a9da6}));
+    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:_stockHex()}));
     scene.add(blockMesh);
     // edge circle outlines (top + bottom)
     var edgeMat = new THREE.LineBasicMaterial({color:0x3a3e48});
@@ -6829,7 +6972,7 @@ function buildScene(prog){
   } else {
     var bg = new THREE.BoxGeometry(w, d, h);
     bg.translate(min.x+w/2, min.y+d/2, min.z+h/2);
-    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:0x9a9da6}));
+    blockMesh = new THREE.Mesh(bg, new THREE.MeshLambertMaterial({color:_stockHex()}));
     scene.add(blockMesh);
     blockEdges = new THREE.LineSegments(new THREE.EdgesGeometry(bg), new THREE.LineBasicMaterial({color:0x3a3e48}));
     scene.add(blockEdges);
@@ -9821,7 +9964,7 @@ function learnSolve(){
   learnCheck();
 }
 /* ── Mobile bottom-tab controller (no-op on desktop) ── */
-function _isMTab(){ return window.matchMedia && matchMedia('(max-width:700px)').matches; }
+function _isMTab(){ return true; } // Android app: always single-column/tabbed layout
 function mtabSwitch(name){
   // Switching straight to Editor with NO active practice task would show a
   // blank editor (openLearn stashes the program) — close Learn & restore it.
@@ -9857,7 +10000,7 @@ document.body.setAttribute('data-mtab','editor');
    editor tab now uses a fixed layout with internal code scroll, so no textarea
    auto-grow is required. */
 (function(){
-  function isMob(){ return window.matchMedia('(max-width:700px)').matches; }
+  function isMob(){ return true; } // Android app: always mobile
   function grow(){
     if(!isMob() || document.body.getAttribute('data-mtab')!=='editor'){
       var t=document.getElementById('code'); if(t) t.style.height='';
@@ -9932,6 +10075,37 @@ document.body.setAttribute('data-mtab','editor');
   window.addEventListener('touchmove', kick, {passive:true});
   window.addEventListener('orientationchange', function(){ setTimeout(kick, 50); });
   kick();
+})();
+
+/* Hide the bottom mobile tab bar while a text field is focused (soft keyboard
+   open). This is the reliable cross-environment signal: the Capacitor WebView
+   resizes on keyboard show, which defeats the visualViewport-offset check
+   above, leaving the fixed bottom bar stuck over the keyboard. Focus/blur fire
+   the same in the app and the browser. */
+(function(){
+  function isEditable(el){
+    if(!el) return false;
+    if(el.tagName === 'TEXTAREA') return true;
+    if(el.tagName === 'INPUT'){
+      var ty = (el.getAttribute('type') || 'text').toLowerCase();
+      return ['text','search','number','tel','url','email','password'].indexOf(ty) >= 0;
+    }
+    return !!el.isContentEditable;
+  }
+  var tmr = null;
+  document.addEventListener('focusin', function(e){
+    if(isEditable(e.target)){
+      if(tmr){ clearTimeout(tmr); tmr = null; }
+      document.documentElement.classList.add('editing-field');
+    }
+  });
+  document.addEventListener('focusout', function(){
+    // small delay so switching directly between fields doesn't flash the bar
+    if(tmr) clearTimeout(tmr);
+    tmr = setTimeout(function(){
+      if(!isEditable(document.activeElement)) document.documentElement.classList.remove('editing-field');
+    }, 120);
+  });
 })();
 
 function learnResetProgress(){
@@ -10103,6 +10277,51 @@ function learnRender(){
     if(typeof window._growCode==='function') requestAnimationFrame(window._growCode);
   }
 }
+</script>
+
+<script>
+/* First-launch onboarding tour. Shows automatically only inside the app
+   (window.Capacitor) on the first launch, then remembers via localStorage.
+   Add ?onboard=1 to the URL to force it in a browser (for previewing). */
+(function(){
+  var N = 3, idx = 0;
+  window.obGo = function(i){
+    idx = Math.max(0, Math.min(N-1, i));
+    var t = document.getElementById('onboardTrack');
+    if(t) t.style.transform = 'translateX(-' + (idx*100) + '%)';
+    var dots = document.getElementById('onboardDots');
+    if(dots){ var h=''; for(var k=0;k<N;k++){ h += '<i class="'+(k===idx?'on':'')+'"></i>'; } dots.innerHTML = h; }
+    var nx = document.getElementById('onboardNext');
+    if(nx) nx.textContent = (idx===N-1) ? 'Get started' : 'Next';
+  };
+  window.obNext = function(){ if(idx < N-1) window.obGo(idx+1); else window.obClose(); };
+  window.obClose = function(){
+    var dont = document.getElementById('onboardDont');
+    if(!dont || dont.checked){ try{ localStorage.setItem('tnc_onboarded','1'); }catch(e){} }
+    var ov = document.getElementById('onboardOverlay');
+    if(ov) ov.classList.remove('on');
+  };
+  function obShow(){ var ov = document.getElementById('onboardOverlay'); if(!ov) return; window.obGo(0); ov.classList.add('on'); }
+  // swipe between slides
+  var track = document.getElementById('onboardTrack');
+  if(track){
+    var x0 = null;
+    track.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+    track.addEventListener('touchend', function(e){
+      if(x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if(Math.abs(dx) < 40) return;
+      if(dx < 0) window.obNext(); else window.obGo(idx-1);
+    }, {passive:true});
+  }
+  function maybeShow(){
+    var force = /[?&]onboard=1/.test(location.search);
+    var seen = false; try{ seen = !!localStorage.getItem('tnc_onboarded'); }catch(e){}
+    if(force || (window.Capacitor && !seen)) obShow();
+  }
+  if(document.readyState === 'loading') window.addEventListener('load', maybeShow);
+  else setTimeout(maybeShow, 60);
+})();
 </script>
 
 <script>
