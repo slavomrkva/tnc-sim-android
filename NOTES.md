@@ -221,6 +221,20 @@ only bump once per actual release (rule #1/#2 territory) — don't try to keep
 the two numbers in sync, they answer different questions ("did my edit make
 it into this build?" vs. "which Play Store release is this?").
 
+### 9. `android:windowSoftInputMode="adjustResize"` is required — without it, no JS keyboard fix can work
+`android/app/src/main/AndroidManifest.xml`'s `<activity>` must have
+`android:windowSoftInputMode="adjustResize"`. Without it, Android defaults to
+panning the whole window under the keyboard instead of shrinking the
+available space — which means `visualViewport` (and `window.innerHeight`)
+never actually change when the keyboard opens, so rule #7's keyboard-open
+detection (and anything else built on `visualViewport`) silently never fires.
+Symptom: the bottom tab bar just sits there, unmoved, right above/behind the
+keyboard, no matter what the JS does — because from the JS's point of view
+the keyboard never "opened" at all. This is a **native config change**: it
+requires `npx cap sync android` + a real rebuild to take effect, and can
+never be verified via the browser/htmlpreview preview (`window.visualViewport`
+behaves normally there) — only on a real device or emulator.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -235,6 +249,14 @@ it into this build?" vs. "which Play Store release is this?").
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.6`. Found the real root cause of the
+  persistent "black bar above the keyboard" report: `AndroidManifest.xml`'s
+  `<activity>` had no `android:windowSoftInputMode`, so Android was panning
+  the window under the keyboard instead of resizing it — `visualViewport`
+  never changed, so the rule #7 detection never fired regardless of how
+  correct the JS was. Added `android:windowSoftInputMode="adjustResize"`.
+  Native change — requires `npx cap sync android` + real rebuild, cannot be
+  verified in the browser preview. See rule #9.
 - `APP_VERSION` bumped to `1.0.5`. Formalized versioning: the app stays in
   the `1.0.x` series permanently (paired with the web repo's separate `0.80x`
   series — never confuse the two), and every single push must bump
