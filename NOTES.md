@@ -374,6 +374,24 @@ last one (this file has 4). Both failure modes produced **zero console
 errors** — the app just silently failed to boot. See "Module map" above for
 the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 
+### 11. TWO separate bottom reservations must both be dropped while the keyboard is open
+Clearing space for the fixed `.mtab-bar` in the mobile editor layout is done in
+**two independent places**, and hiding the keyboard's black gap requires
+dropping **both** while `kbd-open`:
+1. `body{padding-bottom:50px}` — the outer reservation on `<body>` itself.
+2. `body[data-mtab="editor"] .editor-panel{padding-bottom:calc(46px + safe-area)}`
+   — the inner reservation on the scrolling panel.
+During `kbd-open` the body is shrunk to `--vvh` with `box-sizing:border-box`, so
+any leftover bottom padding becomes a strip of body background (`--bg`,
+near-black) directly above the keyboard — the exact "black area above the
+keyboard" symptom. The 1.0.7 fix dropped only #2 and the bug persisted for
+several versions because #1 was missed. Both now have a
+`html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` /
+`… .editor-panel{padding-bottom:0 !important;}` override. If you ever add a
+third bottom reservation (or change these), remember it needs the same
+`kbd-open` drop, and remember this whole class of bug is invisible in browser
+preview — only a real-device/emulator Capacitor build shows it (rule #7/#9).
+
 ---
 
 ## Testing checklist before shipping a release
@@ -388,6 +406,20 @@ the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.11`. **Found the never-identified source of the
+  residual "black area above the keyboard" (TODO.md "strongest remaining
+  clue").** `body{padding-bottom:50px}` (the mobile-layout reservation that
+  clears the fixed `.mtab-bar`) was never dropped while the keyboard is open —
+  only `.editor-panel`'s own padding was (the 1.0.7 fix). With body shrunk to
+  `--vvh` and `box-sizing:border-box` during `kbd-open`, that 50px became a
+  strip of body background (`--bg` ≈ `#100f0d`, near-black) sitting right above
+  the keyboard. Detection was never the problem (rule #7 fires correctly — the
+  Learn practice bar hides), it was this dead reservation. Fix: added
+  `html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` in
+  `www/android/styles.css`, right beside the existing `.editor-panel`
+  padding-drop. CSS-only, additive. See new rule #11. **Not yet verified on a
+  real device** — this class of bug only manifests in the on-device Capacitor
+  WebView (rule #7/#9); verify with a clean rebuild before trusting it.
 - `APP_VERSION` bumped to `1.0.10`. **Reverted `1.0.9`'s
   `@capacitor/keyboard`-plugin approach** after real-device testing showed a
   genuine regression: on keyboard open the tab bar visibly slid up with the

@@ -664,6 +664,14 @@ footer a:hover{text-decoration:underline;}
     overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
     padding-bottom:calc(46px + env(safe-area-inset-bottom));box-sizing:border-box;touch-action:pan-y;width:100%;}
   html.kbd-open body[data-mtab="editor"]{height:var(--vvh,100svh);}
+  /* body reserves 50px at its bottom (see `body{padding-bottom:50px}` above) to
+     clear the fixed .mtab-bar. While the keyboard is open, body is shrunk to
+     --vvh with box-sizing:border-box, so that reservation becomes a 50px strip
+     of body background (--bg, near-black) sitting right above the keyboard —
+     the residual "black area above the keyboard" that survived the 1.0.7 fix.
+     The bar itself is translated off-screen while kbd-open, so the reservation
+     is dead space; drop it too. */
+  html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}
   /* .editor-panel always reserves bottom padding to clear the fixed tab bar —
      but while the keyboard is open that bar is hidden (translated off-screen,
      see rule #7/#9), so the reservation just leaves a bare, unstyled gap
