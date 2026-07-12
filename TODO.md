@@ -1,20 +1,26 @@
 # TODO / known open items
 
-## Deferred: keyboard bug — proper fix via @capacitor/keyboard plugin
-The bottom tab bar / black-bar-above-keyboard issue (NOTES.md rules #7 and
-#9) has had two rounds of JS-only fixes (`visualViewport` baseline tracking +
-`adjustResize` manifest fix). It mostly works now, but the current approach
-(polling `visualViewport` height against a remembered baseline) is inherently
-a workaround. **Deliberately deferred, on purpose, until after the
-core/web/android module-split refactor landed** (see NOTES.md rule #10 and
-"Module map") — fixing it mid-refactor would have made it harder to tell
-which category of change caused what. Now that the refactor is done and
-verified, the next real attempt at this should replace the
-`visualViewport`-polling logic (currently in `www/android/keyboard.js`) with
-the `@capacitor/keyboard` plugin, which fires real
-`keyboardWillShow`/`keyboardDidHide` events instead of inferring keyboard
-state from viewport math. Needs a real device/emulator to verify (rule #9 —
-this class of bug never reproduces in browser preview).
+## NEEDS ON-DEVICE VERIFICATION: keyboard fix rewritten to use @capacitor/keyboard
+`www/android/keyboard.js` was rewritten (`APP_VERSION 1.0.9`) to use the
+native `@capacitor/keyboard` plugin's `keyboardDidShow`/`keyboardDidHide`
+events instead of the `visualViewport`-baseline-polling workaround (see
+NOTES.md rule #7 for the full history and why). `npm install
+@capacitor/keyboard` + `npx cap sync android` were run — the native Gradle
+module (`capacitor-keyboard`) is wired into `android/settings.gradle` via
+the auto-generated `android/capacitor.settings.gradle`, and
+`AndroidManifest.xml`'s `windowSoftInputMode="adjustResize"` (rule #9) is
+already in place and still required.
+
+**This has NOT been verified on a real device or emulator** — this class of
+bug (and the plugin itself) doesn't exist in browser/htmlpreview preview at
+all, only a real Android build can confirm it actually works (rule #9).
+Before shipping a release built on this: `npx cap sync android` (if not
+already fresh), build + install on a real device, open the editor tab, tap
+into the code area to bring up the soft keyboard, confirm the bottom tab bar
+hides cleanly (no black gap, no stuck-hidden-after-close), and confirm it
+still works after rotating the device with the keyboard open. If it
+misbehaves, rule #7 documents the old (working, shipped in `1.0.4`–`1.0.8`)
+`visualViewport`-baseline approach as a fallback to revert to.
 
 ## Housekeeping from the module-split refactor (2026-07-12)
 - The web repo's `core/*.js` and this repo's `www/core/*.js` are byte-for-

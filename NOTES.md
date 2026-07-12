@@ -119,12 +119,14 @@ split (2026-07-12 refactor, no functionality changed) into:
   - `panels.js`: `renderIdlePanel`/`updateLineNums` — android added a
     `#_idleBlocks` block-count span to the idle toolbar that web doesn't
     have; the two functions are a linked pair, kept together.
-  - `keyboard.js`: the `visualViewport`/`kbd-open` keyboard-handling IIFE —
-    see rule #7. **Materially different from web's**, not a constant swap —
-    android tracks a re-synced baseline height because
-    `window.innerHeight` doesn't diverge from `visualViewport.height` inside
-    the Capacitor WebView the way it does in a real mobile browser (web's
-    approach reads ~0 forever here).
+  - `keyboard.js`: the `kbd-open` keyboard-handling logic — see rule #7.
+    **Materially different from web's**, not a constant swap — android uses
+    the native `@capacitor/keyboard` plugin's `keyboardDidShow`/
+    `keyboardDidHide` events (no such plugin exists in a plain browser, so
+    web can't use this); web instead infers keyboard state from
+    `visualViewport`, since `window.innerHeight` doesn't diverge from
+    `visualViewport.height` inside the Capacitor WebView the way it does in
+    a real mobile browser (web's own approach would read ~0 forever here).
   - `onboarding.js` — the first-launch onboarding tour IIFE
     (`window.obGo`/`obNext`/`obClose`, swipe handlers). **Android-only**,
     web has zero onboarding code.
@@ -273,11 +275,22 @@ for the htmlpreview preview); otherwise app-only code can live here freely.
 `npx cap sync android`. Editing `www/` and building without syncing ships the
 OLD content. Always sync after changing anything in `www/`.
 
-### 7. Keyboard-open detection: compare visualViewport height to a remembered baseline — not to window.innerHeight, and not to focus/blur
-Two earlier approaches to detecting "the soft keyboard is covering the
-`.mtab-bar` bottom tab bar" both failed on a real device (bugs only showed up
-there, never in desktop/browser testing — always verify this specific class of
-fix on a physical phone):
+### 7. Keyboard-open detection: use the native `@capacitor/keyboard` plugin events — not visualViewport polling, and not focus/blur
+**Current approach (as of `APP_VERSION 1.0.9`):** `www/android/keyboard.js`
+listens for the native `keyboardDidShow`/`keyboardDidHide` events from the
+`@capacitor/keyboard` plugin (`window.addEventListener('keyboardDidShow', …)`
+— Cordova-compatible global events, no need to touch
+`Capacitor.Plugins.Keyboard` directly) and toggles `html.kbd-open`/
+`html.editing-field` directly from those two booleans. No polling, no
+baseline, no height math. Requires
+`android:windowSoftInputMode="adjustResize"` (rule #9) so
+`window.innerHeight` is already correctly resized by the time
+`keyboardDidShow` fires — `keyboardDidShow` (not `keyboardWillShow`) is used
+specifically so the resize has already happened when `--vvh` is read from
+`window.innerHeight`. Guarded behind `if(!window.Capacitor) return;` — a
+no-op in plain-browser preview, where the plugin doesn't exist.
+
+**Why not visualViewport polling (the old approach, two failed attempts before it):**
 - **`window.innerHeight - visualViewport.height` offset**: reads ~0 forever
   inside the Capacitor WebView, because it resizes `window.innerHeight`
   together with the keyboard — the two live values never diverge.
@@ -287,21 +300,27 @@ fix on a physical phone):
   doesn't need a re-tap), so `blur` does not reliably fire when the keyboard
   actually closes — the bar stayed hidden and unreachable forever, breaking
   tab navigation.
+- **baseline-vs-`visualViewport.height` polling** (worked, shipped in
+  `1.0.4`–`1.0.8`, replaced in `1.0.9`): capture `baseline =
+  visualViewport.height` once, re-sync it whenever the viewport is at least
+  as tall as `baseline`, and compare the live height against it
+  (`kbdOpen = (baseline - visualViewport.height) > 140`). This was correct
+  and shipped for a while, but was an inherent workaround (inferring an
+  on/off event from continuous height comparisons) — replaced once the
+  module-split refactor (rule #10) made it practical to revisit, per TODO.md.
+  If the native-events approach above ever needs to be reverted, this is
+  the fallback to reach for — do not reintroduce the two *broken* approaches
+  above it.
 
-**What works**: capture `baseline = visualViewport.height` once, and
-re-sync it any time the viewport is at least as tall as `baseline` (i.e.
-whenever there's confidently no keyboard, including after rotation).
-`kbdOpen = (baseline - visualViewport.height) > 140`. This measures the
-keyboard's actual on-screen occlusion against a stable reference instead of
-two numbers that move together, and is completely independent of DOM focus
-state. Also: only ONE mechanism drives this — the `editing-field`/`kbd-open`
-classes are set from this single IIFE. Don't reintroduce a second
-mechanism (old rAF/address-bar-chasing loop, or focus/blur) alongside it —
-that's exactly the "two things fighting" bug this rule replaced twice now.
-`.mtab-bar` also stays `transform:translateY(120%) translateZ(0)` (not
-`visibility:hidden`) to avoid a separate real-device-only bug: flipping
-`visibility` on a `transform:translateZ(0)`-promoted GPU layer can leave a
-stale blank/black composited tile instead of fully hiding.
+**Still true regardless of detection mechanism:** only ONE mechanism should
+ever drive the `editing-field`/`kbd-open` classes at a time — don't
+reintroduce a second one (old rAF/address-bar-chasing loop, or focus/blur)
+alongside the current one, that's exactly the "two things fighting" bug this
+rule has replaced multiple times now. `.mtab-bar` also stays
+`transform:translateY(120%) translateZ(0)` (not `visibility:hidden`) to
+avoid a separate real-device-only bug: flipping `visibility` on a
+`transform:translateZ(0)`-promoted GPU layer can leave a stale blank/black
+composited tile instead of fully hiding.
 
 ### 8. `APP_VERSION` is a build marker, separate from `versionCode`/`versionName`
 `APP_VERSION` (top of the main `<script>` in `www/index.html`, shown in the
@@ -328,15 +347,21 @@ it into this build?" vs. "which Play Store release is this?").
 `android/app/src/main/AndroidManifest.xml`'s `<activity>` must have
 `android:windowSoftInputMode="adjustResize"`. Without it, Android defaults to
 panning the whole window under the keyboard instead of shrinking the
-available space — which means `visualViewport` (and `window.innerHeight`)
-never actually change when the keyboard opens, so rule #7's keyboard-open
-detection (and anything else built on `visualViewport`) silently never fires.
-Symptom: the bottom tab bar just sits there, unmoved, right above/behind the
-keyboard, no matter what the JS does — because from the JS's point of view
-the keyboard never "opened" at all. This is a **native config change**: it
+available space — which means `window.innerHeight` never actually changes
+when the keyboard opens. Rule #7's current native-events detection
+(`keyboardDidShow`/`keyboardDidHide`) will likely still fire either way (the
+plugin has its own native signal for keyboard visibility, independent of
+this setting), but `--vvh` (read from `window.innerHeight` right when
+`keyboardDidShow` fires) would be wrong without it, and the CSS that sizes
+the editor panel to `var(--vvh)` would be sizing against the un-resized
+window. (This was also true, more severely, of the older `visualViewport`-
+based detection this rule originally documented — without `adjustResize`,
+`visualViewport` never changed either, so the whole detection silently never
+fired at all, not just the sizing.) This is a **native config change**: it
 requires `npx cap sync android` + a real rebuild to take effect, and can
-never be verified via the browser/htmlpreview preview (`window.visualViewport`
-behaves normally there) — only on a real device or emulator.
+never be fully verified via the browser/htmlpreview preview — only on a real
+device or emulator (rule #7's mechanism also doesn't exist at all outside
+the native app, so browser preview can't exercise it regardless).
 
 ### 10. `www/index.html` is now split into `core/`/`android/` modules — see "Module map" above
 As of 2026-07-12, the JS/CSS that used to be one giant inline `<script>`/
@@ -366,6 +391,16 @@ the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.9`. Replaced the `visualViewport`-baseline
+  keyboard-detection workaround (rule #7, shipped in `1.0.4`) with the native
+  `@capacitor/keyboard` plugin's `keyboardDidShow`/`keyboardDidHide` events —
+  no more polling/baseline-tracking, just two real events. `npm install
+  @capacitor/keyboard` + `npx cap sync android` run (native `capacitor-
+  keyboard` Gradle module now wired in). Rewrote `www/android/keyboard.js`
+  accordingly; updated NOTES.md rules #7 and #9 and the "Module map" entry
+  for `keyboard.js`. **Not yet verified on a real device** — this class of
+  bug and the plugin itself don't exist in browser preview at all; see
+  TODO.md for the verification checklist before the next release build.
 - `APP_VERSION` bumped to `1.0.8`. Pure structural refactor, no functionality
   changed: split `www/index.html`'s inline `<script>`/`<style>` into
   `www/core/*.js` (20 files, byte-for-byte identical to the web repo's
