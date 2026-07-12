@@ -392,6 +392,21 @@ third bottom reservation (or change these), remember it needs the same
 `kbd-open` drop, and remember this whole class of bug is invisible in browser
 preview — only a real-device/emulator Capacitor build shows it (rule #7/#9).
 
+### 12. Resize the 3D renderer from the render loop, not only on window 'resize'
+The 3D canvas is CSS-sized (`#view3d canvas{width:100%;height:100%}`) while
+`onResize()` calls `renderer.setSize(w,h,false)` — the `false` deliberately
+skips the inline style so CSS owns the display size. So the drawing
+buffer/`camera.aspect` must be kept matched to the container's *current* size,
+or the browser stretches the last-sized buffer to fill the box and the model
+distorts. A window `resize` listener alone misses live mid-drag frames and
+container resizes that fire no window event (split-screen/foldable resize,
+tab/orientation change). `loop()` (`www/core/sim-controls.js`) calls
+`resizeToDisplay()` (`www/core/view2d.js`) every frame — a cheap no-op unless
+the container size changed, returning `true` on the resync frame so the
+idle-render throttle still paints it. This is a shared `core/` fix, byte-for-
+byte identical to the web repo; keep it that way and don't reduce it back to a
+resize-only listener.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -406,6 +421,20 @@ preview — only a real-device/emulator Capacitor build shows it (rule #7/#9).
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.12`. **Fixed the 3D model changing aspect ratio
+  (stretching) when the view pane is resized without a window `resize` event** —
+  reported on web and expected here too (window resize, split-screen, foldable
+  unfold, orientation change). Root cause: the render `loop()`
+  (`www/core/sim-controls.js`) repaints every frame but only re-synced the
+  renderer buffer + `camera.aspect` on `window`'s `resize` event; the canvas is
+  CSS-stretched to `100%x100%` while `renderer.setSize(w,h,false)` leaves the
+  inline style alone, so any frame where the container differs from the last
+  resize snapshot renders at the wrong aspect. Added `resizeToDisplay()`
+  (`www/core/view2d.js`), a per-frame "resize-on-render" check called at the top
+  of `loop()` (no-op unless the container size actually changed). Verified in a
+  headless browser on the web repo: a container resized without a resize event
+  went from a 37% horizontal stretch to 1:1. `core/` change — kept byte-for-byte
+  identical to the web repo (`tnc-sim` `v0.809`). New rule #12.
 - `APP_VERSION` bumped to `1.0.11`. **Found the never-identified source of the
   residual "black area above the keyboard" (TODO.md "strongest remaining
   clue").** `body{padding-bottom:50px}` (the mobile-layout reservation that
