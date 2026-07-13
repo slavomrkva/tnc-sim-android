@@ -1,22 +1,26 @@
 # TNC Sim Android
 
-Standalone Capacitor Android app. The whole app is `www/index.html` — edit it
-directly here. This repo is independent of the web repo (`slavomrkva/tnc-sim`);
-nothing auto-syncs, and changes here cannot affect the website.
+Standalone Capacitor Android app. The app source is `www/`: `www/index.html`
+is the shell and it loads classic JS/CSS modules from `www/core/` and
+`www/android/`. This repo is independent of `slavomrkva/tnc-sim`; nothing
+syncs automatically.
 
-Read `NOTES.md` in this repo root before making any change — it has the
-project map, non-obvious rules (applicationId, keystore signing, the correct
-`origin` remote, `cap sync` before building), and the edit/preview/release
-flows.
+## Start of every session
 
-**Every push must bump `APP_VERSION` in `www/index.html` by +1 on the last
-segment — no exceptions.** App stays in the `1.0.x` series (see NOTES.md rule
-#8; web repo separately uses `0.80x`, never confuse the two schemes).
+1. Read every root Markdown file and `store/README.md` before analysing or
+   editing.
+2. For a bug, read `TODO.md` and the relevant `BUG_HISTORY.md` entry. Cross-repo
+   bugs must be tracked in both repositories.
+3. For a Play release, read `RELEASE_NOTES.md` and the Release flow in
+   `NOTES.md`.
 
-For user-visible or important changes, also add a short line to
-`RELEASE_NOTES.md` — its top entry is what goes into the Play Console
-"What's new" box for the next release.
+## Non-negotiables
 
-After making a change, also update `NOTES.md`: add a line to its Changelog,
-and add a new numbered rule under "NON-OBVIOUS RULES" if you hit a
-non-obvious pitfall.
+- Edit app content in `www/`; run `npx cap sync android` before every build
+  after a `www/` change.
+- Every push bumps `APP_VERSION` in `www/android/app.js` by one last segment,
+  updates `NOTES.md`, and uses the `1.0.x` series.
+- Before every push, verify that `origin` is `tnc-sim-android`; never commit a
+  keystore, recovery codes, build artifacts, or unrelated local files.
+- A user-visible change also gets a short `RELEASE_NOTES.md` entry. Add a new
+  numbered NOTES rule only for a durable, non-obvious pitfall.

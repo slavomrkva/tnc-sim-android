@@ -149,6 +149,15 @@ split (2026-07-12 refactor, no functionality changed) into:
 you run it by hand** — never automatically, never as part of `cap sync` or
 the release flow. See the script's header comment for usage.
 
+### Module-split maintenance
+- `www/core/` and web `core/` were mechanically compared at the split, but may
+  drift after deliberate changes. Never assume they still match; compare or use
+  the explicit one-way web → Android sync when that is the intended change.
+- CSS remains product-specific (`web/styles.css` vs `www/android/styles.css`);
+  a shared CSS module has not been verified as safe.
+- Immediate IIFEs remain in each product's `app.js` because their execution
+  order matters (notably `APP_VERSION`). Do not move them into `core/`.
+
 ### A real gotcha hit during the split
 When extracting a `function name(){...}` block, stop exactly at its closing
 `}` — do not grab trailing same-line content. `}/* next thing's doc comment
@@ -190,9 +199,11 @@ doing this kind of split.
 ## Release flow (ship a new Android version)
 1. `git pull`, then `npx cap sync android` (copies `www/` into the native
    project). Run `npm install` first only if deps changed.
-2. Bump `versionCode` (integer, always +1 from the last Play Store release)
-   and `versionName` in `android/app/build.gradle`. **Never reuse or lower a
-   versionCode** — Play Store will reject the upload.
+2. Set `versionCode` higher than the highest code already uploaded to Play
+   Console, and set the matching `versionName` in `android/app/build.gradle`.
+   Never reuse or lower an **uploaded** code — Play Store will reject it. If an
+   unuploaded local code was prepared incorrectly, correct it before generating
+   the final `.aab`, after checking Play Console's bundle history.
 3. Commit + push here.
 4. On the dev machine (this cloud repo has no Android SDK or signing keystore):
    `git pull`, open in Android Studio, **Generate Signed Bundle** using the
@@ -200,6 +211,12 @@ doing this kind of split.
    rule #2), produce the `.aab`.
 5. Upload the `.aab` to Play Console as a new release on the existing
    `org.tncsim.twa` listing.
+
+## Release archive
+After a shipped Android release, archive the signed bundle outside this
+repository as `android-<version>-code-<versionCode>.aab`, create the matching
+Git tag `android-v<version>-code-<versionCode>`, and create a GitHub Release
+with that bundle attached. Never commit `.aab` or `.apk` artifacts to Git.
 
 ---
 
@@ -273,57 +290,14 @@ for the htmlpreview preview); otherwise app-only code can live here freely.
 `npx cap sync android`. Editing `www/` and building without syncing ships the
 OLD content. Always sync after changing anything in `www/`.
 
-### 7. Keyboard-open detection: compare visualViewport height to a remembered baseline — not to window.innerHeight, not to focus/blur, and not to the native @capacitor/keyboard plugin events
-**Current approach (restored in `APP_VERSION 1.0.10`, originally shipped
-`1.0.4`–`1.0.8`):** `www/android/keyboard.js` captures `baseline =
-visualViewport.height` once, re-syncs it any time the viewport is at least
-as tall as `baseline` (i.e. whenever there's confidently no keyboard,
-including after rotation), and compares the live height against it:
-`kbdOpen = (baseline - visualViewport.height) > 140`. This measures the
-keyboard's actual on-screen occlusion continuously (on every
-`visualViewport` `resize`/`scroll`) against a stable reference, instead of
-relying on a single discrete event. This is a proven, real-device-tested
-fix — do not replace it without on-device testing (see the failed attempt
-below).
-
-**Three earlier/alternative approaches were tried and all failed on a real
-device** (bugs only showed up there, never in desktop/browser testing —
-always verify this specific class of fix on a physical phone):
-- **`window.innerHeight - visualViewport.height` offset**: reads ~0 forever
-  inside the Capacitor WebView, because it resizes `window.innerHeight`
-  together with the keyboard — the two live values never diverge.
-- **focus/blur on the hidden `#mobileInput`**: this app deliberately keeps
-  that input focused after the on-screen keyboard is dismissed (see the "keep
-  mobileInput focused when FM is active" blur handler, so the next quick edit
-  doesn't need a re-tap), so `blur` does not reliably fire when the keyboard
-  actually closes — the bar stayed hidden and unreachable forever, breaking
-  tab navigation.
-- **Native `@capacitor/keyboard` plugin events** (`keyboardDidShow`/
-  `keyboardDidHide`, tried and reverted same-day in `1.0.9`→`1.0.10`): looked
-  like the "correct" fix on paper (a real native event instead of inferring
-  state from height math) and was even documented as the recommended next
-  step in an earlier version of this file. **Confirmed broken on a real
-  device**: on keyboard open, the tab bar visibly slid up together with the
-  keyboard and only hid a moment later, leaving a black empty gap above the
-  keyboard in between; on keyboard close, the gap stayed black for a moment
-  before the bar slid back in. Root cause (inferred, not device-debugged
-  further): the discrete `Did`-suffixed events don't reliably fire in sync
-  with the actual keyboard/resize animation completing, unlike a continuous
-  `visualViewport` listener which can't drift out of sync with reality
-  because it's measuring the real, current height on every tick. **Do not
-  retry this approach without a way to iterate directly on a real device** —
-  it cannot be debugged or verified from source alone or in browser preview.
-  The npm dependency was fully removed (`npm uninstall @capacitor/keyboard`
-  + `npx cap sync android`) rather than left installed-but-unused.
-
-**Regardless of detection mechanism:** only ONE mechanism should ever drive
-the `editing-field`/`kbd-open` classes at a time — don't reintroduce a second
-one alongside the current one, that's exactly the "two things fighting" bug
-this rule has been rewritten to fix multiple times now. `.mtab-bar` also
-stays `transform:translateY(120%) translateZ(0)` (not `visibility:hidden`)
-to avoid a separate real-device-only bug: flipping `visibility` on a
-`transform:translateZ(0)`-promoted GPU layer can leave a stale blank/black
-composited tile instead of fully hiding.
+### 7. Keyboard-open detection uses a remembered visualViewport baseline
+`www/android/keyboard.js` re-syncs a baseline `visualViewport.height` whenever
+the keyboard is confidently closed and treats a drop greater than 140px as open.
+Only this mechanism may drive `editing-field`/`kbd-open` classes. Do not replace
+it with `window.innerHeight` offsets, focus/blur, `visibility:hidden`, or native
+`@capacitor/keyboard` events: all failed in the Capacitor WebView. Verify any
+keyboard change on a real device; browser preview cannot reproduce this class of
+bug. The detailed failed-attempt history is in `BUG_HISTORY.md`.
 
 ### 8. `APP_VERSION` is a build marker, separate from `versionCode`/`versionName`
 `APP_VERSION` (top of the main `<script>` in `www/index.html`, shown in the
@@ -449,6 +423,11 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.21`. Documentation-only cleanup: added concise
+  session routing, moved module-split maintenance out of `TODO.md`, moved the
+  Android bundle archive rule into this release flow, and condensed duplicate
+  keyboard history now retained in `BUG_HISTORY.md`. Clarified `versionCode`
+  against the highest Play-uploaded code. No runtime change.
 - `APP_VERSION` bumped to `1.0.20`. Added five newly reported cross-repo open
   bugs C1–C5 to `TODO.md`: editor focus/scroll jumping, incorrect RL/RR exit
   motion, RND/CHF insertion at program start, block-insertion rules, and the

@@ -2,9 +2,9 @@
 
 The **Android app** for [TNC Sim](https://tncsim.org), a free, open-source
 simulator for Heidenhain TNC (Klartext) CNC programming. Built with
-**Capacitor** — the whole app is `www/index.html`, wrapped in a native Android
-shell so it runs fully offline with no browser address bar. Published on the
-Play Store as `org.tncsim.twa`.
+**Capacitor** — `www/index.html` is the HTML shell and loads the app's plain
+JS/CSS modules from `www/`, wrapped in a native Android shell for fully offline
+use with no browser address bar. Published on the Play Store as `org.tncsim.twa`.
 
 This repo is standalone: the app content in `www/` is its own source and is
 independent of the website repo.
@@ -19,8 +19,8 @@ independent of the website repo.
 
 ## Project layout
 
-- `www/` — the app itself (`index.html` + bundled `vendor/` Three.js + icons).
-  **Edit here.**
+- `www/` — the app source: `index.html` shell, `core/` shared logic,
+  `android/` app-specific modules, bundled Three.js, and icons. **Edit here.**
 - `android/` — native Android/Gradle project.
 - `capacitor.config.json` — Capacitor config (`appId`, `webDir: www`).
 - `NOTES.md` — project map, rules, and the edit/preview/release flows. Read it first.
