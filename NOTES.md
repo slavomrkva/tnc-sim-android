@@ -374,6 +374,39 @@ last one (this file has 4). Both failure modes produced **zero console
 errors** — the app just silently failed to boot. See "Module map" above for
 the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 
+### 11. TWO separate bottom reservations must both be dropped while the keyboard is open
+Clearing space for the fixed `.mtab-bar` in the mobile editor layout is done in
+**two independent places**, and hiding the keyboard's black gap requires
+dropping **both** while `kbd-open`:
+1. `body{padding-bottom:50px}` — the outer reservation on `<body>` itself.
+2. `body[data-mtab="editor"] .editor-panel{padding-bottom:calc(46px + safe-area)}`
+   — the inner reservation on the scrolling panel.
+During `kbd-open` the body is shrunk to `--vvh` with `box-sizing:border-box`, so
+any leftover bottom padding becomes a strip of body background (`--bg`,
+near-black) directly above the keyboard — the exact "black area above the
+keyboard" symptom. The 1.0.7 fix dropped only #2 and the bug persisted for
+several versions because #1 was missed. Both now have a
+`html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` /
+`… .editor-panel{padding-bottom:0 !important;}` override. If you ever add a
+third bottom reservation (or change these), remember it needs the same
+`kbd-open` drop, and remember this whole class of bug is invisible in browser
+preview — only a real-device/emulator Capacitor build shows it (rule #7/#9).
+
+### 12. Resize the 3D renderer from the render loop, not only on window 'resize'
+The 3D canvas is CSS-sized (`#view3d canvas{width:100%;height:100%}`) while
+`onResize()` calls `renderer.setSize(w,h,false)` — the `false` deliberately
+skips the inline style so CSS owns the display size. So the drawing
+buffer/`camera.aspect` must be kept matched to the container's *current* size,
+or the browser stretches the last-sized buffer to fill the box and the model
+distorts. A window `resize` listener alone misses live mid-drag frames and
+container resizes that fire no window event (split-screen/foldable resize,
+tab/orientation change). `loop()` (`www/core/sim-controls.js`) calls
+`resizeToDisplay()` (`www/core/view2d.js`) every frame — a cheap no-op unless
+the container size changed, returning `true` on the resync frame so the
+idle-render throttle still paints it. This is a shared `core/` fix, byte-for-
+byte identical to the web repo; keep it that way and don't reduce it back to a
+resize-only listener.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -388,6 +421,46 @@ the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.13`. Cleaned up comment spacing in the "Angle
+  Mill" demo program (`DEMO_PROGRAMS` in `www/android/app.js`, mirrors the web
+  repo's `tnc-sim` v0.811): several inline `;` comments had huge, inconsistent
+  runs of padding spaces (up to 32) left over from an attempt to column-align
+  them that never lined up. Normalized to a single space before `;`, matching
+  the default "Complete Part" demo's convention. Purely cosmetic, no code/logic
+  lines touched. `Q1 = Q1+0,5774`'s decimal comma was deliberately left as-is —
+  not a bug, `parseProgram()` normalizes commas to dots globally before any
+  Q-expression is evaluated (see web repo's NOTES.md v0.811 entry for the
+  verification). `www/android/app.js` only (not `core/`) — kept byte-identical
+  to web's `web/app.js` copy of `DEMO_PROGRAMS` (both repos duplicate it
+  verbatim in their own `app.js`).
+- `APP_VERSION` bumped to `1.0.12`. **Fixed the 3D model changing aspect ratio
+  (stretching) when the view pane is resized without a window `resize` event** —
+  reported on web and expected here too (window resize, split-screen, foldable
+  unfold, orientation change). Root cause: the render `loop()`
+  (`www/core/sim-controls.js`) repaints every frame but only re-synced the
+  renderer buffer + `camera.aspect` on `window`'s `resize` event; the canvas is
+  CSS-stretched to `100%x100%` while `renderer.setSize(w,h,false)` leaves the
+  inline style alone, so any frame where the container differs from the last
+  resize snapshot renders at the wrong aspect. Added `resizeToDisplay()`
+  (`www/core/view2d.js`), a per-frame "resize-on-render" check called at the top
+  of `loop()` (no-op unless the container size actually changed). Verified in a
+  headless browser on the web repo: a container resized without a resize event
+  went from a 37% horizontal stretch to 1:1. `core/` change — kept byte-for-byte
+  identical to the web repo (`tnc-sim` `v0.809`). New rule #12.
+- `APP_VERSION` bumped to `1.0.11`. **Found the never-identified source of the
+  residual "black area above the keyboard" (TODO.md "strongest remaining
+  clue").** `body{padding-bottom:50px}` (the mobile-layout reservation that
+  clears the fixed `.mtab-bar`) was never dropped while the keyboard is open —
+  only `.editor-panel`'s own padding was (the 1.0.7 fix). With body shrunk to
+  `--vvh` and `box-sizing:border-box` during `kbd-open`, that 50px became a
+  strip of body background (`--bg` ≈ `#100f0d`, near-black) sitting right above
+  the keyboard. Detection was never the problem (rule #7 fires correctly — the
+  Learn practice bar hides), it was this dead reservation. Fix: added
+  `html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` in
+  `www/android/styles.css`, right beside the existing `.editor-panel`
+  padding-drop. CSS-only, additive. See new rule #11. **Not yet verified on a
+  real device** — this class of bug only manifests in the on-device Capacitor
+  WebView (rule #7/#9); verify with a clean rebuild before trusting it.
 - `APP_VERSION` bumped to `1.0.10`. **Reverted `1.0.9`'s
   `@capacitor/keyboard`-plugin approach** after real-device testing showed a
   genuine regression: on keyboard open the tab bar visibly slid up with the

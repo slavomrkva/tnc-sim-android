@@ -1,5 +1,22 @@
 # TODO / known open items
 
+## UPDATE (1.0.11): candidate root cause for the residual black area — found, needs on-device verification
+Followed the "Strongest remaining clue" below (kbd-open detection is fine — the
+Learn practice bar hides correctly — so the black strip is a *different*
+element that reserves bottom space). It is `body{padding-bottom:50px}` (the
+mobile-layout reservation clearing the fixed `.mtab-bar`). While the keyboard
+is open, body is shrunk to `--vvh` with `box-sizing:border-box`, so that 50px
+turns into a strip of body background (`--bg` ≈ `#100f0d`, near-black) sitting
+right above the keyboard. The 1.0.7 fix dropped `.editor-panel`'s padding but
+**not** the body's own padding — two independent bottom reservations, only one
+was cleared (see NOTES.md rule #11). Fix in `1.0.11`: added
+`html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` in
+`www/android/styles.css`. **CSS-only, additive, but NOT yet verified on a real
+device** — per the dead-end note below there is no way to reproduce this bug
+in browser preview; it must be confirmed with a clean on-device Capacitor
+rebuild (`npx cap sync android` + full rebuild, rule #6/#9). If it's finally
+clean on-device, this whole HISTORY section can be marked resolved.
+
 ## HISTORY: bottom tab bar / black area above keyboard — full pre-refactor investigation log
 This is the detailed, chronological record of everything tried in the
 session that produced the `1.0.4`–`1.0.8` `visualViewport`-baseline
