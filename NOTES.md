@@ -427,6 +427,9 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.23`. Added the explicit documentation rule:
+  preserve durable context in `docs/history/` with a root link when simplifying;
+  never discard it. No runtime change.
 - `APP_VERSION` bumped to `1.0.22`. Preserved detailed module-split history in
   `docs/history/module-split-refactor.md` and linked it from the concise current
   rules, so it is loaded only for relevant changes. No runtime change.
