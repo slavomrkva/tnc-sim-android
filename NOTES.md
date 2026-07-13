@@ -421,6 +421,15 @@ resize-only listener.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.14`. Added a **temporary on-device debug HUD** to
+  `www/android/keyboard.js` (guarded by `var DBG`) to diagnose the long-standing
+  bottom-bar / black-gap-above-keyboard bug, which is invisible in browser
+  preview (rule #7/#9) and has only ever been fixed blind. The overlay paints
+  live viewport metrics (baseline, `visualViewport.height`, `window.innerHeight`,
+  `offsetTop`, diff/maxDiff, `kbdOpen`, `kbd-open`/`editing-field` classes,
+  `data-mtab`, `.mtab-bar` rect + transform) and is kept live through the
+  keyboard animation by a short rAF sampler. Read-only — it does NOT drive the
+  classes (rule #7). To be removed once the bug is diagnosed. See TODO.md.
 - `APP_VERSION` bumped to `1.0.13`. Cleaned up comment spacing in the "Angle
   Mill" demo program (`DEMO_PROGRAMS` in `www/android/app.js`, mirrors the web
   repo's `tnc-sim` v0.811): several inline `;` comments had huge, inconsistent

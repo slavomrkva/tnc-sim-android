@@ -1,5 +1,22 @@
 # TODO / known open items
 
+## DEBUG (1.0.14): temporary on-device HUD added to diagnose the keyboard bug
+Because this bug is invisible in browser preview and every past fix was made
+blind (real-device rebuild cycles only — see NOTES rule #7/#9), `1.0.14` adds a
+**temporary debug overlay** in `www/android/keyboard.js` (guarded by `var DBG`).
+It paints live viewport numbers top-left: `baseline`, `visualViewport.height`,
+`window.innerHeight`, `visualViewport.offsetTop`, `diff`/`maxDiff`
+(`baseline − vv.height`), `kbdOpen`, the `kbd-open`/`editing-field` class state,
+`data-mtab`, the `.mtab-bar` bounding-box top/bottom, and its computed
+`transform`. A short rAF sampler keeps it live through the open/close animation
+so transient frames (the "rides up then hides" moment) are captured. It only
+READS state — it never drives the classes (rule #7). **Purpose:** get real
+numbers off the device (photograph the HUD before / during-opening / open /
+during-closing / closed) so the remaining fix can be reasoned about instead of
+guessed. **REMOVE this block once diagnosed** (delete the DEBUG HUD section and
+the `kickSample()` call, set nothing else back).
+
+
 ## UPDATE (1.0.11): candidate root cause for the residual black area — found, needs on-device verification
 Followed the "Strongest remaining clue" below (kbd-open detection is fine — the
 Learn practice bar hides correctly — so the black strip is a *different*
