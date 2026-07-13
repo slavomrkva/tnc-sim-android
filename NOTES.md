@@ -427,6 +427,11 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.26`. Closed C1 after successful real-device web
+  and Android verification by moving its full history from `TODO.md` to
+  `BUG_HISTORY.md`. Added a code-path analysis of C2: the R0 boundary rewrites
+  only the next segment's start, making a nominal pure-Z cancellation diagonal
+  from the compensated XY point. No C2 runtime change yet.
 - `APP_VERSION` bumped to `1.0.25`. Ported the tested mobile-web focus fix to
   Android WebView: editor controls now use one cancellable focus request with
   `preventScroll`, the hidden input no longer refocuses itself after blur,
