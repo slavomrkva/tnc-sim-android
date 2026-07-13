@@ -427,6 +427,9 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.24`. Defined root Markdown as a small navigation
+  layer: update existing sections, archive durable background in its existing
+  topic, and add a root file only for a new current contract. No runtime change.
 - `APP_VERSION` bumped to `1.0.23`. Added the explicit documentation rule:
   preserve durable context in `docs/history/` with a root link when simplifying;
   never discard it. No runtime change.
