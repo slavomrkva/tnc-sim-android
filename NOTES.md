@@ -421,6 +421,18 @@ resize-only listener.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.13`. Cleaned up comment spacing in the "Angle
+  Mill" demo program (`DEMO_PROGRAMS` in `www/android/app.js`, mirrors the web
+  repo's `tnc-sim` v0.811): several inline `;` comments had huge, inconsistent
+  runs of padding spaces (up to 32) left over from an attempt to column-align
+  them that never lined up. Normalized to a single space before `;`, matching
+  the default "Complete Part" demo's convention. Purely cosmetic, no code/logic
+  lines touched. `Q1 = Q1+0,5774`'s decimal comma was deliberately left as-is —
+  not a bug, `parseProgram()` normalizes commas to dots globally before any
+  Q-expression is evaluated (see web repo's NOTES.md v0.811 entry for the
+  verification). `www/android/app.js` only (not `core/`) — kept byte-identical
+  to web's `web/app.js` copy of `DEMO_PROGRAMS` (both repos duplicate it
+  verbatim in their own `app.js`).
 - `APP_VERSION` bumped to `1.0.12`. **Fixed the 3D model changing aspect ratio
   (stretching) when the view pane is resized without a window `resize` event** —
   reported on web and expected here too (window resize, split-screen, foldable
