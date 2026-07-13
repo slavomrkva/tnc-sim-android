@@ -427,6 +427,11 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.29`. Closed C2 after the user confirmed the
+  Android 1.0.27 port as well as the already-verified web fix. Moved the full
+  repro, root cause, rejected partial approaches, final continuity fix,
+  commits, and regression/build evidence from `TODO.md` to `BUG_HISTORY.md`.
+  No new parser runtime change.
 - `APP_VERSION` bumped to `1.0.28`. Closed C3 and C4 from user verification in
   the current app. C3 is no longer observed after C1 stabilised focus/selection;
   no separate RND/CHF change was needed. C4's current block-placement behaviour
