@@ -449,6 +449,10 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.18`. Added the release-archive workflow to
+  `RELEASE_NOTES.md`: archive every shipped signed `.aab` outside Git, create a
+  matching Android Git tag + GitHub Release with the bundle attached, and tag
+  web releases too. Never commit Android build artifacts to Git.
 - `APP_VERSION` bumped to `1.0.17`. Removed the temporary debug HUD from
   `www/android/keyboard.js` (restored to the clean baseline detection) now that
   the keyboard bar / black-gap / flicker bug is confirmed fixed on-device. Added

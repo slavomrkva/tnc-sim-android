@@ -9,6 +9,12 @@ user-facing history.
 > add a short line here under the release's `versionName (versionCode)`. Skip
 > purely internal tweaks — those go only in `NOTES.md`. Keep it in plain
 > language a user understands (it goes on the Play Store).
+>
+> **Release archive:** after every shipped Android release, archive the signed
+> `.aab` outside this repository using `android-<version>-code-<versionCode>.aab`,
+> create the matching Git tag `android-v<version>-code-<versionCode>`, and create
+> a GitHub Release with the `.aab` attached. For web releases, create the matching
+> `web-v<APP_VERSION>` Git tag. Never commit `.aab` or `.apk` artifacts to Git.
 
 ---
 
