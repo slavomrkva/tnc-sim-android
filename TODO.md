@@ -49,7 +49,8 @@ END PGM PROGRAM
 ```
 
 ### Status
-Open. Root cause identified; no runtime fix applied yet.
+Open across both repos. Web fix verified and merged; identical Android 1.0.27
+port is implemented and awaiting real-device verification.
 
 ### Analysis (2026-07-13)
 - The defect is in the shared `www/core/parser-engine.js` radius-compensation
@@ -68,6 +69,15 @@ Open. Root cause identified; no runtime fix applied yet.
   `nextSeg.to` alone would leave either a diagonal or a discontinuity.
 - Regression coverage should include RL and RR, ordinary lateral R0 lead-out,
   R0 on a pure Z retract, multiple following Z-only moves, and a later XY move.
+
+### Attempts
+- **Web v0.821/v0.822:** user verified the reported mobile-web contour retracts
+  vertically; the fix was merged to web `main`.
+- **Android 1.0.27:** ported the identical `offsetRun()` continuity change and
+  regression harness. A zero-XY R0 keeps the last compensated physical XY
+  through Z/state-only segments; the first later XY move leads out to its
+  nominal target. Tests cover RL, RR, lateral R0, repeated Z retracts, a later
+  XY lead-out, and the full reported RND/CHF contour. Awaiting device test.
 
 ## C3 — Vkladanie RND/CHF niekedy vloží blok na začiatok programu
 **Repos:** web + Android. **Reported:** 2026-07-13.

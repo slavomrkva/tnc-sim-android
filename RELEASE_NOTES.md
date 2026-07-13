@@ -13,6 +13,8 @@ user-facing history.
 ---
 
 ## 1.0.2 (versionCode 3)
+- Fixed RL/RR cancellation so a `L Z... R0` retract moves vertically instead
+  of diagonally by the tool-radius compensation offset.
 - Editing values and switching Learn tasks no longer makes the editor jump or
   unexpectedly reopen the on-screen keyboard.
 - The bottom Editor / 3D / Learn tab bar behaves properly with the on-screen

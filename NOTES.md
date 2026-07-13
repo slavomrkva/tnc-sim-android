@@ -427,6 +427,11 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.27`. Ported the verified web C2 fix and its
+  regression harness: a pure-Z R0 cancellation keeps the last compensated
+  physical XY through retract/state-only segments, with the first later XY
+  move providing the lead-out. RL/RR, lateral R0, repeated Z, later XY, and the
+  full reported RND/CHF contour pass. Awaiting real-device Android verification.
 - `APP_VERSION` bumped to `1.0.26`. Closed C1 after successful real-device web
   and Android verification by moving its full history from `TODO.md` to
   `BUG_HISTORY.md`. Added a code-path analysis of C2: the R0 boundary rewrites
