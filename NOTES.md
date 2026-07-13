@@ -111,11 +111,10 @@ split (2026-07-12 refactor, no functionality changed) into:
 - **`www/android/*.js`** (6 files) — only 4 functions are genuinely diverged
   from web, all in the forced-mobile-layout category:
   - `layout.js`: `_isMTab()` (hardcoded `return true` here; web computes a
-    real `matchMedia('(max-width:1024px)')` breakpoint — rule #0),
+    real `matchMedia('(max-width:1024px)')` breakpoint — rule #0), and
     `showKpHelp` (web's `window.innerWidth > 1024` desktop-positioning
-    branches are replaced with `false` here), plus an `isMob()`/`grow()`
-    textarea-autogrow IIFE (`isMob()` has the same divergence as `_isMTab`,
-    `grow()` itself is identical to web's copy).
+    branches are replaced with `false` here). The bounded-editor `_growCode`
+    compatibility hook is otherwise shared with web.
   - `panels.js`: `renderIdlePanel`/`updateLineNums` — android added a
     `#_idleBlocks` block-count span to the idle toolbar that web doesn't
     have; the two functions are a linked pair, kept together.
@@ -352,23 +351,14 @@ last one (this file has 4). Both failure modes produced **zero console
 errors** — the app just silently failed to boot. See "Module map" above for
 the full breakdown and `android/app.js`'s note on why it's order-sensitive.
 
-### 11. TWO separate bottom reservations must both be dropped while the keyboard is open
-Clearing space for the fixed `.mtab-bar` in the mobile editor layout is done in
-**two independent places**, and hiding the keyboard's black gap requires
-dropping **both** while `kbd-open`:
-1. `body{padding-bottom:50px}` — the outer reservation on `<body>` itself.
-2. `body[data-mtab="editor"] .editor-panel{padding-bottom:calc(46px + safe-area)}`
-   — the inner reservation on the scrolling panel.
-During `kbd-open` the body is shrunk to `--vvh` with `box-sizing:border-box`, so
-any leftover bottom padding becomes a strip of body background (`--bg`,
-near-black) directly above the keyboard — the exact "black area above the
-keyboard" symptom. The 1.0.7 fix dropped only #2 and the bug persisted for
-several versions because #1 was missed. Both now have a
-`html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` /
-`… .editor-panel{padding-bottom:0 !important;}` override. If you ever add a
-third bottom reservation (or change these), remember it needs the same
-`kbd-open` drop, and remember this whole class of bug is invisible in browser
-preview — only a real-device/emulator Capacitor build shows it (rule #7/#9).
+### 11. Drop the editor's bottom-tab reservation while the keyboard is open
+The bounded editor now reserves the fixed `.mtab-bar` only on the editor body;
+`.editor-panel` itself has no bottom padding. During `kbd-open` the body is
+shrunk to `--vvh`, so its reservation must still be removed by
+`html.kbd-open body[data-mtab="editor"]{padding-bottom:0 !important;}` or it
+becomes a near-black strip above the keyboard. If another bottom reservation is
+introduced, give it the same `kbd-open` override. This remains an on-device
+Capacitor behaviour that browser preview cannot prove (rule #7/#9).
 
 ### 12. Resize the 3D renderer from the render loop, not only on window 'resize'
 The 3D canvas is CSS-sized (`#view3d canvas{width:100%;height:100%}`) while
@@ -427,6 +417,14 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.30`. Ported the accepted web C5/C6 and BLKFORM
+  changes to Android: the editor is a bounded flex column whose code area is
+  the only scroll owner; light-mode contextual values remain readable; missing
+  or all-zero BLK FORM runs in toolpath-only mode; and `BLKFORM OFF/ON` hides or
+  restores stock beside Measure/Path. Measure opens below the wrapped button
+  row and stock toggles repaint immediately. Added absent/zero/valid BLK FORM
+  parser regressions. Android-specific keyboard detection and forced-mobile
+  layout remain intact.
 - `APP_VERSION` bumped to `1.0.29`. Closed C2 after the user confirmed the
   Android 1.0.27 port as well as the already-verified web fix. Moved the full
   repro, root cause, rejected partial approaches, final continuity fix,
