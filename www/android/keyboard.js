@@ -25,53 +25,6 @@
   var vv = window.visualViewport;
   var bar = null;
   var baseline = vv.height;
-
-  /* =====================================================================
-     TEMPORARY on-device DEBUG HUD — added 1.0.14 to finally get real
-     numbers off the device for the long-standing "bottom bar jumps/black
-     gap above keyboard" bug (this bug is invisible in browser preview, so
-     we've been fixing blind — see TODO.md / NOTES rule #7). It only READS
-     state and paints an overlay; it never touches the kbd-open /
-     editing-field classes (rule #7: only one mechanism drives those).
-     REMOVE this whole block once the bug is diagnosed. Flip DBG to disable.
-     ===================================================================== */
-  var DBG = true, hud = null, maxDiff = 0, raf = 0, ticks = 0;
-  function paint(){
-    if(!DBG) return;
-    if(!hud){
-      if(!document.body) return;
-      hud = document.createElement('div');
-      hud.id = '_kbHud';
-      hud.style.cssText = 'position:fixed;top:0;left:0;z-index:2147483647;'
-        + 'background:rgba(0,0,0,.82);color:#0f0;font:11px/1.35 monospace;'
-        + 'padding:4px 7px;white-space:pre;pointer-events:none;'
-        + 'border-bottom-right-radius:6px;';
-      document.body.appendChild(hud);
-    }
-    if(!bar) bar = document.querySelector('.mtab-bar');
-    var diff = Math.round(baseline - vv.height);
-    if(diff > maxDiff) maxDiff = diff;
-    var kbdOpen = diff > 140;
-    var cls = document.documentElement.classList;
-    var br = bar ? bar.getBoundingClientRect() : null;
-    var cs = bar ? getComputedStyle(bar).transform : '';
-    hud.textContent =
-        'base ' + Math.round(baseline) + '   vvh ' + Math.round(vv.height) + '\n'
-      + 'innerH ' + window.innerHeight + '   offT ' + Math.round(vv.offsetTop) + '\n'
-      + 'diff ' + diff + '   maxDiff ' + maxDiff + '\n'
-      + 'kbdOpen ' + kbdOpen
-        + '   cls ' + (cls.contains('kbd-open') ? 'K' : '-') + (cls.contains('editing-field') ? 'E' : '-') + '\n'
-      + 'tab ' + document.body.getAttribute('data-mtab') + '\n'
-      + 'barTop ' + (br ? Math.round(br.top) : '—') + '  barBot ' + (br ? Math.round(br.bottom) : '—') + '\n'
-      + 'xform ' + (cs && cs !== 'none' ? cs.replace(/matrix\([^)]*\)/, function(m){ return m.length > 24 ? '…' + m.slice(-14) : m; }) : 'none');
-  }
-  // Sample for a short while after each change so the HUD captures the
-  // transient frames of the keyboard open/close animation, not just the
-  // settled value.
-  function sample(){ paint(); if(++ticks < 60){ raf = requestAnimationFrame(sample); } else { raf = 0; } }
-  function kickSample(){ ticks = 0; if(!raf) raf = requestAnimationFrame(sample); }
-  /* ============================ end DEBUG HUD ============================ */
-
   function apply(){
     if(!bar) bar = document.querySelector('.mtab-bar');
     if(vv.height >= baseline - 2) baseline = vv.height; // no keyboard right now — keep the reference fresh
@@ -79,7 +32,6 @@
     document.documentElement.style.setProperty('--vvh', vv.height + 'px');
     document.documentElement.classList.toggle('kbd-open', kbdOpen);
     document.documentElement.classList.toggle('editing-field', kbdOpen);
-    kickSample(); // DEBUG: keep the HUD live through the animation
   }
   vv.addEventListener('resize', apply);
   vv.addEventListener('scroll', apply);

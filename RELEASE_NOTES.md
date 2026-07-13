@@ -12,6 +12,14 @@ user-facing history.
 
 ---
 
+## Unreleased (next Play release — fill in versionName/versionCode at release time)
+- The bottom Editor / 3D / Learn tab bar behaves properly with the on-screen
+  keyboard now: it no longer slides up with the keyboard, leaves no black gap
+  above it, doesn't flicker or animate when the keyboard opens, and reliably
+  reappears when you close the keyboard.
+- Learn: fixed an empty dark strip at the bottom of the lessons — the lesson
+  panel now fills the screen down to the bottom tabs.
+
 ## 1.0.2 (versionCode 3)
 - New welcome tour on first launch.
 - Cleaner top bar and editor toolbar.

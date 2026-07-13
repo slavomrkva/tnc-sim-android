@@ -419,6 +419,22 @@ be a fixed, unmoving anchor. It must hide/appear **instantly**. (A
 `transition:transform .16s ease` was on `.mtab-bar` up to `1.0.14` and caused
 exactly this; removed in `1.0.15`.) Keep the hide, drop the animation.
 
+### 14. Bug lifecycle: TODO.md while open (log every attempt), BUG_HISTORY.md when fixed
+Every discovered bug MUST be tracked, not carried only in one session's memory:
+1. **On discovery** → add an entry under "Open bugs" in `TODO.md`.
+2. **On every fix attempt** → append what was tried and its result (especially
+   on-device results) to that TODO entry *as it happens*. The failed attempts
+   are the point — they stop the next memory-less session from re-trying a known
+   dead end (this class of keyboard bug cost many blind rebuild cycles exactly
+   because attempts weren't all captured in one place).
+3. **When fixed** → move the whole entry out of `TODO.md` and into
+   `BUG_HISTORY.md` (symptom + root cause + all attempts + final state), and
+   delete it from `TODO.md`.
+Do this in the SAME commit as the code change, so the docs never drift from the
+tree. This applies to both repos (`tnc-sim` and `tnc-sim-android`); each keeps
+its own `TODO.md` + `BUG_HISTORY.md`, and cross-references the other when a bug
+spans both.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -433,6 +449,14 @@ exactly this; removed in `1.0.15`.) Keep the hide, drop the animation.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.17`. Removed the temporary debug HUD from
+  `www/android/keyboard.js` (restored to the clean baseline detection) now that
+  the keyboard bar / black-gap / flicker bug is confirmed fixed on-device. Added
+  `BUG_HISTORY.md` (archive of resolved bugs + every attempt) and the **bug
+  lifecycle** workflow as NOTES rule #14; moved the long keyboard-bug saga and
+  the Learn dead-space fix out of `TODO.md` into `BUG_HISTORY.md` (TODO now has
+  no open bugs). RELEASE_NOTES: added an "Unreleased" entry for the keyboard +
+  Learn user-facing fixes.
 - `APP_VERSION` bumped to `1.0.16`. Fixed the dead near-black empty strip at the
   bottom of the **Learn tab** (`www/android/styles.css`, mirrors web repo
   `tnc-sim` v0.812). The Learn tab, unlike Editor/3D, had no full-height flex
