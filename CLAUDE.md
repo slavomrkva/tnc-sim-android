@@ -13,6 +13,8 @@ syncs automatically.
    bugs must be tracked in both repositories.
 3. For a Play release, read `RELEASE_NOTES.md` and the Release flow in
    `NOTES.md`.
+4. Read `docs/history/` only when a current root document links to the relevant
+   topic.
 
 ## Non-negotiables
 

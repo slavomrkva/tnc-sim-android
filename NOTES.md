@@ -13,8 +13,8 @@
 > the project protects itself across sessions that have no shared memory —
 > growing this list is expected and encouraged.
 >
-> **Also bump `APP_VERSION`** (near the top of the main `<script>` in
-> `www/index.html`) **on every change, however small** — it's the on-device
+> **Also bump `APP_VERSION`** (near the top of `www/android/app.js`) **on every
+> change, however small** — it's the on-device
 > build marker shown in the About popup, and it's how you confirm a fresh
 > install/sync actually picked up your latest edit. See rule #8.
 >
@@ -157,6 +157,10 @@ the release flow. See the script's header comment for usage.
   a shared CSS module has not been verified as safe.
 - Immediate IIFEs remain in each product's `app.js` because their execution
   order matters (notably `APP_VERSION`). Do not move them into `core/`.
+
+Read `docs/history/module-split-refactor.md` only for a module-boundary, shared
+CSS, or script-load-order change. It preserves the original verification and
+failed-refactor context without making it mandatory session reading.
 
 ### A real gotcha hit during the split
 When extracting a `function name(){...}` block, stop exactly at its closing
@@ -423,6 +427,9 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.22`. Preserved detailed module-split history in
+  `docs/history/module-split-refactor.md` and linked it from the concise current
+  rules, so it is loaded only for relevant changes. No runtime change.
 - `APP_VERSION` bumped to `1.0.21`. Documentation-only cleanup: added concise
   session routing, moved module-split maintenance out of `TODO.md`, moved the
   Android bundle archive rule into this release flow, and condensed duplicate
