@@ -433,6 +433,16 @@ exactly this; removed in `1.0.15`.) Keep the hide, drop the animation.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.16`. Fixed the dead near-black empty strip at the
+  bottom of the **Learn tab** (`www/android/styles.css`, mirrors web repo
+  `tnc-sim` v0.812). The Learn tab, unlike Editor/3D, had no full-height flex
+  layout — it relied on default block flow plus an arbitrary lp-body
+  `max-height:calc(100svh - 220px)` cap, so `#learnPanel` ended at its content
+  height and the space below it down to the tab bar was bare page background
+  (`--bg`). Gave the Learn tab the same full-height flex treatment as the 3D tab
+  and replaced the cap with `max-height:none;flex:1` so the lesson body fills to
+  just above the tab bar. Verified in the web repo headless (Playwright,
+  390×844): gap panel→bar went 71px → 0. CSS-only.
 - `APP_VERSION` bumped to `1.0.15`. Removed the `transition:transform .16s ease`
   from `.mtab-bar` (`www/android/styles.css`): the bottom tab bar was visibly
   *animating* (sliding down) when the keyboard opened, which read as a flicker
