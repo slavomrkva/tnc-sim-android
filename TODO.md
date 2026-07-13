@@ -79,28 +79,6 @@ port is implemented and awaiting real-device verification.
   nominal target. Tests cover RL, RR, lateral R0, repeated Z retracts, a later
   XY lead-out, and the full reported RND/CHF contour. Awaiting device test.
 
-## C3 — Vkladanie RND/CHF niekedy vloží blok na začiatok programu
-**Repos:** web + Android. **Reported:** 2026-07-13.
-
-### Symptom
-Pri písaní programu vkladanie hodnôt RND a CHF niekedy vloží tieto bloky na
-úplný začiatok programu. Pravdepodobne to súvisí so skákaním focusu pri
-otváraní panelov na editáciu týchto funkcií.
-
-### Status
-Open. C1 focus handling is fixed; C3 still needs an independent retest.
-
-## C4 — Pravidlá vloženia ďalšieho bloku podľa aktívneho riadku
-**Repos:** web + Android. **Reported:** 2026-07-13.
-
-### Expected behaviour
-Keď je aktívny neprázdny riadok a kurzor bliká na jeho konci, ďalší blok sa má
-vložiť pod tento riadok bez pridania prázdneho riadku. Keď kurzor bliká v
-prázdnom riadku, ďalší blok sa má vložiť na miesto tohto riadku a nahradiť ho.
-
-### Status
-Open.
-
 ## C5 — Textové pole prechádza pod ovládacie panely
 **Repos:** web + Android. **Reported:** 2026-07-13.
 

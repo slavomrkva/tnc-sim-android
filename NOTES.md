@@ -427,6 +427,12 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.28`. Closed C3 and C4 from user verification in
+  the current app. C3 is no longer observed after C1 stabilised focus/selection;
+  no separate RND/CHF change was needed. C4's current block-placement behaviour
+  is accepted as matching the intended workflow even though it may not
+  literally implement every sentence of the original wording. Moved both
+  entries to `BUG_HISTORY.md`; no insertion runtime change.
 - `APP_VERSION` bumped to `1.0.27`. Ported the verified web C2 fix and its
   regression harness: a pure-Z R0 cancellation keeps the last compensated
   physical XY through retract/state-only segments, with the first later XY
