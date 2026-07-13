@@ -449,6 +449,11 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.19`. Corrected the next Play closed-test
+  release to `versionCode 3` / `versionName 1.0.2` after verifying in Play
+  Console that only version codes 1 and 2 were ever uploaded. The prepared
+  code-4 / 1.0.3 bundle was never uploaded, so it is safe to replace before
+  release. Consolidated its release notes under 1.0.2.
 - `APP_VERSION` bumped to `1.0.18`. Added the release-archive workflow to
   `RELEASE_NOTES.md`: archive every shipped signed `.aab` outside Git, create a
   matching Android Git tag + GitHub Release with the bundle attached, and tag

@@ -18,7 +18,7 @@ user-facing history.
 
 ---
 
-## 1.0.3 (versionCode 4)
+## 1.0.2 (versionCode 3)
 - The bottom Editor / 3D / Learn tab bar behaves properly with the on-screen
   keyboard now: it no longer slides up with the keyboard, leaves no black gap
   above it, doesn't flicker or animate when the keyboard opens, and reliably
@@ -28,12 +28,9 @@ user-facing history.
 - Improved light mode with a cleaner workspace, better contrast, and clearer controls.
 - Fixed 3D model distortion when resizing the window or changing the layout.
 - Minor bug fixes and stability improvements.
-
-## 1.0.2 (versionCode 3)
 - New welcome tour on first launch.
 - Cleaner top bar and editor toolbar.
 - Full-width layout on tablets — the 3D simulation is no longer cramped.
-- The bottom tab bar no longer gets in the way when the keyboard is open.
 - The app now uses its own icon.
 - 3D engine is bundled — full offline support from the first launch.
 - App version is shown in the About dialog.
