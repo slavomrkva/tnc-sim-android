@@ -427,6 +427,13 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.25`. Ported the tested mobile-web focus fix to
+  Android WebView: editor controls now use one cancellable focus request with
+  `preventScroll`, the hidden input no longer refocuses itself after blur,
+  Learn transitions close active field/Q/BLK editors before replacing code,
+  and keyboard visibility uses open/close hysteresis. Kept the Android-specific
+  remembered-`visualViewport` baseline. Awaiting real-device verification on
+  branch `debug/c1-android-focus`.
 - `APP_VERSION` bumped to `1.0.24`. Defined root Markdown as a small navigation
   layer: update existing sections, archive durable background in its existing
   topic, and add a root file only for a new current contract. No runtime change.

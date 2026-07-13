@@ -13,6 +13,8 @@ user-facing history.
 ---
 
 ## 1.0.2 (versionCode 3)
+- Editing values and switching Learn tasks no longer makes the editor jump or
+  unexpectedly reopen the on-screen keyboard.
 - The bottom Editor / 3D / Learn tab bar behaves properly with the on-screen
   keyboard now: it no longer slides up with the keyboard, leaves no black gap
   above it, doesn't flicker or animate when the keyboard opens, and reliably

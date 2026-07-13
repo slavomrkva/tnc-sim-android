@@ -9,12 +9,8 @@
       inside the Capacitor WebView, because it resizes window.innerHeight
       together with the keyboard, so the two live values never actually
       diverge.
-   2. focus/blur on the hidden #mobileInput: this app deliberately keeps that
-      input focused after the on-screen keyboard is dismissed (see the "keep
-      mobileInput focused when FM is active" blur handler, so the next quick
-      edit doesn't need a re-tap) — so blur does not reliably fire when the
-      keyboard actually closes, leaving the bar permanently hidden and the
-      app stuck (confirmed on a real device).
+   2. focus/blur on the hidden #mobileInput: focus state does not reliably
+      describe whether the Android soft keyboard is actually visible.
    This approach avoids both problems: `baseline` is captured once (and
    silently re-synced any time the viewport is at least as tall as it —
    i.e. whenever we're confident no keyboard is covering anything, including
@@ -25,16 +21,23 @@
   var vv = window.visualViewport;
   var bar = null;
   var baseline = vv.height;
+  var keyboardOpen = false;
   function apply(){
     if(!bar) bar = document.querySelector('.mtab-bar');
-    if(vv.height >= baseline - 2) baseline = vv.height; // no keyboard right now — keep the reference fresh
-    var kbdOpen = (baseline - vv.height) > 140;
+    if(!keyboardOpen && vv.height >= baseline - 2) baseline = vv.height;
+    var drop = baseline - vv.height;
+    if(!keyboardOpen && drop > 140) keyboardOpen = true;
+    else if(keyboardOpen && drop < 80) keyboardOpen = false;
+    var kbdOpen = keyboardOpen;
     document.documentElement.style.setProperty('--vvh', vv.height + 'px');
     document.documentElement.classList.toggle('kbd-open', kbdOpen);
     document.documentElement.classList.toggle('editing-field', kbdOpen);
   }
   vv.addEventListener('resize', apply);
   vv.addEventListener('scroll', apply);
-  window.addEventListener('orientationchange', function(){ setTimeout(function(){ baseline = vv.height; apply(); }, 300); });
+  window.addEventListener('orientationchange', function(){
+    keyboardOpen = false;
+    setTimeout(function(){ baseline = vv.height; apply(); }, 300);
+  });
   apply();
 })();

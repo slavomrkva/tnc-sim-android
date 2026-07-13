@@ -22,6 +22,13 @@ používateľ ručne prescroloval.
 ### Status
 Open. Súvisí s C3.
 
+### Attempts
+- `debug/c1-android-focus` / `APP_VERSION 1.0.25`: port webového stabilného
+  focus flow do Android WebView. Odstránený oneskorený refocus po `blur`, focus
+  požiadavky sa rušia tokenom, Learn prechody ukončia aktívny field/Q/BLK
+  editor a detekcia klávesnice používa hysteréziu. Čaká na test na reálnom
+  Android zariadení.
+
 ## C2 — RL/RR korekcia pri záverečnom pohybe Z+20 vedie nástroj šikmo do modelu
 **Repos:** web + Android. **Reported:** 2026-07-13.
 

@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.24';
+var APP_VERSION = '1.0.25';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -785,6 +785,10 @@ var SUGS={
 document.getElementById('ctxPanel').addEventListener('mousedown', function(e){
   // don't intercept clicks on idle panel buttons
   if(e.target && e.target.closest && e.target.closest('.btn')) return;
+  // Active field/Q buttons must not steal focus from the hidden input.
+  // Completion actions explicitly end the input session.
+  if(isMobile() && e.target && e.target.closest && e.target.closest('button') &&
+     (FM.active || _qpPanelOpen())) e.preventDefault();
   saveLastSel();
 });
 document.getElementById('ctxPanel').addEventListener('mouseup', function(){
@@ -939,19 +943,12 @@ document.addEventListener('keydown', function(e){
 // Mobile input handling via hidden input
 var mobileInput = document.getElementById('mobileInput');
 if(mobileInput){
-  // keep mobileInput focused when FM is active
   var MI_SENTINEL = '​'; // zero-width space as sentinel
 
   function resetMobileInput(){
     mobileInput.value = MI_SENTINEL;
     lastMobileVal = MI_SENTINEL;
   }
-
-  mobileInput.addEventListener('blur', function(){
-    if((FM.active || _qpPanelOpen()) && isMobile()){
-      setTimeout(function(){ mobileInput.focus(); }, 30);
-    }
-  });
 
   mobileInput.addEventListener('input', function(){
     // ── QP (Q parameter) panel routing — takes priority when open ──
