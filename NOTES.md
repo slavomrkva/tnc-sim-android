@@ -449,6 +449,10 @@ spans both.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.20`. Added five newly reported cross-repo open
+  bugs C1–C5 to `TODO.md`: editor focus/scroll jumping, incorrect RL/RR exit
+  motion, RND/CHF insertion at program start, block-insertion rules, and the
+  editor text area extending behind control panels. Includes C2's repro program.
 - `APP_VERSION` bumped to `1.0.19`. Corrected the next Play closed-test
   release to `versionCode 3` / `versionName 1.0.2` after verifying in Play
   Console that only version codes 1 and 2 were ever uploaded. The prepared
