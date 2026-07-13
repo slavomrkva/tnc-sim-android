@@ -407,6 +407,34 @@ idle-render throttle still paints it. This is a shared `core/` fix, byte-for-
 byte identical to the web repo; keep it that way and don't reduce it back to a
 resize-only listener.
 
+### 13. The bottom tab bar must NOT animate (no transform transition)
+`.mtab-bar` hides while the keyboard is open (it has to — in the resizing
+Capacitor WebView a static `position:fixed;bottom:0` bar sits right on top of
+the keyboard, the original bug; see rule #7/#9). It hides via
+`html.editing-field .mtab-bar{transform:translateY(120%)…}`. Do **not** put a
+`transition` on that transform: animating the slide makes the bar visibly move
+*through* the region the keyboard is animating into, which reads as a flicker on
+open and generally as the bar "jumping" — and users expect a bottom tab bar to
+be a fixed, unmoving anchor. It must hide/appear **instantly**. (A
+`transition:transform .16s ease` was on `.mtab-bar` up to `1.0.14` and caused
+exactly this; removed in `1.0.15`.) Keep the hide, drop the animation.
+
+### 14. Bug lifecycle: TODO.md while open (log every attempt), BUG_HISTORY.md when fixed
+Every discovered bug MUST be tracked, not carried only in one session's memory:
+1. **On discovery** → add an entry under "Open bugs" in `TODO.md`.
+2. **On every fix attempt** → append what was tried and its result (especially
+   on-device results) to that TODO entry *as it happens*. The failed attempts
+   are the point — they stop the next memory-less session from re-trying a known
+   dead end (this class of keyboard bug cost many blind rebuild cycles exactly
+   because attempts weren't all captured in one place).
+3. **When fixed** → move the whole entry out of `TODO.md` and into
+   `BUG_HISTORY.md` (symptom + root cause + all attempts + final state), and
+   delete it from `TODO.md`.
+Do this in the SAME commit as the code change, so the docs never drift from the
+tree. This applies to both repos (`tnc-sim` and `tnc-sim-android`); each keeps
+its own `TODO.md` + `BUG_HISTORY.md`, and cross-references the other when a bug
+spans both.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -421,6 +449,40 @@ resize-only listener.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.17`. Removed the temporary debug HUD from
+  `www/android/keyboard.js` (restored to the clean baseline detection) now that
+  the keyboard bar / black-gap / flicker bug is confirmed fixed on-device. Added
+  `BUG_HISTORY.md` (archive of resolved bugs + every attempt) and the **bug
+  lifecycle** workflow as NOTES rule #14; moved the long keyboard-bug saga and
+  the Learn dead-space fix out of `TODO.md` into `BUG_HISTORY.md` (TODO now has
+  no open bugs). RELEASE_NOTES: added an "Unreleased" entry for the keyboard +
+  Learn user-facing fixes.
+- `APP_VERSION` bumped to `1.0.16`. Fixed the dead near-black empty strip at the
+  bottom of the **Learn tab** (`www/android/styles.css`, mirrors web repo
+  `tnc-sim` v0.812). The Learn tab, unlike Editor/3D, had no full-height flex
+  layout — it relied on default block flow plus an arbitrary lp-body
+  `max-height:calc(100svh - 220px)` cap, so `#learnPanel` ended at its content
+  height and the space below it down to the tab bar was bare page background
+  (`--bg`). Gave the Learn tab the same full-height flex treatment as the 3D tab
+  and replaced the cap with `max-height:none;flex:1` so the lesson body fills to
+  just above the tab bar. Verified in the web repo headless (Playwright,
+  390×844): gap panel→bar went 71px → 0. CSS-only.
+- `APP_VERSION` bumped to `1.0.15`. Removed the `transition:transform .16s ease`
+  from `.mtab-bar` (`www/android/styles.css`): the bottom tab bar was visibly
+  *animating* (sliding down) when the keyboard opened, which read as a flicker
+  in the slide-out region and made the bar feel like it was moving. It still
+  hides while the keyboard is open (mandatory in the resizing WebView — rule
+  #7/#9), but now hides/appears instantly instead of animating. New rule #13.
+  (Debug HUD from 1.0.14 still present — user is actively diagnosing on-device.)
+- `APP_VERSION` bumped to `1.0.14`. Added a **temporary on-device debug HUD** to
+  `www/android/keyboard.js` (guarded by `var DBG`) to diagnose the long-standing
+  bottom-bar / black-gap-above-keyboard bug, which is invisible in browser
+  preview (rule #7/#9) and has only ever been fixed blind. The overlay paints
+  live viewport metrics (baseline, `visualViewport.height`, `window.innerHeight`,
+  `offsetTop`, diff/maxDiff, `kbdOpen`, `kbd-open`/`editing-field` classes,
+  `data-mtab`, `.mtab-bar` rect + transform) and is kept live through the
+  keyboard animation by a short rAF sampler. Read-only — it does NOT drive the
+  classes (rule #7). To be removed once the bug is diagnosed. See TODO.md.
 - `APP_VERSION` bumped to `1.0.13`. Cleaned up comment spacing in the "Angle
   Mill" demo program (`DEMO_PROGRAMS` in `www/android/app.js`, mirrors the web
   repo's `tnc-sim` v0.811): several inline `;` comments had huge, inconsistent
