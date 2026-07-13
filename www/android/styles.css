@@ -614,7 +614,13 @@ footer a:hover{text-decoration:underline;}
 .mtab-bar{display:none;}
 #learnMobileBar{display:none;}
 @media all{
-  .mtab-bar{position:fixed;left:0;right:0;bottom:0;z-index:8000;display:flex;background:var(--surface2);border-top:1px solid var(--border);height:calc(46px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;transform:translateZ(0);transition:transform .16s ease;}
+  /* No transform transition: the bar must not visibly *move* when the keyboard
+     opens/closes. It still has to disappear while typing (in the resizing
+     Capacitor WebView a static bottom bar would sit right on top of the
+     keyboard — the original bug), but it should hide/appear instantly, not
+     slide through the area the keyboard is animating into (that slide was the
+     "flicker on open"). */
+  .mtab-bar{position:fixed;left:0;right:0;bottom:0;z-index:8000;display:flex;background:var(--surface2);border-top:1px solid var(--border);height:calc(46px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;transform:translateZ(0);}
   .mtab-bar button{flex:1;background:none;border:none;border-top:3px solid transparent;color:var(--text3);font-family:var(--mono);font-size:9.5px;padding:3px 4px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:background .15s,color .15s;}
   .mtab-bar button .mi{font-size:0;line-height:0;display:flex;}
   .mtab-bar button .mi svg{width:23px;height:23px;display:block;}

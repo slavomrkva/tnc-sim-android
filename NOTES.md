@@ -407,6 +407,18 @@ idle-render throttle still paints it. This is a shared `core/` fix, byte-for-
 byte identical to the web repo; keep it that way and don't reduce it back to a
 resize-only listener.
 
+### 13. The bottom tab bar must NOT animate (no transform transition)
+`.mtab-bar` hides while the keyboard is open (it has to — in the resizing
+Capacitor WebView a static `position:fixed;bottom:0` bar sits right on top of
+the keyboard, the original bug; see rule #7/#9). It hides via
+`html.editing-field .mtab-bar{transform:translateY(120%)…}`. Do **not** put a
+`transition` on that transform: animating the slide makes the bar visibly move
+*through* the region the keyboard is animating into, which reads as a flicker on
+open and generally as the bar "jumping" — and users expect a bottom tab bar to
+be a fixed, unmoving anchor. It must hide/appear **instantly**. (A
+`transition:transform .16s ease` was on `.mtab-bar` up to `1.0.14` and caused
+exactly this; removed in `1.0.15`.) Keep the hide, drop the animation.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -421,6 +433,13 @@ resize-only listener.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.15`. Removed the `transition:transform .16s ease`
+  from `.mtab-bar` (`www/android/styles.css`): the bottom tab bar was visibly
+  *animating* (sliding down) when the keyboard opened, which read as a flicker
+  in the slide-out region and made the bar feel like it was moving. It still
+  hides while the keyboard is open (mandatory in the resizing WebView — rule
+  #7/#9), but now hides/appears instantly instead of animating. New rule #13.
+  (Debug HUD from 1.0.14 still present — user is actively diagnosing on-device.)
 - `APP_VERSION` bumped to `1.0.14`. Added a **temporary on-device debug HUD** to
   `www/android/keyboard.js` (guarded by `var DBG`) to diagnose the long-standing
   bottom-bar / black-gap-above-keyboard bug, which is invisible in browser
