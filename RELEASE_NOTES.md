@@ -13,6 +13,13 @@ user-facing history.
 ---
 
 ## 1.0.2 (versionCode 3)
+- Added `BLKFORM OFF/ON` beside Measure and Path to hide or restore the
+  workpiece while inspecting the toolpath.
+- Programs can run without a workpiece when BLK FORM is omitted or both box
+  corners are zero.
+- Fixed the Measure panel overlapping BLKFORM on phones.
+- Program text no longer scrolls behind editing and practice controls.
+- Fixed unreadable tool/function names in light-mode interactive panels.
 - Fixed RL/RR cancellation so a `L Z... R0` retract moves vertically instead
   of diagonally by the tool-radius compensation offset.
 - Editing values and switching Learn tasks no longer makes the editor jump or

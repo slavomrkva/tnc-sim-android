@@ -13,6 +13,37 @@ Newest first.
 
 ---
 
+## C6 — Measure panel overlapped the mobile BLKFORM control
+**Repos:** web `tnc-sim` + Android `tnc-sim-android`.
+**Resolved:** 2026-07-13 in web v0.828 and Android 1.0.30.
+
+### Symptom
+`BLKFORM OFF` appeared not to work on mobile, and enabling Measure placed its
+floating panel over the BLKFORM button.
+
+### Root cause and fix
+`#measureOverlay` used the same fixed top strip as the wrapping canvas button
+row. It now opens 6px below the measured bottom of the complete row and has a
+mobile-safe maximum width. BLKFORM also forces an immediate WebGL repaint;
+turning stock off closes and disables Measure. The web fix was verified at
+390×844 and then deliberately ported to the Android source.
+
+## C5 — Editor text passed behind mobile control panels
+**Repos:** web `tnc-sim` + Android `tnc-sim-android`.
+**Resolved:** 2026-07-13 in web v0.825 and Android 1.0.30.
+
+### Symptom
+Program text scrolled behind Path functions, contextual editors and practice
+controls because the whole editor panel was the scroll owner and those controls
+were sticky overlays without firm vertical boundaries.
+
+### Root cause and fix
+The mobile editor is now a bounded flex column: its controls remain real rows
+in normal flow, while only the code viewport scrolls in the remaining space.
+Opening a context or practice row therefore reduces the code height instead of
+covering it. Android keeps its existing WebView keyboard detection and hides
+the practice row while the keyboard is open.
+
 ## C2 — Pure-Z R0 cancellation moved diagonally after an RL/RR contour
 **Repos:** web `tnc-sim` (v0.822; `cc1f5ea`, merged by `67b8393`) + Android
 `tnc-sim-android` (1.0.27; `55c0ace`).
