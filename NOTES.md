@@ -429,6 +429,24 @@ mechanical core sync.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.33`. Ported the confirmed web CYCL cycle fixes
+  from `tnc-sim` PR #8 (commits `b90c01d`, `80cacfc`) into `www/core/parser-engine.js`
+  and `www/core/voxel-cutting.js`: `Q206 FAUTO` in cycles 200/201/208/209 now uses
+  the feed from the active `TOOL CALL`, not a later modal L/C feed; Cycle 208's
+  `Q334` is the max Z descent per full helix revolution computed over the whole
+  Q200-safety-height-to-Q201-depth travel (Q334=0 keeps the old single-revolution
+  behavior); in solid material (Q342=0) every constant-radius helix ring is
+  entered via a semicircular lead-in from the bore center instead of an expanding
+  r=0 spiral, so the first ring is a real non-zero radius (physical tool radius —
+  R5 for the default D20 bore with a R5 mill); the default Complete Part demo's
+  first `CYCL DEF 208` now uses `Q334=+2`. Added a shared `ensureVisible` segment
+  flag so short cycle retracts/returns (Cycle 200/201/208/209) get one held
+  render midpoint instead of teleporting between frames; Cycle 200 retracts stay
+  FMAX, Cycle 209 retracts use synchronized pitch×RPM feed, never FMAX. Ported
+  `tests/parser-cycles.test.js` (paths adjusted to `www/core/*` and `www/index.html`).
+  Android's lower `VOXEL_BUDGET`/`HI_VOXEL_BUDGET` WebView memory guards (rule
+  #15) were deliberately left untouched — the only intentional divergence from
+  the web fix.
 - `APP_VERSION` bumped to `1.0.32`. Deliberately ported only the accepted
   Learn improvements from web commit `fc45bf1` onto the optimized Android
   `main`: a highlighted Start here orientation lesson, replayable guided

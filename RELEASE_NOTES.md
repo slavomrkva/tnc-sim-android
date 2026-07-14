@@ -12,6 +12,15 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.33)
+- Fixed bore-milling cycle (CYCL 208) feed and toolpath: automatic feed now
+  correctly follows the tool call, and full-material bores enter each helix
+  pass smoothly from the center instead of an unrealistic zero-radius spiral.
+- Short internal retract/return moves in cycles 200, 201, 208 and 209 are now
+  visible in the 3D simulation instead of appearing to teleport.
+- Fixed tapping cycle (CYCL 209) retract speed to use the correct synchronized
+  feed instead of rapid traverse.
+
 ## Unreleased test build (APP_VERSION 1.0.32)
 - Added a Start here tutorial that explains how lessons and practice work.
 - Every practice task now shows its goals and offers three progressive hints.

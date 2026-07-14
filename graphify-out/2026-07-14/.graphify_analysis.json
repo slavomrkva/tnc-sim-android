@@ -2379,17 +2379,17 @@
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `copy()` connect `copy` to `three.min.js`, `At`, `tn`, `ec`, `no`, `jc`, `ct`, `Ce`, `pt`, `sn`, `yc`, `Wn`, `.updateProjectionMatrix`, `Ne`, `.setAttribute`, `ws`, `.subVectors`, `nc`, `eh`, `jt`, `.applyMatrix4`, `.toJSON`, `.constructor`, `updateMatrixWorld`, `jn`, `re`, `.multiplyScalar`, `.isEmpty`, `us`, `bug-report.js`, `en`, `nl`, `.toArray`, `ml`, `.dot`, `cl`, `.fromJSON`, `.setFromMatrixPosition`, `rh`, `zl`, `.fromBufferAttribute`, `la`, `fl`, `Ll`, `Rl`, `.copy`, `dl`, `el`, `pl`, `sc`, `Aa`, `Do`, `fo`, `Rs`, `zo`?",
+      "question": "Why does `copy()` connect `Object Cloning Utilities` to `Three.js Core Engine`, `Quaternion Math Operations`, `Geometry Parsing and Colors`, `Spherical Harmonics Math`, `3D Object Transforms`, `Skeleton Bone Binding`, `Buffer Attribute Management`, `Scene Object Traversal`, `Bounding Box Operations`, `Buffer Geometry Arrays`, `Animation Mixer Actions`, `WebGL Parameter Management`, `Camera Projection Setup`, `Frustum and Plane Math`, `Geometry Normal Computation`, `Render Object Lifecycle`, `Triangle Geometry Math`, `Quaternion Interpolation`, `Bounding Box Math`, `Ray and Sphere Math`, `Raycaster Intersection`, `Object Serialization`, `Matrix4 Decomposition`, `Bone Transform Updates`, `Render Target Setup`, `Ray Casting Math`, `Camera Ray Utilities`, `Bounding Geometry Utils`, `Shadow Map Management`, `Bug Report UI`, `Buffer Geometry Groups`, `Curve Path Building`, `Skeleton Management`, `Curve Length Mapping`, `Vector Angle and Events`, `Shape and Font Parsing`, `Geometry JSON Parsing`, `LOD Object Parsing`, `Line3 Geometry Math`, `Shape Extraction Utils`, `Line Geometry Utils`, `Instanced Mesh Management`, `Cubic Bezier Curve`, `Spline Curve Operations`, `Spaced Points Curve`, `Triangle Point Set`, `Quadratic Bezier Curve`, `Linear Curve Segment`, `Catmull Rom Curve`, `Euler Rotation Clone`, `Clone Constructor Update Pattern`, `Copy Constructor Pair`, `Copy Constructor Pair`, `Copy Constructor Pair`, `Copy Constructor Pair`?",
       "why": "High betweenness centrality (0.072) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `vt` connect `vt` to `three.min.js`, `tn`, `Lc`, `ec`, `parse`, `jc`, `copy`, `ct`, `Wn`, `.setAttribute`, `ws`, `.getX`, `jt`, `_o`, `.multiplyScalar`, `.isEmpty`, `us`, `constructor`, `en`, `nl`, `.toArray`, `cl`, `ls`, `Hi`, `.length`, `Aa`, `uc`, `fo`, `hl`, `rc`?",
+      "question": "Why does `vt` connect `WebGL Texture Binding` to `Three.js Core Engine`, `Geometry Parsing and Colors`, `Clock and Audio Analyzer`, `Spherical Harmonics Math`, `Asset Loading Pipeline`, `Skeleton Bone Binding`, `Object Cloning Utilities`, `Buffer Attribute Management`, `WebGL Parameter Management`, `Geometry Normal Computation`, `Render Object Lifecycle`, `Buffer Attribute Transforms`, `Ray and Sphere Math`, `Animation Parsing Utils`, `Camera Ray Utilities`, `Bounding Geometry Utils`, `Shadow Map Management`, `Geometry Transform Helpers`, `Buffer Geometry Groups`, `Curve Path Building`, `Skeleton Management`, `Shape and Font Parsing`, `Buffer Attribute Data`, `String Utility Helpers`, `Vector Normalization`, `Clone Constructor Update Pattern`, `Loader Options Handler`, `Copy Constructor Pair`, `Asset Loader`, `Text Decode URL Utils`?",
       "why": "High betweenness centrality (0.071) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `i()` connect `Wn` to `three.min.js`, `cl`, `vt`, `ls`, `.constructor`, `Hi`, `updateMatrixWorld`, `no`, `parse`, `uc`, `field-editing.js`, `constructor`, `en`, `.setAttribute`, `.subVectors`?",
+      "question": "Why does `i()` connect `WebGL Parameter Management` to `Three.js Core Engine`, `Shape and Font Parsing`, `WebGL Texture Binding`, `Buffer Attribute Data`, `Matrix4 Decomposition`, `String Utility Helpers`, `Bone Transform Updates`, `3D Object Transforms`, `Asset Loading Pipeline`, `Loader Options Handler`, `Field Editing UI`, `Geometry Transform Helpers`, `Buffer Geometry Groups`, `Geometry Normal Computation`, `Triangle Geometry Math`?",
       "why": "High betweenness centrality (0.038) - this node is a cross-community bridge."
     },
     {
@@ -2399,17 +2399,17 @@
     },
     {
       "type": "low_cohesion",
-      "question": "Should `three.min.js` be split into smaller, more focused modules?",
+      "question": "Should `Three.js Core Engine` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.031388329979879274 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
-      "question": "Should `vt` be split into smaller, more focused modules?",
+      "question": "Should `WebGL Texture Binding` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.029399585921325053 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
-      "question": "Should `At` be split into smaller, more focused modules?",
+      "question": "Should `Quaternion Math Operations` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.06560283687943262 - nodes in this community are weakly interconnected."
     }
   ]
