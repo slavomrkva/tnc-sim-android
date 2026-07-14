@@ -12,7 +12,11 @@ user-facing history.
 
 ---
 
-## Unreleased test build (APP_VERSION 1.0.31)
+## Unreleased test build (APP_VERSION 1.0.32)
+- Added a Start here tutorial that explains how lessons and practice work.
+- Every practice task now shows its goals and offers three progressive hints.
+- Added a guided tour of the assignment, editor, goals, hints and Check button.
+- Finishing a lesson now returns to the Learn lesson list.
 - Smoother 3D machining: only changed parts of the workpiece mesh are rebuilt.
 - Added Low, Default and High simulation quality, with matching Refine detail.
 
