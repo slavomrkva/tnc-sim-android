@@ -85,7 +85,7 @@ Store).
 ## Module map (core/ vs android/) — read this before editing www/
 `www/index.html`'s inline `<script>`/`<style>` content was mechanically
 split (2026-07-12 refactor, no functionality changed) into:
-- **`www/core/*.js`** (20 files) — shared code kept aligned with the web repo
+- **`www/core/*.js`** (21 files) — shared code kept aligned with the web repo
   (`tnc-sim`): 264 of 268 top-level functions plus
   5 shared data tables are identical between the two repos — mechanically
   verified by extracting every function by name from both repos' original
@@ -93,7 +93,7 @@ split (2026-07-12 refactor, no functionality changed) into:
   radius-comp engine** (`core/parser-engine.js`), the voxel cutting engine
   (`core/voxel-cutting.js`), 3D rendering (`core/render3d.js`), and —
   notably — **the entire "Learn" tutorial system**
-  (`core/learn-tutorial.js`, 35 functions) and mobile tab-switching
+  (`core/learn-coach.js` + `core/learn-tutorial.js`) and mobile tab-switching
   (`core/mobile-tabs.js`), all of which are shared with web now (an earlier,
   now-corrected pass at this refactor had wrongly concluded Learn mode and
   mobile tabs were app-only — that was based on comparing against a stale,
@@ -429,6 +429,14 @@ mechanical core sync.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.32`. Deliberately ported only the accepted
+  Learn improvements from web commit `fc45bf1` onto the optimized Android
+  `main`: a highlighted Start here orientation lesson, replayable guided
+  practice coach, goals visible before grading, progressive three-level hints
+  for every task, and a consistent return to the lesson list after Finish.
+  Added the shared `www/core/learn-coach.js` module and its classic-script load
+  order; Android layout, keyboard behavior and chunked voxel simulation remain
+  unchanged.
 - `APP_VERSION` bumped to `1.0.31`. Ported the accepted chunked voxel meshing
   from web v0.831, including recursive Measure raycasting and group-safe reset,
   disposal and Refine. Added Low (100/1 mm), recommended Default (150/0.7 mm)
