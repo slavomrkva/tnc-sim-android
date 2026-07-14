@@ -222,6 +222,15 @@ After a shipped Android release, archive the signed bundle outside this
 repository as `android-<version>-code-<versionCode>.aab`, create the matching
 Git tag `android-v<version>-code-<versionCode>`, and create a GitHub Release
 with that bundle attached. Never commit `.aab` or `.apk` artifacts to Git.
+This is not optional — do it right after every Play Console upload, not just
+when convenient.
+
+**Backup retention: keep the last 4 shipped releases (tag + GitHub Release +
+attached `.aab`), oldest-first pruning.** After adding a new release's tag/
+Release, if more than 4 exist, delete the oldest one: `git push origin
+:refs/tags/<old-tag>` (+ local `git tag -d <old-tag>`), `gh release delete
+<old-tag>`, and remove its locally archived `.aab` copy. Never prune below 4
+— if in doubt whether one counts as "shipped", keep it.
 
 ---
 
@@ -425,10 +434,18 @@ mechanical core sync.
 - `git status` / `git show --stat HEAD` shows no keystore, recovery codes, or
   unrelated personal files before pushing.
 - Signed with the original keystore (ask the human if unsure — don't guess).
+- Release tag pushed and GitHub Release created (see "Release archive" above);
+  oldest release pruned if more than 4 now exist.
 
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.34`. Documentation-only: made the "Release
+  archive" flow mandatory (tag + GitHub Release + archived `.aab` right after
+  every Play Console upload, not just when convenient) and added a 4-release
+  backup retention policy — prune the oldest tag/Release/`.aab` once more than
+  4 shipped releases exist, never below 4. Added the corresponding checklist
+  item. No runtime change.
 - `APP_VERSION` bumped to `1.0.33`. Ported the confirmed web CYCL cycle fixes
   from `tnc-sim` PR #8 (commits `b90c01d`, `80cacfc`) into `www/core/parser-engine.js`
   and `www/core/voxel-cutting.js`: `Q206 FAUTO` in cycles 200/201/208/209 now uses
