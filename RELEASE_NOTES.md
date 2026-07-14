@@ -12,6 +12,10 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.31)
+- Smoother 3D machining: only changed parts of the workpiece mesh are rebuilt.
+- Added Low, Default and High simulation quality, with matching Refine detail.
+
 ## 1.0.2 (versionCode 3)
 - Added `BLKFORM OFF/ON` beside Measure and Path to hide or restore the
   workpiece while inspecting the toolpath.
