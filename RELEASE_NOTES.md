@@ -12,6 +12,12 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.38)
+- Added four ready-to-run demos: Chamfering, Rough & Finish, Thread Hole, and
+  Precise Hole.
+- The light-theme 3D table grid is now a softer neutral grey. Opening another
+  lesson starts with its practice hints closed.
+
 ## Unreleased test build (APP_VERSION 1.0.36)
 - Fixed **Export** doing nothing: both the program Export button and the Tool
   Table's Export button now save the file via the system share sheet (pick
