@@ -1,0 +1,54 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>TNC Sim Android content regression check</title>
+<body>WAIT</body>
+<iframe id="app" src="../www/index.html" style="width:430px;height:850px"></iframe>
+<script>
+var frame = document.getElementById('app');
+frame.onload = function(){
+  setTimeout(function(){
+    try{
+      var w = frame.contentWindow;
+      var d = frame.contentDocument;
+      var demoNames = Array.from(w.DEMO_PROGRAMS, function(demo){ return demo.name; });
+      ['Chamfering', 'Rough & Finish', 'Thread Hole', 'Precise Hole'].forEach(function(name){
+        if(demoNames.indexOf(name) < 0) throw new Error('missing demo in app library: ' + name);
+      });
+      w.loadDemo(demoNames.indexOf('Precise Hole'));
+      if(d.getElementById('code').value.indexOf('CYCL DEF 201') < 0){
+        throw new Error('Precise Hole demo did not load into the editor');
+      }
+
+      d.documentElement.setAttribute('data-theme', 'light');
+      var gridColors = w._gridColors();
+      if(gridColors[0] !== 0x858c96 || gridColors[1] !== 0xaab0b8){
+        throw new Error('light grid colors do not match the grey palette');
+      }
+      var grid = new w.THREE.GridHelper(100, 10, 0, 0);
+      grid.userData.divisions = 10;
+      var colorVersion = grid.geometry.getAttribute('color').version;
+      w._applyGridTheme(grid);
+      if(grid.geometry.getAttribute('color').version <= colorVersion){
+        throw new Error('live grid recolor did not update its color buffer');
+      }
+
+      var first = w.LESSONS.findIndex(function(L){ return L.tasks && L.tasks.length; });
+      var other = w.LESSONS.findIndex(function(L, i){ return i !== first && L.tasks && L.tasks.length; });
+      w.LEARN.open = true;
+      w.LEARN.lesson = first;
+      w.LEARN.task = 0;
+      w.LEARN.hint = 2;
+      w.LEARN.lastResults = [{ok:false}];
+      w.LEARN.view = 'lesson';
+      w.learnOpenLesson(other);
+      if(w.LEARN.task !== -1 || w.LEARN.hint !== 0 || w.LEARN.lastResults !== null){
+        throw new Error('new lesson did not reset task/hint/result state');
+      }
+
+      document.body.textContent = 'PASS: Android demos, light grid, and new-lesson hint reset';
+    }catch(e){
+      document.body.textContent = 'FAIL: ' + e.message + '\n' + (e.stack || '');
+    }
+  }, 800);
+};
+</script>

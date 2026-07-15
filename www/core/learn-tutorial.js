@@ -612,7 +612,8 @@ function closeLearn(){
 }
 
 function learnOpenLesson(i){
-  LEARN.lesson = i; LEARN.slide = 0; LEARN.view = 'lesson';
+  LEARN.lesson = i; LEARN.slide = 0; LEARN.task = -1;
+  LEARN.lastResults = null; LEARN.hint = 0; LEARN.view = 'lesson';
   learnRender();
 }
 
