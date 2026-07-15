@@ -424,6 +424,14 @@ intentional WebView guards are 12 million live and 32 million Refine voxels,
 lower than web's 24/64 million. Do not overwrite those two limits during a
 mechanical core sync.
 
+### 16. Q-value fallbacks must treat 0 as valid
+When reading cycle params from a single-line `CYCL DEF`, use
+`Q!==undefined ? Q : default`, NOT `Q || default`. An explicit `Q=+0` is a
+valid, meaningful value (e.g. Cycle 209's `Q256=0` means "full retract out of
+the hole" and `Q257=0` means "single pass, no chip breaking"); `Q||default`
+silently discards it because `0` is falsy in JS. Cycle 200's Q202 already used
+the safe pattern; Cycle 209 did not until `APP_VERSION 1.0.35` fixed it.
+
 ---
 
 ## Testing checklist before shipping a release
@@ -440,6 +448,67 @@ mechanical core sync.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.35`. Ported six confirmed web `tnc-sim` fixes
+  (v0.835–v0.844, branch `claude/debug-effort-estimation-ivbkid`) into this
+  app, adapting the CSS-only ones from web's `@media(max-width:1024px)`
+  breakpoint to this app's unconditional `@media all` mobile layout (rule #0):
+  1. **Cycle 209 `Q256`/`Q257`** (`www/core/parser-engine.js`) — the
+     single-line `CYCL DEF 209` parse used `qm[256]||0.2`, so an explicit
+     `Q256=+0` (full retract) or `Q257=+0` (single pass) was silently replaced
+     by the default. Fixed with the `!==undefined` pattern; see new rule #16.
+     `HI_VOXEL_BUDGET` (rule #15) was left untouched.
+  2. **Tool Table "? Help" hint** (`www/core/tool-table.js`,
+     `www/android/styles.css`) — hid the "Click ? Help above..." sentence on
+     `pointer:coarse`, since `toggleKpHelp()` (`core/help-popups.js`, already
+     byte-identical) skips hover-help mode entirely on touch and opens the
+     full reference modal instead, so the described flow never applied here.
+  3. **F-field mobile buttons** (`www/core/field-editing.js`,
+     `www/android/styles.css`) — collapsed the feed field's 4 extra actions
+     (Q ref, FMAX, FAUTO, skip) into one `<select class="fbar-feedmode">`,
+     which used to wrap the field-editor row and grow `.ctx-panel`'s height.
+     A new `applyFeedMode()` dispatcher routes to the existing
+     `toggleQField`/`applySug`/`setFieldVal` setters. Preserved this file's
+     own prior "Fallback for older mobile browsers" comment/logic untouched.
+  4. **Light-theme dark-overlay contrast** (`www/android/styles.css`) — the
+     Learn practice coach tour tooltip and the 3D "TOOLS USED"/Measure panels
+     had near-invisible text in light theme: their fixed-dark backgrounds
+     paired with `var(--text2)/--text3`, which light theme redefines to dark
+     colors. Extended the existing dark-chrome custom-property re-scope
+     selector list to include `#toolLegend`, `#measureOverlay` and
+     `#learnCoach .coach-tip` (a prior `color:...!important` attempt on the
+     containers alone didn't reach their inline-styled child spans). Also
+     replaced the always-dead `var(--panel,#1b1f27)` with the literal color.
+  5. **Mobile status bar / tablet toolbar and view-tab width** (`www/android/
+     styles.css`) — the running-block status text could wrap to 2 lines and
+     grow the status bar's height between blocks; fixed with `flex-wrap:
+     nowrap` + ellipsis. The 3D tab's Run/Step/Stop, quality group, speed
+     control and the 3D/XY-toolpath/Tool-Table view tabs had no `max-width`,
+     so on tablet-sized Android devices (this app's mobile layout is
+     unconditional, so this affects every large-screen device, not just a
+     width range) they stretched edge-to-edge; capped at 150px/260px/190px
+     respectively, matching web's values.
+  6. **Intro coach tour: 4 new steps** (`www/core/learn-coach.js` — now
+     byte-identical to web again, `www/core/learn-tutorial.js`) — added
+     "Leave Learn mode" (`.lp-x`/`closeLearn()`), "Back to all lessons"
+     (new `.lp-hamburger` class/`learnBackToList()`), "Give up on this task"
+     (new `.lp-exit` class/`learnExit()`) and a playful "Psst — a password
+     button" step for the low-opacity solve control (new `.lp-solve` class/
+     `learnSolve()`). The first two need `#learnPanel`, which on this app
+     (like web) only exists on the Learn tab while the rest of the tour uses
+     the Editor-tab-pinned practice strip; added `_coachEnsureTabFor()` to
+     switch `mtabSwitch()` to the right tab per step, and `learnCoachEnd()`
+     now restores the Editor tab if Skip happens mid-panel-step. Preserved
+     this file's own pre-existing `_learnEndEditorInput()` comment wording.
+  7. Also fixed the same malformed inline `CYCL DEF 209 Q257=+11 Q256=+0`
+     line in the default Complete Part demo (`www/index.html`) to the
+     standard one-Q-per-line Klartext layout used by every other cycle in
+     that demo — cosmetic only, the parser reads both forms identically after
+     fix 1.
+  All 5 existing `tests/*.test.js` suites still pass; the coach-tour and
+  contrast fixes were also verified headless (Playwright) against
+  `www/index.html` directly, matching the web repo's verified before/after
+  measurements exactly (e.g. WCAG contrast 1.06:1 → 13.83:1 for the coach
+  tooltip title, tablet toolbar button width 261px → 150px).
 - `APP_VERSION` bumped to `1.0.34`. Documentation-only: made the "Release
   archive" flow mandatory (tag + GitHub Release + archived `.aab` right after
   every Play Console upload, not just when convenient) and added a 4-release
