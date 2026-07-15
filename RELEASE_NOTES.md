@@ -12,6 +12,21 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.35)
+- Fixed the tapping cycle (CYCL 209): setting Q256 to 0 (full retract) or Q257
+  to 0 (single pass, no chip breaking) now actually works instead of being
+  silently ignored.
+- The Tool Table no longer shows a "? Help" hint that didn't apply on this app.
+- Editing a feed (F) value no longer makes the on-screen keypad panel jump or
+  grow — the FMAX/FAUTO/Q/skip options are now one compact dropdown.
+- Fixed near-invisible text in light theme in the Learn practice tutorial's
+  guided tour and the 3D view's "Tools used"/Measure panels.
+- The 3D view's Run/Step/Stop buttons and view tabs no longer stretch overly
+  wide on tablets.
+- The Learn intro tutorial's guided tour now also points out how to leave
+  Learn mode, go back to the lesson list, give up on a task, and what that
+  hidden password button next to Reset actually does.
+
 ## Unreleased test build (APP_VERSION 1.0.33)
 - Fixed bore-milling cycle (CYCL 208) feed and toolpath: automatic feed now
   correctly follows the tool call, and full-material bores enter each helix
