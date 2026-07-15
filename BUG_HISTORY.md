@@ -13,6 +13,71 @@ Newest first.
 
 ---
 
+## Export (program and Tool Table) did nothing on device
+**Repo:** Android `tnc-sim-android`. **Resolved:** APP_VERSION 1.0.36.
+**Verified:** 2026-07-15 when the user confirmed the freshly built current APK
+works correctly.
+
+### Symptom and cause
+Both exports used a Blob URL plus synthetic `<a download>`. Android WebView
+reported download-attribute support but had no `DownloadListener`, so the path
+silently saved nothing.
+
+### Attempts and fix
+- The Android-only helpers moved from shared `www/core/editor-core.js` to
+  `www/android/app.js`.
+- Official `@capacitor/filesystem` and `@capacitor/share` plugins write the file
+  to app cache and open the system share sheet. Existing FileProvider cache
+  coverage was reused; Capacitor sync registered both plugins. The first build
+  was intentionally kept open pending device evidence, then accepted after the
+  user's 1.0.36 APK test.
+
+## C10 — Cycle 209 explicit zero values were ignored
+**Repos:** web `tnc-sim` + Android `tnc-sim-android`.
+**Resolved:** Android 1.0.35. **Accepted:** 2026-07-15.
+
+Single-line Cycle 209 defaults used `qm[n] || default`, discarding valid
+`Q256=0` and `Q257=0`. The Android port uses
+`Q !== undefined ? Q : default`, preserving full retract and single-pass
+semantics. The user confirmed the current build works correctly.
+
+## C9 — Short drilling/tapping retracts appeared to teleport
+**Repos:** web `tnc-sim` + Android `tnc-sim-android`.
+**Resolved:** Android 1.0.33. **Accepted:** 2026-07-15.
+
+Correct short cycle reversals could finish inside one display frame. Only
+cycle-internal marked reversals now receive one held midpoint render. Cycle 200
+remains FMAX and Cycle 209 remains synchronized at pitch × spindle speed;
+ordinary rapid and arc motion is unchanged. Parser regressions passed and the
+current build was accepted by the user.
+
+## C8 — Cycle 208 used the wrong FAUTO feed and uneven helix infeed
+**Repos:** web `tnc-sim` + Android `tnc-sim-android`.
+**Resolved:** Android 1.0.33. **Accepted:** 2026-07-15.
+
+Cycle `FAUTO` incorrectly followed a later modal contour feed, and helix depth
+calculation excluded Q200 safety travel. The port keeps `toolCallFeed` separate,
+calculates full safeZ-to-depthZ revolutions, and enters solid stock through a
+semicircular lead-in to constant-radius helices. Automated regressions passed;
+the user accepted the current behavior.
+
+## C7 — 3D stock updates stalled during machining
+**Repos:** web `tnc-sim` + Android `tnc-sim-android`.
+**Resolved:** Android 1.0.31. **Verified:** 2026-07-15 in the current APK.
+
+### Symptom and cause
+Every cut rebuilt the complete voxel mesh, causing visible stalls while
+Marching Cubes rescanned and re-uploaded the full grid.
+
+### Attempts and fix
+- Web profiling isolated pauses above 50 ms to stock rebuilds, not tool motion.
+- Accepted web chunking divided the live mesh into 32×32-cell XY chunks with a
+  one-cell dirty halo and exact-geometry regressions.
+- Android ported chunking, recursive Measure raycasting, group-safe disposal,
+  Low/Default/High profiles, and conservative 12M live / 32M Refine budgets.
+  Automated geometry/profile tests and a debug build passed; the user then
+  confirmed the current APK works correctly.
+
 ## C6 — Measure panel overlapped the mobile BLKFORM control
 **Repos:** web `tnc-sim` + Android `tnc-sim-android`.
 **Resolved:** 2026-07-13 in web v0.828 and Android 1.0.30.
