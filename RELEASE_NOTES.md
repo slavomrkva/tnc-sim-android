@@ -12,6 +12,14 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.40)
+- Added a conservative Android 3D mode using WebGL1 and smaller GPU buffers for
+  devices whose embedded WebView loses its WebGL2 rendering context.
+
+## Unreleased test build (APP_VERSION 1.0.39)
+- The 3D fallback now shows copyable device diagnostics to identify WebView/GPU
+  compatibility failures during remote-device testing.
+
 ## Unreleased test build (APP_VERSION 1.0.38)
 - Added four ready-to-run demos: Chamfering, Rough & Finish, Thread Hole, and
   Precise Hole.

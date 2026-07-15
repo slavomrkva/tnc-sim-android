@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.38';
+var APP_VERSION = '1.0.40';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -1396,6 +1396,178 @@ runValidation();
 buildKeypad();
 renderIdlePanel();
 
+// Android-only on-screen WebGL diagnostics. BrowserStack and affected physical
+// devices can lose the embedded WebView's EGL/Skia backing before remote DevTools
+// can be attached, so preserve the last successful context snapshot and show it
+// inside the existing 3D fallback panel. This test build also forces the
+// conservative WebGL1 context described below; recovery behaviour is unchanged.
+var _android3DDiag = {
+  startedAt: performance.now(),
+  mode: 'forced-webgl1-safe',
+  phase: 'boot',
+  attempts: [],
+  context: null,
+  eventStatus: '',
+  lostAfterMs: null
+};
+
+function _android3DDiagContext(gl){
+  if(!gl) return null;
+  var out = {};
+  try{
+    out.api = (typeof WebGL2RenderingContext!=='undefined' && gl instanceof WebGL2RenderingContext) ? 'WebGL2' : 'WebGL1';
+    out.version = gl.getParameter(gl.VERSION) || '';
+    out.vendor = gl.getParameter(gl.VENDOR) || '';
+    out.renderer = gl.getParameter(gl.RENDERER) || '';
+    var ext = gl.getExtension('WEBGL_debug_renderer_info');
+    if(ext){
+      out.unmaskedVendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) || '';
+      out.unmaskedRenderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || '';
+    }
+    out.attributes = gl.getContextAttributes();
+    out.buffer = gl.drawingBufferWidth + 'x' + gl.drawingBufferHeight;
+  }catch(e){ out.snapshotError = String(e && e.message ? e.message : e); }
+  return out;
+}
+
+function _android3DDiagText(){
+  var d = _android3DDiag;
+  var elapsed = Math.round(performance.now() - d.startedAt);
+  var lines = [
+    'TNC Sim ' + APP_VERSION + ' / Android 3D diagnostic',
+    'mode=' + d.mode,
+    'phase=' + d.phase + '  elapsed=' + elapsed + 'ms',
+    'viewport=' + window.innerWidth + 'x' + window.innerHeight
+      + '  screen=' + screen.width + 'x' + screen.height
+      + '  dpr=' + (window.devicePixelRatio || 1)
+  ];
+  if(d.lostAfterMs!==null) lines.push('contextLostAfter=' + d.lostAfterMs + 'ms');
+  if(d.eventStatus) lines.push('eventStatus=' + d.eventStatus);
+  for(var i=0;i<d.attempts.length;i++){
+    var a=d.attempts[i];
+    lines.push('attempt' + (i+1) + '=' + a.options + ' -> ' + a.result);
+  }
+  if(d.context){
+    lines.push('api=' + (d.context.api || '?') + '  buffer=' + (d.context.buffer || '?'));
+    lines.push('GL_VERSION=' + (d.context.version || '?'));
+    lines.push('GPU=' + (d.context.unmaskedRenderer || d.context.renderer || '?'));
+    lines.push('GPU_VENDOR=' + (d.context.unmaskedVendor || d.context.vendor || '?'));
+    lines.push('attributes=' + JSON.stringify(d.context.attributes));
+    if(d.context.snapshotError) lines.push('snapshotError=' + d.context.snapshotError);
+  }
+  lines.push('UA=' + navigator.userAgent);
+  return lines.join('\n');
+}
+
+function _android3DDiagShow(){
+  var box=document.getElementById('view3dError');
+  if(!box) return;
+  box.style.overflow='auto';
+  box.style.alignItems='flex-start';
+  var host=box.firstElementChild || box;
+  host.style.width='100%';
+  host.style.maxWidth='720px';
+  var old=document.getElementById('android3DDiag'); if(old) old.remove();
+  var panel=document.createElement('div'); panel.id='android3DDiag';
+  panel.style.cssText='margin-top:14px;text-align:left;border:1px solid var(--border);border-radius:6px;padding:9px;background:var(--surface);';
+  var pre=document.createElement('pre');
+  pre.style.cssText='margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono);font-size:9px;line-height:1.45;color:var(--text2);user-select:text;';
+  pre.textContent=_android3DDiagText();
+  var copy=document.createElement('button');
+  copy.textContent='Copy diagnostic';
+  copy.style.cssText='margin-top:8px;padding:5px 9px;border:1px solid var(--border);border-radius:5px;background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:10px;';
+  copy.onclick=function(){
+    var text=pre.textContent;
+    function done(){ copy.textContent='Copied'; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ _android3DDiagCopyFallback(text); done(); });
+    } else { _android3DDiagCopyFallback(text); done(); }
+  };
+  panel.appendChild(pre); panel.appendChild(copy); host.appendChild(panel);
+}
+
+function _android3DDiagCopyFallback(text){
+  var ta=document.createElement('textarea'); ta.value=text;
+  ta.style.cssText='position:fixed;left:-9999px;top:0;';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  ta.remove();
+}
+
+function _installAndroid3DDiagnostics(){
+  var originalShow=show3DError;
+  show3DError=function(msg){
+    if(_android3DDiag.phase==='boot') _android3DDiag.phase='renderer-start-failed';
+    originalShow(msg);
+    _android3DDiagShow();
+  };
+
+  var OriginalRenderer=THREE.WebGLRenderer;
+  THREE.WebGLRenderer=function(options){
+    var requested=options||{};
+    var attempt={options:JSON.stringify(requested),result:'starting'};
+    _android3DDiag.attempts.push(attempt);
+    try{
+      // The failing devices create a WebGL2 + MSAA + stencil context successfully,
+      // then lose its EGLImage backing a few seconds later. Create the conservative
+      // Android context explicitly so Three.js cannot prefer WebGL2 again.
+      var canvas=document.createElement('canvas');
+      var attrs={
+        alpha:false,
+        antialias:false,
+        depth:true,
+        stencil:false,
+        premultipliedAlpha:true,
+        preserveDrawingBuffer:false,
+        powerPreference:'low-power',
+        failIfMajorPerformanceCaveat:false
+      };
+      var gl=canvas.getContext('webgl',attrs) || canvas.getContext('experimental-webgl',attrs);
+      if(!gl) throw new Error('Safe WebGL1 context unavailable');
+      var safeOptions={
+        canvas:canvas,
+        context:gl,
+        alpha:false,
+        antialias:false,
+        depth:true,
+        stencil:false,
+        premultipliedAlpha:true,
+        preserveDrawingBuffer:false,
+        powerPreference:'low-power',
+        failIfMajorPerformanceCaveat:false
+      };
+      var instance=new OriginalRenderer(safeOptions);
+      var activeGl=instance && instance.getContext ? instance.getContext() : null;
+      attempt.result=activeGl ? 'safe-context-created' : 'no-context';
+      if(activeGl){
+        _android3DDiag.phase='context-created';
+        _android3DDiag.context=_android3DDiagContext(activeGl);
+      }
+      return instance;
+    }catch(e){
+      attempt.result='exception: ' + String(e && e.message ? e.message : e);
+      _android3DDiag.phase='renderer-attempt-failed';
+      throw e;
+    }
+  };
+  THREE.WebGLRenderer.prototype=OriginalRenderer.prototype;
+  return function(){ THREE.WebGLRenderer=OriginalRenderer; };
+}
+
+function _attachAndroid3DDiagnostics(){
+  if(!renderer || !renderer.domElement) return;
+  var canvas=renderer.domElement;
+  canvas.addEventListener('webglcontextlost',function(ev){
+    _android3DDiag.phase='context-lost';
+    _android3DDiag.lostAfterMs=Math.round(performance.now()-_android3DDiag.startedAt);
+    _android3DDiag.eventStatus=(ev && ev.statusMessage) ? ev.statusMessage : '(empty)';
+  },false);
+  canvas.addEventListener('webglcontextrestored',function(){
+    _android3DDiag.phase='context-restored';
+    try{ _android3DDiag.context=_android3DDiagContext(renderer.getContext()); }catch(e){}
+  },false);
+}
+
 // View hint — desktop vs touch
 (function(){
   var h = document.getElementById('viewHint');
@@ -1407,7 +1579,14 @@ renderIdlePanel();
   }
 })();
 if(THREE_OK){
-  init3D();
+  var _restoreRendererCtor=_installAndroid3DDiagnostics();
+  try{ init3D(); }
+  finally{ _restoreRendererCtor(); }
+  // The shared renderer caps touch devices at 1.5. Keep this compatibility
+  // build at one device-independent pixel per CSS pixel to reduce EGL buffers.
+  if(renderer && renderer.setPixelRatio){ renderer.setPixelRatio(1); }
+  if(renderer && renderer.getContext){ _android3DDiag.context=_android3DDiagContext(renderer.getContext()); }
+  _attachAndroid3DDiagnostics();
   initMeasureRaycaster();
   prepare();
   loop();
