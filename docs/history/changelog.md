@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.41 — adaptive Android WebGL compatibility
+
+- Prepared Play release 1.0.3 / versionCode 4 from the current accepted main.
+- Kept normal WebGL quality by default and enabled the explicit low-memory
+  WebGL1 renderer only after an early context loss remains unrestored.
+- Persisted safe mode per Android WebView user-agent, restored the current
+  program/view across the one-time reload, and retried normal mode after a
+  WebView update.
+- Added regression coverage for normal, failed and safe renderer paths.
+
 ## APP_VERSION 1.0.38 — machining demos and accepted web ports
 
 - Added four shared demo programs with parser and motion regression coverage.

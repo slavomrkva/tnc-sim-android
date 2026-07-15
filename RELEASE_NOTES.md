@@ -12,6 +12,16 @@ user-facing history.
 
 ---
 
+## 1.0.3 (versionCode 4)
+- 3D now automatically enables a compatible rendering mode if Android WebView
+  loses its GPU context, while retaining full quality on unaffected devices.
+- Added four ready-to-run machining demos and expanded Learn tutorials, goals,
+  hints, and guided practice.
+- Improved cycles 200, 201, 208 and 209, including feeds, helical entry and
+  visible retract moves.
+- Export now uses the Android share sheet, with additional light-theme and
+  mobile-layout fixes.
+
 ## Unreleased test build (APP_VERSION 1.0.38)
 - Added four ready-to-run demos: Chamfering, Rough & Finish, Thread Hole, and
   Precise Hole.

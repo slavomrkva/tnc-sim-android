@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.38';
+var APP_VERSION = '1.0.41';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -1391,6 +1391,8 @@ var measureRaycaster = null;
 
 
 // ---------- boot ----------
+var _androidWebGLCompat = window.AndroidWebGLCompat || null;
+if(_androidWebGLCompat) _androidWebGLCompat.restoreSessionState(codeEl);
 updateLineNums();
 runValidation();
 buildKeypad();
@@ -1407,10 +1409,17 @@ renderIdlePanel();
   }
 })();
 if(THREE_OK){
-  init3D();
+  var _restoreAndroidRenderer = _androidWebGLCompat
+    ? _androidWebGLCompat.installRenderer(THREE) : function(){};
+  try{ init3D(); }
+  finally{ _restoreAndroidRenderer(); }
+  if(_androidWebGLCompat && _androidWebGLCompat.isSafeMode()
+    && renderer && renderer.setPixelRatio){ renderer.setPixelRatio(1); }
+  if(_androidWebGLCompat) _androidWebGLCompat.watchRenderer(renderer);
   initMeasureRaycaster();
   prepare();
   loop();
+  if(_androidWebGLCompat) _androidWebGLCompat.afterBoot();
 } else {
   // fallback: 2D only
   document.getElementById('tab3d').style.display='none';
