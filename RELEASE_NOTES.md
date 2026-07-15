@@ -12,6 +12,11 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.36)
+- Fixed **Export** doing nothing: both the program Export button and the Tool
+  Table's Export button now save the file via the system share sheet (pick
+  Save/Drive/email/etc.) instead of silently failing.
+
 ## Unreleased test build (APP_VERSION 1.0.35)
 - Fixed the tapping cycle (CYCL 209): setting Q256 to 0 (full retract) or Q257
   to 0 (single pass, no chip breaking) now actually works instead of being

@@ -1,4 +1,7 @@
-// editor-core -- verified byte-for-byte identical between web and android repos.
+// editor-core -- verified byte-for-byte identical between web and android repos,
+// EXCEPT _downloadTextFile: moved out to www/android/app.js (per sync-core.sh --
+// blob: + <a download> silently no-ops in the Capacitor Android WebView, see
+// BUG_HISTORY.md / TODO.md "Export produces nothing on device").
 
 function highlightActiveLine(lineIdx){
   var divs = lineNums.querySelectorAll('.ln');
@@ -431,61 +434,8 @@ function onImportFile(e){
   reader.readAsText(file);
 }
 
-function _downloadTextFile(text, filename){
-  var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-  // Detect whether the <a download> mechanism actually works (iOS Safari does not).
-  var a = document.createElement('a');
-  var supportsDownload = ('download' in a);
-  if(supportsDownload){
-    var url = URL.createObjectURL(blob);
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);   // must be in DOM for some mobile browsers
-    a.click();
-    // delay revoke + removal so the download actually starts on mobile
-    setTimeout(function(){
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 1500);
-    return;
-  }
-  // Fallback (iOS Safari / no download support): open the file content for manual save/share.
-  try{
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      var w = window.open(ev.target.result, '_blank');
-      if(!w) _showExportFallback(text, filename);
-    };
-    reader.readAsDataURL(blob);
-  }catch(err){
-    _showExportFallback(text, filename);
-  }
-}
-
-function _showExportFallback(text, filename){
-  // Last-resort: show a textarea the user can select-all & copy, plus Web Share if available.
-  var ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);display:flex;flex-direction:column;padding:16px;gap:10px;';
-  ov.innerHTML =
-    '<div style="color:#fff;font-family:var(--mono),monospace;font-size:13px;">'+filename+' — select all and copy, or use Share</div>'
-    + '<textarea readonly style="flex:1;width:100%;font-family:monospace;font-size:12px;background:#111;color:#eee;border:1px solid #444;border-radius:6px;padding:8px;"></textarea>'
-    + '<div style="display:flex;gap:8px;">'
-    + '<button id="_expShare" style="flex:1;padding:10px;border:0;border-radius:6px;background:#4a9eff;color:#fff;font-size:14px;">Share</button>'
-    + '<button id="_expClose" style="flex:1;padding:10px;border:0;border-radius:6px;background:#555;color:#fff;font-size:14px;">Close</button>'
-    + '</div>';
-  document.body.appendChild(ov);
-  var ta = ov.querySelector('textarea'); ta.value = text; ta.focus(); ta.select();
-  ov.querySelector('#_expClose').onclick = function(){ document.body.removeChild(ov); };
-  var shareBtn = ov.querySelector('#_expShare');
-  if(navigator.share){
-    shareBtn.onclick = function(){
-      navigator.share({title:filename, text:text}).catch(function(){});
-    };
-  } else {
-    shareBtn.style.display = 'none';
-  }
-}
+// _downloadTextFile(text, filename) lives in www/android/app.js (Capacitor
+// Filesystem + Share) -- see the header comment above.
 
 function exportProgram(){
   var code = codeEl.value;
