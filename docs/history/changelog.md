@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.42 — accepted Learn audit port
+
+- Ported the accepted web v0.858 Learn content, hints, grading rules, diagrams,
+  tutorial flow, coach and accessibility improvements into the shared Android
+  Learn modules.
+- Added Android regression coverage that verifies all official answers, rejects
+  starters and commented-out answers, and catches wrong Cycle 208 depth signs.
+- Preserved the deliberate Android behavior that does not force desktop-panel
+  scrolling after revealing a hint.
+
 ## APP_VERSION 1.0.41 — adaptive Android WebGL compatibility
 
 - Prepared Play release 1.0.3 / versionCode 4 from the current accepted main.

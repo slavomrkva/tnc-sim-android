@@ -13,6 +13,34 @@ Newest first.
 
 ---
 
+## C16 — Complete Learn correctness, content and visual audit
+**Repos:** web `tnc-sim` and Android `tnc-sim-android`. **Resolved:** Android
+APP_VERSION 1.0.42, ported from accepted web v0.858. **Accepted:** the lesson
+package was accepted by the user on 2026-07-15; Android regressions and build
+were verified during the port.
+
+### Symptom and root causes
+Some tasks could pass from starter code, comments, wrong-sign depths or motion
+created by an older cycle. Several Q parameters were not scoped to the requested
+cycle. Lesson explanations and hints included ambiguous machining claims, while
+many diagrams were generic, too small, geometrically misleading or crowded by
+labels. The Start here lesson repeated a long coach instead of giving the
+student a short interactive first success.
+
+### Attempts and accepted fixes
+- Tightened grading around executable code, scoped cycle parameters and ordered
+  sequences; all official solutions pass while starters and regression cheats
+  fail.
+- Improved lesson wording, progressive hints, control semantics, contrast and
+  diagram alternatives.
+- Rebuilt the reported Lesson 7, 9, 11, 13 and 14 visuals, including the 90°
+  countersink and Cycle 208 edge-breaking geometry, then cleared intersecting
+  labels through iterative preview review.
+- Rebuilt Start here around read, try, check and improve, reduced its coach to
+  five essential actions and made the warm-up genuinely checked.
+- Replaced the cramped tutorial status graphics with full-width Goals, Hint and
+  Check cards. The final web preview was accepted before this Android port.
+
 ## Export (program and Tool Table) did nothing on device
 **Repo:** Android `tnc-sim-android`. **Resolved:** APP_VERSION 1.0.36.
 **Verified:** 2026-07-15 when the user confirmed the freshly built current APK

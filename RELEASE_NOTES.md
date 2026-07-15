@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.42)
+- Ported the complete accepted Learn audit from web: stricter and more accurate
+  task checks, clearer lessons and progressive hints, redesigned diagrams, and
+  the shorter interactive Start here tutorial.
+- Improved Learn accessibility with clearer focus states, larger diagram text
+  and stronger light-theme contrast.
+
 ## 1.0.3 (versionCode 4)
 - 3D now automatically enables a compatible rendering mode if Android WebView
   loses its GPU context, while retaining full quality on unaffected devices.
