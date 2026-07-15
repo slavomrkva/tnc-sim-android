@@ -448,6 +448,26 @@ the safe pattern; Cycle 209 did not until `APP_VERSION 1.0.35` fixed it.
 ---
 
 ## Changelog  (newest first — add a line for every change)
+- `APP_VERSION` bumped to `1.0.36`. Fixed Export (program + Tool Table)
+  silently doing nothing on device (see `TODO.md`). Root cause: the shared
+  `_downloadTextFile()` in `www/core/editor-core.js` builds a `blob:` URL and
+  clicks a synthetic `<a download>`; the Capacitor Android WebView has no
+  `DownloadListener`, and `'download' in a` reports `true` here (unlike iOS
+  Safari, which the function already detected and fell back for), so it always
+  took the branch that never actually saves anything. Per `sync-core.sh`'s own
+  rule ("an android-only tweak to shared logic no longer belongs in `core/`"),
+  moved `_downloadTextFile`/`_showExportFallback` out of `www/core/editor-core.js`
+  into `www/android/app.js` and reimplemented with the official
+  `@capacitor/filesystem` + `@capacitor/share` plugins (added to `package.json`,
+  synced with `npx cap sync android` — both now listed in
+  `android/app/capacitor.build.gradle`/`android/capacitor.settings.gradle`).
+  Writes to `Directory.Cache`, then opens the OS share sheet. Reused the
+  `${applicationId}.fileprovider` + `res/xml/file_paths.xml` (`cache-path
+  path="."`) already declared in `AndroidManifest.xml` — no manifest changes
+  needed. `www/core/editor-core.js`'s header comment now flags this one
+  intentional exception to "byte-for-byte identical with web". Not yet
+  verified on a real device (no Android SDK in this environment); tracked open
+  in `TODO.md` until confirmed.
 - `APP_VERSION` bumped to `1.0.35`. Ported six confirmed web `tnc-sim` fixes
   (v0.835–v0.844, branch `claude/debug-effort-estimation-ivbkid`) into this
   app, adapting the CSS-only ones from web's `@media(max-width:1024px)`

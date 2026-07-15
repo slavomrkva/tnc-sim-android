@@ -5,11 +5,34 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.35';
+var APP_VERSION = '1.0.36';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
 })();
+
+// ── Export (program & tool table) ─────────────────────────────────
+// Android-only implementation of core/editor-core.js's _downloadTextFile.
+// The shared web version builds a blob: URL and clicks a synthetic
+// <a download>. That silently does nothing here: the Capacitor Android
+// WebView has no DownloadListener wired up, and (unlike iOS Safari, which the
+// web code already detects and falls back for) 'download' in a still reports
+// true, so it always takes the branch that never actually saves anything.
+// Use the native Filesystem + Share plugins instead: write into the app's
+// cache dir, then hand it to the OS share sheet so the user can save/send it
+// wherever they want.
+function _downloadTextFile(text, filename){
+  var plugins = window.Capacitor && window.Capacitor.Plugins;
+  if(!plugins || !plugins.Filesystem){
+    _toast('Export needs a rebuild (Filesystem plugin missing) — run npx cap sync android.', true);
+    return;
+  }
+  plugins.Filesystem.writeFile({ path: filename, data: text, directory: 'CACHE', encoding: 'utf8' })
+    .then(function(res){
+      if(plugins.Share) return plugins.Share.share({ title: filename, url: res.uri, dialogTitle: 'Save ' + filename });
+    })
+    .catch(function(err){ _toast('Export failed: ' + (err && err.message || 'unknown error'), true); });
+}
 
 // ===== constants.js =====
 // TNC Sim — Constants: CYCLES, BUILDERS, KEYS, defaults
