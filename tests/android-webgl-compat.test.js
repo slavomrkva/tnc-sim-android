@@ -129,7 +129,7 @@ assert.strictEqual(updatedEnv.window.AndroidWebGLCompat.isSafeMode(), false);
 
 // Integration order and release markers.
 assert.ok(index.indexOf('android/webgl-compat.js') < index.indexOf('android/app.js'));
-assert.match(app, /var APP_VERSION = '1\.0\.42';/);
+assert.match(app, /var APP_VERSION = '1\.0\.43';/);
 assert.match(app, /_androidWebGLCompat\.isSafeMode\(\)/);
 assert.match(app, /renderer\.setPixelRatio\(1\)/);
 

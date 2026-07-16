@@ -40,6 +40,9 @@ student a short interactive first success.
   five essential actions and made the warm-up genuinely checked.
 - Replaced the cramped tutorial status graphics with full-width Goals, Hint and
   Check cards. The final web preview was accepted before this Android port.
+- A final accepted refinement reduced Start here to two direct slides. The
+  first shows task → editor → Check; the second explains the three progressive
+  Hint levels in text without an image. The five-step coach stayed unchanged.
 
 ## Export (program and Tool Table) did nothing on device
 **Repo:** Android `tnc-sim-android`. **Resolved:** APP_VERSION 1.0.36.

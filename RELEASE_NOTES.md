@@ -12,6 +12,11 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.43)
+- Simplified Start here to two direct slides: task → editor → Check, followed
+  by a text-only explanation of the three progressive Hint levels. The existing
+  five-step guided tour is unchanged.
+
 ## Unreleased test build (APP_VERSION 1.0.42)
 - Ported the complete accepted Learn audit from web: stricter and more accurate
   task checks, clearer lessons and progressive hints, redesigned diagrams, and

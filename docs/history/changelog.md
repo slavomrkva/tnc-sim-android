@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.43 — accepted shorter tutorial port
+
+- Ported the accepted web v0.861 two-slide Start here lesson and its simpler
+  diagram into Android.
+- Kept the existing five-step coach and the Android-only no-forced-scroll Hint
+  behavior unchanged.
+
 ## APP_VERSION 1.0.42 — accepted Learn audit port
 
 - Ported the accepted web v0.858 Learn content, hints, grading rules, diagrams,
