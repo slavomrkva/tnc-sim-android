@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.47 — called-LBL simulation status
+
+- Ported the accepted web v0.866 `CALL LBL` status fix only; Android retains
+  its mobile-native F selector and receives no desktop feed-menu changes.
+- Added a parser regression for called and fall-through LBL status values.
+
 ## APP_VERSION 1.0.46 — first tutorial orientation lesson
 
 - Ported only `L00` Start here from the older preview branch onto the current
