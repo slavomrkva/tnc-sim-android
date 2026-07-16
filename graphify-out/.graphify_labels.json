@@ -150,10 +150,5 @@
   "148": ".expandByObject",
   "149": "rc",
   "150": ".multiply",
-  "151": "po",
-  "152": "build.gradle",
-  "153": ".setFromCylindrical",
-  "154": ".setFromSpherical",
-  "155": "capacitor.build.gradle",
-  "156": "capacitor.settings.gradle"
+  "152": "build.gradle"
 }

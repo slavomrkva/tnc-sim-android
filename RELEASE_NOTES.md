@@ -12,6 +12,10 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.46)
+- Reworked the first Start here lesson into three concise orientation slides,
+  with a visual preview of Hint 1–3 and an ungraded editor walkthrough.
+
 ## Unreleased test build (APP_VERSION 1.0.45)
 - Corrected cycles 200, 201, 208 and 209 for depths, safe retracts, feeds,
   dwell behavior, spindle direction and tapping parameters.
