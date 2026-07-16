@@ -155,7 +155,8 @@ function onStop(){
     // Force mesh rebuild if pending
     if(VX && VX.dirty) vxRebuildMesh();
     // Show refine button if there are cuts
-    if(VX && (VX.hasCut || (VX.mesh && VX.mesh.visible !== false))){
+    if((typeof VX_COMPAT_MODE==='undefined' || !VX_COMPAT_MODE)
+      && VX && (VX.hasCut || (VX.mesh && VX.mesh.visible !== false))){
       var rb=document.getElementById('refineBtnCanvas');
       if(rb){ rb.style.display=''; rb.disabled=false; rb.textContent='◆ Refine'; }
     }

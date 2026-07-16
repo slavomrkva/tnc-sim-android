@@ -12,6 +12,34 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.53)
+- Keeps full-quality fast 3D on healthy devices and automatically remembers a
+  stable compatibility renderer only after an Android WebView context loss.
+- The compatibility renderer preserves material cutting with reduced profiles
+  and is retried at normal quality after Android System WebView is updated.
+- Refine remains available on normal devices but is hidden in compatibility
+  mode because its large coloured mesh would re-enter the failing GPU path.
+
+## Diagnostic test build (APP_VERSION 1.0.52)
+- Keeps reduced Low voxel cutting but restores the pre-optimization single-mesh
+  GPU layout with one simple, uncoloured Lambert material for Mali/WebGL1.
+
+## Diagnostic test build (APP_VERSION 1.0.51)
+- Restores material cutting with three reduced voxel profiles (50/75/100) to
+  find the stable Mali-G57 mesh limit in one test session.
+
+## Diagnostic test build (APP_VERSION 1.0.50)
+- Keeps the WebGL1 compatibility scene but temporarily omits the voxel cutting
+  mesh to isolate the Mali-G57 context loss from the rest of 3D rendering.
+
+## Diagnostic test build (APP_VERSION 1.0.49)
+- Starts Android 3D directly in the lowest-memory WebGL1 mode to verify Mali
+  compatibility before a failed normal renderer can affect the GPU process.
+
+## Unreleased test build (APP_VERSION 1.0.48)
+- Fixed Android devices that briefly showed 3D and then stayed on a rendering
+  error instead of restarting once in compatibility mode.
+
 ## Unreleased test build (APP_VERSION 1.0.47)
 - The 3D simulation now shows the LBL currently invoked by `CALL LBL`.
 

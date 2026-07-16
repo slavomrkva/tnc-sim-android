@@ -2118,6 +2118,12 @@ function rebuildRunSegments(sub, a, b, out, outSeg){
 }
 
 function triggerRefine(){
+  if(typeof VX_COMPAT_MODE!=='undefined' && VX_COMPAT_MODE){
+    var compatRefineBtn = document.getElementById('refineBtnCanvas');
+    if(compatRefineBtn) compatRefineBtn.style.display='none';
+    if(typeof _toast==='function') _toast('Refine is unavailable in 3D compatibility mode.', false);
+    return;
+  }
   if(!VX || !prog) return;
   var btn = document.getElementById('refineBtnCanvas');
   if(btn){ btn.disabled=true; btn.textContent='\u29d7 Refining\u2026'; }

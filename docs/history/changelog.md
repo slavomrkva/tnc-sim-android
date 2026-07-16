@@ -7,6 +7,58 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.53 — adaptive voxel compatibility candidate
+
+- Redmi Note 14 completed visible material cutting in APP_VERSION 1.0.52,
+  including the diagnostic High profile, confirming the stable monolithic GPU
+  layout on an originally failing Mali device.
+- Removed all globally forced diagnostic flags. Healthy devices again use the
+  normal renderer, chunked mesh and 100/150/200 profiles.
+- A persistent visible context loss is remembered for the exact Android
+  WebView user-agent; the restart combines explicit WebGL1/DPR 1 with the
+  verified monolithic mesh and reduced 50/75/100 profiles. A WebView update
+  clears the marker and retries the normal renderer.
+- Hides and guards Refine only in compatibility mode and changes its quality
+  help to the real reduced resolutions; normal devices retain Refine unchanged.
+
+## APP_VERSION 1.0.52 — monolithic voxel compatibility diagnostic
+
+- Vivo V21 failed before playback even at the reduced 50-level Low profile,
+  proving that cutting workload and raw voxel count were not the trigger.
+- Restores one complete low-resolution voxel mesh instead of the July 14
+  chunk group, removes its vertex-color buffer and uses a single-sided uniform
+  Lambert material while preserving actual material removal.
+
+## APP_VERSION 1.0.51 — reduced-voxel ramp diagnostic
+
+- Re-enabled voxel cutting under forced WebGL1 with live Low/Def/High test
+  resolutions 50/75/100 and matching 2.0/1.5/1.0 mm cell caps.
+- Starts at Low so one clean Vivo V21 session can establish the highest stable
+  geometry level without first allocating the previously failing mesh.
+
+## APP_VERSION 1.0.50 — no-voxel Mali diagnostic
+
+- Retains forced WebGL1, DPR 1, the stock box, grid, labels, lights, tool and
+  render loop while omitting only voxel-grid and Marching Cubes mesh creation.
+- Provides a same-device split between voxel GPU buffers and the remaining
+  WebView/Three.js scene; this is diagnostic and not a release quality mode.
+
+## APP_VERSION 1.0.49 — Mali WebGL1 first-boot diagnostic
+
+- Forces the existing low-memory WebGL1 path before any normal renderer is
+  created, and clamps pixel ratio 1 before Three.js allocates its backing store.
+- Handles a null renderer as a controlled 2D fallback and reports whether
+  WebGL1 context creation or Three.js renderer construction failed.
+
+## APP_VERSION 1.0.48 — resilient Android WebGL recovery
+
+- Replaced the silent localStorage/reload dependency with layered local,
+  session and one-shot URL safe-mode recovery plus explicit navigation.
+- Persistent visible context loss now switches to WebGL1 regardless of time
+  since app boot; background losses wait until the app returns to foreground.
+- Added visible failure diagnostics and regressions for two listeners, bridge
+  readiness, storage failures, navigation fallback and late 3D activation.
+
 ## APP_VERSION 1.0.47 — called-LBL simulation status
 
 - Ported the accepted web v0.866 `CALL LBL` status fix only; Android retains

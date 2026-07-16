@@ -69,10 +69,48 @@ The APK shows the 3D fallback before simulation. Device logs report
   marker, preserves the program/view, and reloads once with explicit WebGL1.
   The marker is tied to the WebView user-agent, so a WebView update retries the
   normal quality renderer automatically.
+- Attempt 5 — BrowserStack OPPO Reno6 reproduced a real persistent loss on
+  APP_VERSION 1.0.46: 3D rendered for about 0.5 seconds, the canvas went white,
+  then the generic context-loss message remained permanently instead of
+  reloading into compatibility mode. APP_VERSION 1.0.48 hardens native Android
+  detection, uses session/URL recovery if local storage fails, replaces the
+  fragile same-page reload with an explicit safe-mode navigation, waits through
+  background losses, and shows a diagnostic code if navigation still fails.
+- Attempt 6 — BrowserStack Vivo V21 / Mali-G57 on APP_VERSION 1.0.48 proved
+  that navigation reached safe mode, but the immediate post-crash WebGL1 boot
+  could not construct a renderer (`3D view could not start`). APP_VERSION
+  1.0.49 is a same-device diagnostic: it starts WebGL1 before any WebGL2 loss,
+  clamps DPR 1 before allocation, keeps 2D alive after a null renderer and
+  distinguishes WebGL1 context failure from Three.js construction failure.
+- Attempt 7 — A clean Vivo V21 run on APP_VERSION 1.0.49 created WebGL1 and
+  rendered briefly, then lost the context within about 0.5 seconds despite
+  antialias/stencil off, low-power preference and DPR 1. APP_VERSION 1.0.50
+  keeps the stock, grid, labels, lights, tool and render loop but omits only the
+  voxel grids and chunked Marching Cubes mesh to isolate the largest GPU-buffer
+  allocation from the rest of the scene.
+- Attempt 8 — APP_VERSION 1.0.50 remained stable on the same Vivo V21 with the
+  voxel/Marching Cubes path disabled; the expected stock box and toolpath were
+  visible but material was not cut. APP_VERSION 1.0.51 restores cutting with
+  50/75/100 live voxel resolutions and 2.0/1.5/1.0 mm cell caps, starting at
+  Low so the stable mesh threshold can be tested in one session.
+- Attempt 9 — APP_VERSION 1.0.51 lost the context on Vivo V21 immediately after
+  opening 3D even at Low, before playback began. This rules out cutting load
+  and a simple voxel-count threshold. APP_VERSION 1.0.52 keeps the reduced Low
+  grid but restores the pre-July-14 monolithic GPU layout: one full mesh, one
+  single-sided Lambert material and no vertex-color buffer.
+- Attempt 10 — APP_VERSION 1.0.52 rendered and cut material successfully on an
+  originally failing Redmi Note 14, including diagnostic High (resolution 100).
+  APP_VERSION 1.0.53 turns that proven renderer into the safe-mode half of the
+  adaptive flow: normal devices retain chunked 100/150/200 rendering; only a
+  device with a persistent visible context loss restarts into WebGL1/DPR 1,
+  monolithic 50/75/100 rendering keyed to its current WebView user-agent.
+  Refine is unavailable only in that mode to avoid its 300–500 coloured mesh.
 ### Status
-Preparing versionName 1.0.3 / versionCode 4 for Google Play Closed testing.
-Keep this open until the adaptive build is verified on an originally failing
-device; the successful safe-mode tests do not provide that same-device A/B yet.
+APP_VERSION 1.0.53 needs two clean-session checks: a healthy device must stay
+on normal Default without reloading, while Redmi Note 14 or Vivo V21 must lose
+the normal context once, restart automatically at compatibility Low, and keep
+cutting. A second app launch must enter compatibility directly without another
+loss. Keep C15 open until both adaptive branches are verified.
 
 ## C12 — Light-theme 3D table grid is too dark
 **Reported:** 2026-07-15. **Repro:** open the 3D simulation in the light theme.

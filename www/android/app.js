@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.47';
+var APP_VERSION = '1.0.53';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -1202,6 +1202,20 @@ var _idleFrames = 0;
 var VX = null; // voxel grid
 var VX_QUALITY = 1; // 0=low, 1=default, 2=high
 var VX_RES_LEVELS = [100, 150, 200];
+// Healthy devices keep the fast chunked renderer and full profiles. A device
+// that previously lost its Android WebView context boots directly into the
+// verified low-memory monolithic renderer for this exact WebView version.
+var VX_COMPAT_MODE = !!(window.AndroidWebGLCompat
+  && window.AndroidWebGLCompat.isSafeMode());
+if(VX_COMPAT_MODE){
+  VX_QUALITY = 0;
+  VX_RES_LEVELS = [50, 75, 100];
+  if(typeof HELP_MAP!=='undefined'){
+    HELP_MAP['q-low'] = {title:'Quality: Low compatibility (50 vox)', desc:'Stable low-memory profile for this Android WebView. Uses one simple voxel mesh and cells up to 2mm.', ex:''};
+    HELP_MAP['q-med'] = {title:'Quality: Default compatibility (75 vox)', desc:'Balanced compatibility profile with cells up to 1.5mm. Use only after Low is stable.', ex:''};
+    HELP_MAP['q-high'] = {title:'Quality: High compatibility (100 vox)', desc:'Highest compatibility profile with cells up to 1mm. Refine is unavailable in compatibility mode.', ex:''};
+  }
+}
 var VX_RES = VX_RES_LEVELS[VX_QUALITY];
 
 // Marching Cubes lookup tables and implementation
@@ -1395,6 +1409,9 @@ var measureRaycaster = null;
 // ---------- boot ----------
 var _androidWebGLCompat = window.AndroidWebGLCompat || null;
 if(_androidWebGLCompat) _androidWebGLCompat.restoreSessionState(codeEl);
+if(VX_COMPAT_MODE && typeof setQuality === 'function'){
+  setQuality(0);
+}
 updateLineNums();
 runValidation();
 buildKeypad();
@@ -1415,16 +1432,26 @@ if(THREE_OK){
     ? _androidWebGLCompat.installRenderer(THREE) : function(){};
   try{ init3D(); }
   finally{ _restoreAndroidRenderer(); }
-  if(_androidWebGLCompat && _androidWebGLCompat.isSafeMode()
-    && renderer && renderer.setPixelRatio){ renderer.setPixelRatio(1); }
+}
+if(THREE_OK && renderer){
   if(_androidWebGLCompat) _androidWebGLCompat.watchRenderer(renderer);
   initMeasureRaycaster();
   prepare();
   loop();
   if(_androidWebGLCompat) _androidWebGLCompat.afterBoot();
 } else {
+  var _threeEngineLoaded = THREE_OK;
+  if(_threeEngineLoaded && _androidWebGLCompat){
+    _androidWebGLCompat.reportRendererFailure();
+  }
+  // Renderer construction failed. Keep the rest of the app and 2D playback
+  // alive without letting prepare() call buildScene() with a null renderer.
+  THREE_OK = false;
   // fallback: 2D only
-  document.getElementById('tab3d').style.display='none';
+  // When Three loaded but its renderer did not, keep this sub-tab reachable so
+  // the tester can read the persistent diagnostic; the simulator still opens
+  // in the working XY view below.
+  if(!_threeEngineLoaded) document.getElementById('tab3d').style.display='none';
   switchView('2d');
   prepare();
   draw2dFull(false);

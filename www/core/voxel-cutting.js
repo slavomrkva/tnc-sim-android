@@ -31,6 +31,9 @@ function vxInit(prog){
   // Large blanks must not lose detail: cap the cell size so resolution stays usable.
   // The cap scales with quality (low/med/high) but never lets a cell exceed it.
   var CELL_CAP = [1.0, 0.7, 0.5][VX_QUALITY!==undefined?VX_QUALITY:1] || 0.7; // mm
+  if(typeof VX_COMPAT_MODE!=='undefined' && VX_COMPAT_MODE){
+    CELL_CAP = [2.0, 1.5, 1.0][VX_QUALITY!==undefined?VX_QUALITY:0] || 2.0;
+  }
   if(cell > CELL_CAP) cell = CELL_CAP;
   var nx=Math.max(4, Math.round(w/cell)+1);
   var ny=Math.max(4, Math.round(d/cell)+1);
@@ -297,6 +300,23 @@ function vxBuildGeometryRange(cellX0,cellX1,cellY0,cellY1){
 }
 
 function vxBuildMesh(){
+  // Compatibility mode recreates the stable pre-optimization GPU shape on a
+  // WebView version that has already lost the chunked renderer: one mesh, one
+  // material and no vertex-color buffer. Cutting rebuilds the complete small
+  // mesh through the existing !VX.chunked branch in vxRebuildMesh().
+  var compatibilityMode = typeof VX_COMPAT_MODE!=='undefined' && VX_COMPAT_MODE;
+  if(compatibilityMode){
+    var fullGeometry=vxBuildGeometryRange(0,VX.nx-1,0,VX.ny-1);
+    fullGeometry.deleteAttribute('color');
+    fullGeometry.computeVertexNormals();
+    var fullMaterial=new THREE.MeshLambertMaterial({color:_stockHex(),side:THREE.FrontSide});
+    var fullMesh=new THREE.Mesh(fullGeometry,fullMaterial);
+    fullMesh.frustumCulled=false;
+    VX.chunks=null;
+    VX.material=fullMaterial;
+    VX.chunked=false;
+    return fullMesh;
+  }
   VX.material=new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide});
   VX.chunks=[];
   var group=new THREE.Group();

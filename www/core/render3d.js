@@ -273,7 +273,8 @@ function buildScene(prog){
     blockEdges = new THREE.LineSegments(new THREE.EdgesGeometry(bg), new THREE.LineBasicMaterial({color:0x3a3e48}));
     scene.add(blockEdges);
   }
-  // voxel init — MC mesh will replace blockMesh immediately
+  // voxel init — MC mesh replaces blockMesh immediately. Android WebView
+  // compatibility is handled inside vxBuildMesh without disabling cutting.
   if(prog.hasStock!==false) vxInit(prog);
   else {
     if(VX&&VX.mesh){ scene.remove(VX.mesh); vxDisposeObject(VX.mesh,true); }

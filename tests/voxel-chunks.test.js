@@ -21,8 +21,10 @@ class BufferAttribute {
 }
 
 class BufferGeometry {
-  constructor(){ this.attributes={}; this.disposed=false; }
+  constructor(){ this.attributes={}; this.disposed=false; this.normalsComputed=false; }
   setAttribute(name, attribute){ this.attributes[name]=attribute; return this; }
+  deleteAttribute(name){ delete this.attributes[name]; return this; }
+  computeVertexNormals(){ this.normalsComputed=true; return this; }
   dispose(){ this.disposed=true; }
 }
 
@@ -51,9 +53,11 @@ const scene = {
 const context = vm.createContext({
   console,
   performance,
-  THREE: { BufferAttribute, BufferGeometry, MeshLambertMaterial:Material, Mesh, Group, DoubleSide:2 },
+  VX_COMPAT_MODE:false,
+  THREE: { BufferAttribute, BufferGeometry, MeshLambertMaterial:Material, Mesh, Group, FrontSide:0, DoubleSide:2 },
   TOOL_CUT_COLORS: [[0.9,0.2,0.1],[0.1,0.7,0.9]],
   _stockRGB: () => [0.55,0.58,0.62],
+  _stockHex: () => 0x8c949e,
   scene,
   blockMesh:null,
   blockEdges:null,
@@ -121,6 +125,30 @@ assert.strictEqual(replaced.length,2,'only dirty chunk geometries should be repl
 before.forEach((geometry,index) => {
   assert.strictEqual(geometry.disposed,replaced.some(chunk => context.VX.chunks[index]===chunk));
 });
+
+// A WebView version remembered after a context loss uses the verified
+// compatibility GPU shape: one mesh, no chunks and no vertex-color buffer.
+context.VX_COMPAT_MODE=true;
+context.VX=makeVoxel(51,41,16);
+const compatibilityMesh=context.vxBuildMesh();
+assert.ok(compatibilityMesh instanceof Mesh);
+assert.strictEqual(context.VX.chunked,false);
+assert.strictEqual(context.VX.chunks,null);
+assert.strictEqual(compatibilityMesh.geometry.attributes.color,undefined);
+assert.strictEqual(compatibilityMesh.geometry.normalsComputed,true);
+assert.strictEqual(compatibilityMesh.material.options.color,0x8c949e);
+assert.strictEqual(compatibilityMesh.material.options.side,0);
+context.VX.mesh=compatibilityMesh;
+scene.add(compatibilityMesh);
+context.VX.dirty=true;
+context.vxRebuildMesh();
+assert.ok(context.VX.mesh instanceof Mesh);
+assert.notStrictEqual(context.VX.mesh,compatibilityMesh);
+assert.strictEqual(compatibilityMesh.geometry.disposed,true);
+assert.strictEqual(compatibilityMesh.material.disposed,true);
+assert.strictEqual(context.VX.chunked,false);
+assert.strictEqual(context.VX.dirty,false);
+context.VX_COMPAT_MODE=false;
 
 // Informational microbenchmark: one local default-quality tile versus a full scan.
 context.VX=makeVoxel(101,101,21);
