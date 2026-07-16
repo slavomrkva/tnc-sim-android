@@ -8,6 +8,23 @@
 
 ## Open bugs
 
+## C17 — Tool Table CRUD, parameters and import/export were inconsistent
+**Reported:** 2026-07-16. **Repro:** add or renumber tools, import malformed or
+duplicate JSON, lock a called tool, or change DR/TIME2 and rerun simulation.
+### Symptom
+Tool numbers could collide, imported rows bypassed validation and unsafe text
+could be rendered as HTML. Several changes left stale simulation state, and
+TL/RT, DR and TIME2/CUR.TIME behavior did not match their descriptions.
+### Attempts
+- Attempt 1 — ported the user-accepted web v0.862 fix into Android APP_VERSION
+  1.0.44, retaining the Android-only Filesystem + Share export implementation.
+  Added shared regression coverage for CRUD, normalized transactional import,
+  safe rendering, replacement tools, geometry compensation and tool life.
+### Status
+Web behavior is accepted. All nine Android JavaScript regressions, Capacitor
+sync and the APP_VERSION 1.0.44 debug APK build pass; keep open until the APK
+workflows are verified on a device.
+
 ## C15 — Embedded Android WebView loses the 3D EGL backing
 **Reported:** 2026-07-15. **Repro:** current APK on BrowserStack Redmi Note 12
 Pro / Android 12; the same device renders `tncsim.org` correctly in Chrome.

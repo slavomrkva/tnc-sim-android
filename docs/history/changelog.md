@@ -7,6 +7,15 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.44 — Tool Table workflow hardening
+
+- Ported the accepted web v0.862 Tool Table fixes for validated add, edit,
+  delete, import and export behavior into the shared Android source.
+- Added transactional import normalization, unique tool-number enforcement,
+  safe text rendering, consistent simulation invalidation and regression tests.
+- Made TL/RT replacement selection, DR geometry and TIME2/CUR.TIME behavior
+  effective during simulation while preserving the Android native share export.
+
 ## APP_VERSION 1.0.43 — accepted shorter tutorial port
 
 - Ported the accepted web v0.861 two-slide Start here lesson and its simpler

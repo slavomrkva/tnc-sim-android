@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.44)
+- Fixed Tool Table add, edit, delete, import and export workflows, including
+  duplicate-number protection and safer validation of imported tools.
+- Tool locking, replacement tools, radius oversize and tool-life fields now
+  affect simulation consistently; misleading parameter descriptions were
+  clarified.
+
 ## Unreleased test build (APP_VERSION 1.0.43)
 - Simplified Start here to two direct slides: task → editor → Check, followed
   by a text-only explanation of the three progressive Hint levels. The existing
