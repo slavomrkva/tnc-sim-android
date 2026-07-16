@@ -13,6 +13,21 @@ Newest first.
 
 ---
 
+## C19 — CALL LBL status was blank in the 3D simulation
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.47, ported from accepted
+web v0.866. **Resolved/accepted:** 2026-07-16.
+
+### Symptom and root cause
+Expanded `CALL LBL n` segments use the source line of the call to preserve
+editor highlighting. The status panel treated that line as ordinary source,
+scanned past `LBL 0`, and displayed an empty LBL value.
+
+### Accepted fix and verification
+- Resolve an explicit `CALL LBL n` before scanning surrounding labels, keeping
+  the existing source-line highlighting intact.
+- Added a focused parser regression; all Android JavaScript regressions,
+  Capacitor sync and debug build were run for this accepted port.
+
 ## C16 — Complete Learn correctness, content and visual audit
 **Repos:** web `tnc-sim` and Android `tnc-sim-android`. **Resolved:** Android
 APP_VERSION 1.0.42, ported from accepted web v0.858. **Accepted:** the lesson

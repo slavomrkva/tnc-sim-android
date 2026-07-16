@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.47)
+- The 3D simulation now shows the LBL currently invoked by `CALL LBL`.
+
 ## Unreleased test build (APP_VERSION 1.0.46)
 - Reworked the first Start here lesson into three concise orientation slides,
   with a visual preview of Hint 1–3 and an ungraded editor walkthrough.
