@@ -8,6 +8,28 @@
 
 ## Open bugs
 
+## C18 — HEIDENHAIN cycles, compensated cutting and validator audit
+**Reported:** 2026-07-16. **Repro:** cycles 200/201/208/209, Complete Part and
+Angle Mill on the accepted web v0.863 programs.
+### Symptom
+Explicit zero and positive depths, second clearances, Cycle 208 effective
+radius/retract sequencing, small RL/RR radii and programmed DL/DR could produce
+wrong or silently omitted paths. Parser-only geometry and unsupported-block
+errors were not visible in Problems; Complete Part and Angle Mill exposed the
+silent L-block failure.
+### Attempts
+- Attempt 1 — ported the user-accepted web v0.863 implementation into Android
+  APP_VERSION 1.0.45 from a fresh GitHub `main`, preserving the Android native
+  export path and its conservative 12-million-voxel WebView memory guard.
+- Attempt 2 — ported the cycle audit, exact demo, tool-table and validator
+  regressions. They verify segment order, coordinates, feeds/FMAX, directions,
+  pass counts, diagnostics and absence of rejected cutting paths.
+### Status
+Web behavior is accepted. Keep this Android entry open until the debug APK is
+exercised on a device. Thread-flank fidelity, machine Q403 caps and
+version-dependent Q342 behavior additionally require an offline control or a
+real HEIDENHAIN machine.
+
 ## C17 — Tool Table CRUD, parameters and import/export were inconsistent
 **Reported:** 2026-07-16. **Repro:** add or renumber tools, import malformed or
 duplicate JSON, lock a called tool, or change DR/TIME2 and rerun simulation.

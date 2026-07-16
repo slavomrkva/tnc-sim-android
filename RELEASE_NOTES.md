@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.45)
+- Corrected cycles 200, 201, 208 and 209 for depths, safe retracts, feeds,
+  dwell behavior, spindle direction and tapping parameters.
+- Reworked Cycle 208 and RL/RR/R0 cutting paths, and made invalid or unsupported
+  blocks visible in Problems instead of silently ignoring their toolpaths.
+- Complete Part and Angle Mill now execute their full intended L-block paths.
+
 ## Unreleased test build (APP_VERSION 1.0.44)
 - Fixed Tool Table add, edit, delete, import and export workflows, including
   duplicate-number protection and safer validation of imported tools.

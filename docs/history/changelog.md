@@ -7,6 +7,17 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.45 — HEIDENHAIN cycle, cutting and validator corrections
+
+- Ported accepted web v0.863 cycle 200/201/208/209 behavior, including explicit
+  zero handling, depth validation, safe retracts, feeds, dwell events, spindle
+  direction, Q239/Q403, Q334/Q342/Q351, RCUTS, ANGLE and PITCH.
+- Ported DL/DR and RL/RR/R0 path corrections, Cycle 208 effective-radius and
+  centre-before-retract handling, and parser diagnostics in the Problems panel.
+- Restored Complete Part and Angle Mill L-block paths and added detailed cycle,
+  validator, segment-order and demo regressions while preserving Android export
+  and the lower Android voxel-memory budget.
+
 ## APP_VERSION 1.0.44 — Tool Table workflow hardening
 
 - Ported the accepted web v0.862 Tool Table fixes for validated add, edit,
