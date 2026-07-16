@@ -7,6 +7,14 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.46 — first tutorial orientation lesson
+
+- Ported only `L00` Start here from the older preview branch onto the current
+  Android main: three information slides, visual Hint 1–3 progression and an
+  ungraded editor/3D walkthrough.
+- Hid the solution control for this intro lesson and added focused regressions,
+  while preserving all mobile layout, WebView and voxel-limit behavior.
+
 ## APP_VERSION 1.0.45 — HEIDENHAIN cycle, cutting and validator corrections
 
 - Ported accepted web v0.863 cycle 200/201/208/209 behavior, including explicit
