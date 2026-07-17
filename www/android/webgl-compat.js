@@ -1,44 +1,39 @@
 // Android WebView 3D compatibility controller.
-// Keep the normal renderer on healthy devices. If its context is lost while
-// the app is visible and does not recover, remember this WebView version
-// and reload once with an explicit low-memory WebGL1 context.
+// Compatibility mode is an explicit user choice. Renderer failures never
+// switch modes automatically; the error panel and the persistent controls
+// drawer outside WebGL expose the same manual toggle.
 (function(global){
   'use strict';
 
-  var SAFE_UA_KEY = 'tncSimWebglSafeUaV1';
-  var SESSION_SAFE_UA_KEY = 'tncSimWebglSafeSessionUaV1';
+  var MODE_KEY = 'tncSimWebglCompatibilityModeV1';
+  var SESSION_MODE_KEY = 'tncSimWebglCompatibilitySessionV1';
   var RELOAD_STATE_KEY = 'tncSimWebglReloadStateV1';
-  var SWITCHED_KEY = 'tncSimWebglSwitchedV1';
-  var SAFE_QUERY_KEY = 'tncWebglSafe';
-  var RECOVERY_WAIT_MS = 2000;
-  var RELOAD_WATCHDOG_MS = 1500;
+  var SWITCHED_KEY = 'tncSimWebglSwitchedV2';
+  var MODE_QUERY_KEY = 'tncWebglCompat';
+  var LEGACY_SAFE_UA_KEY = 'tncSimWebglSafeUaV1';
+  var LEGACY_SESSION_SAFE_UA_KEY = 'tncSimWebglSafeSessionUaV1';
+  var LEGACY_SAFE_QUERY_KEY = 'tncWebglSafe';
   var restoredState = null;
   var diagnostics = {
     native:false,
-    attached:false,
-    loss:false,
     stage:'boot',
     storage:'none',
     navigation:'none'
   };
 
   function userAgent(){ return (global.navigator && global.navigator.userAgent) || ''; }
+
   function isAndroidApp(){
     try{
       if(global.Capacitor){
         var platform = typeof global.Capacitor.getPlatform === 'function'
           ? global.Capacitor.getPlatform() : '';
-        // getPlatform() is the authoritative Capacitor signal. Do not reject a
-        // real Android WebView merely because isNativePlatform() is temporarily
-        // false while the bridge finishes booting.
         if(platform === 'android') return true;
         if(typeof global.Capacitor.isNativePlatform === 'function'
           && global.Capacitor.isNativePlatform() && /Android/i.test(userAgent())) return true;
         if(platform && platform !== 'android') return false;
       }
     }catch(e){}
-    // Native Android WebView user-agents contain the standalone `wv` token;
-    // Chrome on the same phone does not. This also covers very early bridge boot.
     return /(?:^|[;\s])wv(?:[;)\s]|$)/i.test(userAgent());
   }
 
@@ -59,53 +54,35 @@
     try{ if(storage) storage.removeItem(key); }catch(e){}
   }
 
-  function safeRequestedByUrl(){
+  function cleanupLegacyAutomaticMode(){
+    // APP_VERSION 1.0.53 could persist safe mode after one context loss. That
+    // automatic decision must not carry into the manual-only controller.
+    removeStorage(global.localStorage, LEGACY_SAFE_UA_KEY);
+    removeStorage(global.sessionStorage, LEGACY_SESSION_SAFE_UA_KEY);
+  }
+
+  function modeRequestedByUrl(){
     try{
-      return new global.URL(global.location.href).searchParams.get(SAFE_QUERY_KEY) === '1';
+      return new global.URL(global.location.href).searchParams.get(MODE_QUERY_KEY) === '1';
     }catch(e){ return false; }
   }
 
-  function buildSafeReloadUrl(){
-    try{
-      var url = new global.URL(global.location.href);
-      url.searchParams.set(SAFE_QUERY_KEY, '1');
-      return url.toString();
-    }catch(e){ return global.location.href; }
-  }
-
-  function readSafeMode(){
+  function readMode(){
     diagnostics.native = isAndroidApp();
     if(!diagnostics.native) return false;
-    var ua = userAgent();
-    var saved = readStorage(global.localStorage, SAFE_UA_KEY)
-      || readStorage(global.sessionStorage, SESSION_SAFE_UA_KEY);
-    if(saved && saved !== ua){
-      // Android System WebView was updated: retry the normal renderer once.
-      removeStorage(global.localStorage, SAFE_UA_KEY);
-      removeStorage(global.sessionStorage, SESSION_SAFE_UA_KEY);
-      return false;
-    }
-    return (!!saved && saved === ua) || safeRequestedByUrl();
+    return readStorage(global.localStorage, MODE_KEY) === '1'
+      || readStorage(global.sessionStorage, SESSION_MODE_KEY) === '1'
+      || modeRequestedByUrl();
   }
 
-  var safeMode = readSafeMode();
-
-  function rememberSafeMode(){
-    var ua = userAgent();
-    if(writeStorage(global.localStorage, SAFE_UA_KEY, ua)) diagnostics.storage = 'local';
-    else if(writeStorage(global.sessionStorage, SESSION_SAFE_UA_KEY, ua)) diagnostics.storage = 'session';
-    else diagnostics.storage = 'url';
-    // The reload URL is an independent one-shot carrier when WebView storage is
-    // unavailable, so recovery must not silently stop on a failed localStorage.
-    safeMode = true;
-    return true;
-  }
+  cleanupLegacyAutomaticMode();
+  var compatibilityMode = readMode();
 
   function installRenderer(THREE){
-    if(!safeMode || !THREE || !THREE.WebGLRenderer) return function(){};
+    if(!compatibilityMode || !THREE || !THREE.WebGLRenderer) return function(){};
     var OriginalRenderer = THREE.WebGLRenderer;
-    function SafeRenderer(){
-      diagnostics.stage = 'safe-context';
+    function CompatibilityRenderer(){
+      diagnostics.stage = 'compatibility-context';
       var canvas = global.document.createElement('canvas');
       var attrs = {
         alpha:false,
@@ -120,8 +97,8 @@
       var gl = canvas.getContext('webgl', attrs)
         || canvas.getContext('experimental-webgl', attrs);
       if(!gl){
-        diagnostics.stage = 'safe-context-unavailable';
-        throw new Error('Compatible WebGL1 context unavailable');
+        diagnostics.stage = 'compatibility-context-unavailable';
+        throw new Error('Compatibility WebGL1 context unavailable');
       }
       try{
         var compatible = new OriginalRenderer({
@@ -136,27 +113,23 @@
           powerPreference:'low-power',
           failIfMajorPerformanceCaveat:false
         });
-        // init3D normally requests up to 1.5 DPR. Safe mode stays at DPR 1 for
-        // the renderer lifetime; clamping the first request is essential too,
-        // changing to DPR 1 only after scene construction already allocates a
-        // large backing store and immediately reallocates it on fragile Mali.
         if(compatible && typeof compatible.setPixelRatio === 'function'){
           var originalSetPixelRatio = compatible.setPixelRatio;
           compatible.setPixelRatio = function(){
             return originalSetPixelRatio.call(compatible, 1);
           };
         }
-        diagnostics.stage = 'safe-renderer-ready';
+        diagnostics.stage = 'compatibility-renderer-ready';
         return compatible;
       }catch(e){
-        diagnostics.stage = 'safe-renderer-failed';
+        diagnostics.stage = 'compatibility-renderer-failed';
         throw e;
       }
     }
-    SafeRenderer.prototype = OriginalRenderer.prototype;
-    THREE.WebGLRenderer = SafeRenderer;
+    CompatibilityRenderer.prototype = OriginalRenderer.prototype;
+    THREE.WebGLRenderer = CompatibilityRenderer;
     return function(){
-      if(THREE.WebGLRenderer === SafeRenderer) THREE.WebGLRenderer = OriginalRenderer;
+      if(THREE.WebGLRenderer === CompatibilityRenderer) THREE.WebGLRenderer = OriginalRenderer;
     };
   }
 
@@ -164,11 +137,11 @@
     try{
       var code = global.document.getElementById('code');
       var state = {
-        code: code ? code.value : null,
-        selectionStart: code && typeof code.selectionStart === 'number' ? code.selectionStart : 0,
-        selectionEnd: code && typeof code.selectionEnd === 'number' ? code.selectionEnd : 0,
-        tab: global.document.body ? global.document.body.getAttribute('data-mtab') : 'editor',
-        view: typeof global.curView === 'string' ? global.curView : '3d'
+        code:code ? code.value : null,
+        selectionStart:code && typeof code.selectionStart === 'number' ? code.selectionStart : 0,
+        selectionEnd:code && typeof code.selectionEnd === 'number' ? code.selectionEnd : 0,
+        tab:global.document.body ? global.document.body.getAttribute('data-mtab') : 'editor',
+        view:typeof global.curView === 'string' ? global.curView : '3d'
       };
       global.sessionStorage.setItem(RELOAD_STATE_KEY, JSON.stringify(state));
     }catch(e){}
@@ -189,128 +162,99 @@
     }catch(e){ restoredState = null; }
   }
 
-  function watchRenderer(renderer){
-    diagnostics.native = isAndroidApp();
-    if(!diagnostics.native || safeMode || !renderer || !renderer.domElement) return function(){};
-    var canvas = renderer.domElement;
-    var lost = false;
-    var timer = null;
-    var watchdog = null;
+  function buildReloadUrl(enabled){
+    try{
+      var url = new global.URL(global.location.href);
+      url.searchParams.delete(LEGACY_SAFE_QUERY_KEY);
+      if(enabled) url.searchParams.set(MODE_QUERY_KEY, '1');
+      else url.searchParams.delete(MODE_QUERY_KEY);
+      return url.toString();
+    }catch(e){ return global.location.href; }
+  }
 
-    function isHidden(){
-      return !!(global.document && (global.document.hidden
-        || global.document.visibilityState === 'hidden'));
+  function setMode(enabled){
+    if(!isAndroidApp()) return false;
+    enabled = !!enabled;
+    saveReloadState();
+    removeStorage(global.localStorage, MODE_KEY);
+    removeStorage(global.sessionStorage, SESSION_MODE_KEY);
+    diagnostics.storage = 'none';
+    if(enabled){
+      if(writeStorage(global.localStorage, MODE_KEY, '1')) diagnostics.storage = 'local';
+      else if(writeStorage(global.sessionStorage, SESSION_MODE_KEY, '1')) diagnostics.storage = 'session';
+      else diagnostics.storage = 'url';
     }
-
-    function diagnosticCode(){
-      return 'C15-N' + (diagnostics.native ? '1' : '0')
-        + 'A' + (diagnostics.attached ? '1' : '0')
-        + 'L' + (diagnostics.loss ? '1' : '0')
-        + 'S' + diagnostics.storage.charAt(0).toUpperCase()
-        + 'R' + diagnostics.navigation.charAt(0).toUpperCase();
-    }
-
-    function showNavigationFailure(){
-      diagnostics.stage = 'navigation-failed';
-      if(typeof global.show3DError === 'function'){
-        global.show3DError('3D compatibility mode could not restart automatically. '
-          + 'Please send diagnostic ' + diagnosticCode() + '. The editor and lessons keep working.');
-      }
-    }
-
-    function navigateToSafeMode(){
-      saveReloadState();
-      rememberSafeMode();
-      try{ global.sessionStorage.setItem(SWITCHED_KEY, '1'); }catch(e){}
-      diagnostics.stage = 'navigation';
-      var target = buildSafeReloadUrl();
+    compatibilityMode = enabled;
+    try{ global.sessionStorage.setItem(SWITCHED_KEY, enabled ? 'compatibility' : 'normal'); }catch(e){}
+    diagnostics.stage = 'manual-switch';
+    var target = buildReloadUrl(enabled);
+    try{
+      diagnostics.navigation = 'replace';
+      global.location.replace(target);
+    }catch(e){
       try{
-        diagnostics.navigation = 'replace';
-        global.location.replace(target);
-      }catch(e){
-        try{
-          diagnostics.navigation = 'reload';
-          global.location.reload();
-        }catch(e2){
-          diagnostics.navigation = 'failed';
-          showNavigationFailure();
-          return;
-        }
+        diagnostics.navigation = 'reload';
+        global.location.reload();
+      }catch(e2){
+        diagnostics.navigation = 'failed';
+        if(typeof global._toast === 'function') global._toast('Could not switch 3D mode. Please restart the app.', false);
+        return false;
       }
-      watchdog = global.setTimeout(showNavigationFailure, RELOAD_WATCHDOG_MS);
     }
+    return true;
+  }
 
-    function scheduleSwitch(){
-      if(!lost || isHidden()){
-        diagnostics.stage = lost ? 'waiting-visible' : 'restored';
-        return;
-      }
-      if(timer) global.clearTimeout(timer);
-      diagnostics.stage = 'waiting-recovery';
-      timer = global.setTimeout(function(){
-        timer = null;
-        if(!lost) return;
-        if(isHidden()){
-          diagnostics.stage = 'waiting-visible';
-          return;
-        }
-        navigateToSafeMode();
-      }, RECOVERY_WAIT_MS);
-    }
+  function toggleMode(){ return setMode(!compatibilityMode); }
 
-    function onLost(event){
-      // The shared renderer listener also does this, but the Android recovery
-      // controller must remain correct if module order changes in the future.
-      if(event && typeof event.preventDefault === 'function') event.preventDefault();
-      lost = true;
-      diagnostics.loss = true;
-      scheduleSwitch();
-    }
+  function modeLabel(){ return compatibilityMode ? 'Normal mode' : 'Compatibility mode'; }
 
-    function onRestored(){
-      lost = false;
-      diagnostics.loss = false;
-      diagnostics.stage = 'restored';
-      if(timer){ global.clearTimeout(timer); timer = null; }
+  function updateControls(){
+    if(!global.document) return;
+    var button = global.document.getElementById('compatModeToggle');
+    if(!button) return;
+    var setting = global.document.getElementById('simulationModeSetting');
+    if(!isAndroidApp()){
+      button.style.display = 'none';
+      if(setting) setting.style.display = 'none';
+      return;
     }
+    button.style.display = '';
+    if(setting) setting.style.display = '';
+    button.textContent = 'Compatibility';
+    button.setAttribute('aria-pressed', compatibilityMode ? 'true' : 'false');
+    button.title = compatibilityMode
+      ? 'Compatibility mode is active; restart 3D with the normal renderer'
+      : 'Restart 3D in low-memory Compatibility mode';
+  }
 
-    function onVisibilityChange(){
-      if(lost && !isHidden()) scheduleSwitch();
-    }
-
-    canvas.addEventListener('webglcontextlost', onLost, false);
-    canvas.addEventListener('webglcontextrestored', onRestored, false);
-    if(global.document && global.document.addEventListener){
-      global.document.addEventListener('visibilitychange', onVisibilityChange, false);
-    }
-    diagnostics.attached = true;
-    diagnostics.stage = 'watching';
-    return function(){
-      if(timer) global.clearTimeout(timer);
-      if(watchdog) global.clearTimeout(watchdog);
-      canvas.removeEventListener('webglcontextlost', onLost, false);
-      canvas.removeEventListener('webglcontextrestored', onRestored, false);
-      if(global.document && global.document.removeEventListener){
-        global.document.removeEventListener('visibilitychange', onVisibilityChange, false);
-      }
-    };
+  function attachErrorButton(container){
+    if(!container || !isAndroidApp() || !global.document) return;
+    var old = global.document.getElementById('view3dCompatibilityButton');
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+    var target = container.firstElementChild || container;
+    var button = global.document.createElement('button');
+    button.id = 'view3dCompatibilityButton';
+    button.type = 'button';
+    button.className = 'compat-mode-action';
+    button.textContent = modeLabel();
+    button.setAttribute('aria-pressed', compatibilityMode ? 'true' : 'false');
+    button.addEventListener('click', toggleMode);
+    target.appendChild(button);
   }
 
   function reportRendererFailure(){
-    if(!safeMode) return;
-    var code = diagnostics.stage === 'safe-context-unavailable'
-      ? 'C15-SC0' : diagnostics.stage === 'safe-renderer-failed'
-        ? 'C15-SR0' : 'C15-SU0';
+    if(!compatibilityMode) return;
+    var code = diagnostics.stage === 'compatibility-context-unavailable'
+      ? 'C15-MC0' : diagnostics.stage === 'compatibility-renderer-failed'
+        ? 'C15-MR0' : 'C15-MU0';
     if(typeof global.show3DError === 'function'){
-      global.show3DError('3D compatibility renderer could not start on this device. '
-        + 'Please send diagnostic ' + code + '. The editor, XY view and lessons keep working.');
-    }
-    if(typeof global._toast === 'function'){
-      global._toast('3D compatibility test failed: ' + code, false);
+      global.show3DError('Compatibility mode could not start 3D on this device. '
+        + 'Try Normal mode or continue with the editor and XY view. Diagnostic ' + code + '.');
     }
   }
 
   function afterBoot(){
+    updateControls();
     if(restoredState && restoredState.tab === 'view'){
       global.setTimeout(function(){
         if(typeof global.mtabSwitch === 'function') global.mtabSwitch('view');
@@ -320,28 +264,30 @@
         }
       }, 0);
     }
-    if(safeMode){
-      try{
-        if(global.sessionStorage.getItem(SWITCHED_KEY) === '1'){
-          global.sessionStorage.removeItem(SWITCHED_KEY);
-          global.setTimeout(function(){
-            if(typeof global._toast === 'function'){
-              global._toast('3D compatibility mode enabled for this device.', false);
-            }
-          }, 0);
-        }
-      }catch(e){}
-    }
+    try{
+      var switched = global.sessionStorage.getItem(SWITCHED_KEY);
+      if(switched){
+        global.sessionStorage.removeItem(SWITCHED_KEY);
+        global.setTimeout(function(){
+          if(typeof global._toast === 'function'){
+            global._toast(switched === 'compatibility' ? 'Compatibility mode enabled.' : 'Normal mode enabled.', false);
+          }
+        }, 0);
+      }
+    }catch(e){}
   }
 
   global.AndroidWebGLCompat = {
-    isSafeMode:function(){ return safeMode; },
+    isSafeMode:function(){ return compatibilityMode; },
     isAndroidApp:isAndroidApp,
+    setMode:setMode,
+    toggleMode:toggleMode,
+    modeLabel:modeLabel,
+    updateControls:updateControls,
+    attachErrorButton:attachErrorButton,
     diagnostics:function(){
       return {
         native:diagnostics.native,
-        attached:diagnostics.attached,
-        loss:diagnostics.loss,
         stage:diagnostics.stage,
         storage:diagnostics.storage,
         navigation:diagnostics.navigation
@@ -350,13 +296,13 @@
     installRenderer:installRenderer,
     reportRendererFailure:reportRendererFailure,
     restoreSessionState:restoreSessionState,
-    watchRenderer:watchRenderer,
     afterBoot:afterBoot,
     constants:{
-      SAFE_UA_KEY:SAFE_UA_KEY,
-      SESSION_SAFE_UA_KEY:SESSION_SAFE_UA_KEY,
-      RECOVERY_WAIT_MS:RECOVERY_WAIT_MS,
-      RELOAD_WATCHDOG_MS:RELOAD_WATCHDOG_MS
+      MODE_KEY:MODE_KEY,
+      SESSION_MODE_KEY:SESSION_MODE_KEY,
+      MODE_QUERY_KEY:MODE_QUERY_KEY
     }
   };
+
+  updateControls();
 })(window);

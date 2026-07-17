@@ -12,13 +12,18 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.54)
+- Groups Quality and the fully manual Compatibility mode toggle in a compact
+  Simulation controls drawer outside the WebGL surface, while Speed stays close
+  to Measure and the other simulation-surface controls. Refine appears on its
+  own second row without moving Speed. The drawer's open state survives app
+  restarts, and the app never switches modes automatically.
+- Compatibility mode keeps reduced material cutting and now renders both sides
+  of the workpiece surface so its top and side walls remain visible.
+
 ## Unreleased test build (APP_VERSION 1.0.53)
-- Keeps full-quality fast 3D on healthy devices and automatically remembers a
-  stable compatibility renderer only after an Android WebView context loss.
-- The compatibility renderer preserves material cutting with reduced profiles
-  and is retried at normal quality after Android System WebView is updated.
-- Refine remains available on normal devices but is hidden in compatibility
-  mode because its large coloured mesh would re-enter the failing GPU path.
+- Tested an automatic compatibility fallback after Android WebView context
+  loss. This experimental automatic switching was removed before release.
 
 ## Diagnostic test build (APP_VERSION 1.0.52)
 - Keeps reduced Low voxel cutting but restores the pre-optimization single-mesh

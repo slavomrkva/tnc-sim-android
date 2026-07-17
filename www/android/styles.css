@@ -29,6 +29,7 @@ html[data-theme="light"]{
 html[data-theme="light"] .toolbar,
 html[data-theme="light"] .panel-header,
 html[data-theme="light"] .view-tabs,
+html[data-theme="light"] .simulation-settings-drawer,
 html[data-theme="light"] .status-bar,
 html[data-theme="light"] .ctx-panel,
 html[data-theme="light"] .keypad,
@@ -42,6 +43,7 @@ html[data-theme="light"] #learnCoach .coach-tip{
   --text:#e8ebf1; --text2:#c6ccd6; --text3:#9aa3b2;
 }
 html[data-theme="light"] .view-tabs,
+html[data-theme="light"] .simulation-settings-drawer,
 html[data-theme="light"] .status-bar,
 html[data-theme="light"] .keypad,
 html[data-theme="light"] .mtab-bar{
@@ -138,6 +140,10 @@ html[data-theme="light"] #measureOverlay{
   box-shadow:0 1px 6px rgba(0,0,0,0.18);
 }
 #stockToggle:disabled,#measureBtn:disabled{opacity:.42;cursor:not-allowed !important;}
+.compat-mode-action{
+  margin-top:16px;padding:8px 14px;border:1px solid var(--accent);border-radius:6px;
+  background:transparent;color:var(--accent);font:11px var(--mono);cursor:pointer;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);height:100%;display:flex;flex-direction:column;overscroll-behavior:none;-webkit-text-size-adjust:100%;}
@@ -218,6 +224,22 @@ html[data-theme="light"] .syn-cycle{color:#7a5520;}
 .speed-val{font-family:var(--mono);font-size:11px;padding:0 10px;color:var(--accent2);min-width:44px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 .canvas-panel{flex:1;display:flex;flex-direction:column;background:var(--bg);min-width:0;}
 .view-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
+.simulation-settings-drawer{border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
+.simulation-settings-toggle{width:100%;height:28px;padding:0 12px;border:0;background:transparent;color:var(--text3);font:10px var(--mono);letter-spacing:.03em;cursor:pointer;display:flex;align-items:center;justify-content:space-between;touch-action:manipulation;}
+.simulation-settings-toggle:hover{color:var(--text2);background:rgba(255,255,255,.025);}
+.simulation-settings-panel{display:grid;grid-template-columns:auto auto;justify-content:start;align-items:end;gap:8px;padding:6px 10px 8px;background:var(--surface2);border-top:1px solid var(--border);}
+.simulation-settings-panel[hidden]{display:none;}
+.simulation-setting{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.simulation-setting-label{font:9px var(--mono);color:var(--text3);letter-spacing:.05em;}
+#compatModeToggle{height:30px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text3);font:10px var(--mono);cursor:pointer;touch-action:manipulation;}
+#compatModeToggle:hover{color:var(--text);border-color:var(--text3);}
+#compatModeToggle[aria-pressed="true"]{border-color:var(--accent);background:rgba(var(--accent-rgb),.14);color:var(--accent);}
+.canvas-speed{margin-left:0;background:rgba(14,16,20,.7);backdrop-filter:blur(4px);border-radius:5px;}
+.canvas-speed .speed-btn{padding:4px 9px;}
+.canvas-speed .speed-val{min-width:42px;padding:0 7px;font-size:10px;}
+.refine-control-row{flex:0 0 100%;display:flex;}
+.refine-control-row:has(#refineBtnCanvas[style*="display:none"]),
+.refine-control-row:has(#refineBtnCanvas[style*="display: none"]){display:none;}
 .tab{font-family:var(--mono);font-size:11px;padding:8px 16px;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;background:var(--surface);}
 .tab.active{color:var(--accent);border-bottom:3px solid var(--accent);background:rgba(20,184,166,.06);}
 .tab:hover:not(.active){color:var(--text2);background:var(--border);}
@@ -489,7 +511,8 @@ footer a:hover{text-decoration:underline;}
   /* Path functions keys: one single row across the full width */
   .kp-row{flex-wrap:nowrap;}
   .kp-row .key{flex:1 1 0 !important;min-width:0;padding:2px 0;}
-  /* 3D tab: transport buttons fill row 1, quality + speed fill row 2 */
+  /* 3D tab: transport buttons stay compact; secondary simulation controls
+     live in the persistent drawer below the view switcher. */
   body[data-mtab="view"] .canvas-panel{overflow:hidden;}
   body[data-mtab="view"] .toolbar{overflow:hidden;}
   /* Capped so these keep growing proportionally on a phone but stop at a
@@ -499,12 +522,10 @@ footer a:hover{text-decoration:underline;}
   body[data-mtab="view"] .toolbar .btn-step,
   body[data-mtab="view"] .toolbar .btn-stop{flex:1 1 20%;max-width:150px;justify-content:center;height:34px;min-height:34px;padding:0 8px;font-size:11px;}
   body[data-mtab="view"] .toolbar .btn-reset{flex:0 1 auto;height:34px;min-height:34px;padding:0 10px;font-size:11px;}
-  body[data-mtab="view"] .toolbar > div:has(#qualityGroup){flex:1 1 42%;max-width:260px;}
-  body[data-mtab="view"] .toolbar #qualityGroup{display:flex;}
-  body[data-mtab="view"] .toolbar #qualityGroup .btn-tog{flex:1;min-height:0;height:34px;padding:0 10px;display:flex;align-items:center;justify-content:center;}
-  body[data-mtab="view"] .toolbar .speed-ctrl{flex:1 1 42%;max-width:260px;justify-content:space-between;height:36px;box-sizing:border-box;}
-  body[data-mtab="view"] .toolbar .speed-btn{height:34px;padding:0 14px;display:flex;align-items:center;}
-  body[data-mtab="view"] .toolbar .speed-val{display:flex;align-items:center;justify-content:center;}
+  body[data-mtab="view"] .simulation-settings-panel{grid-template-columns:minmax(0,1fr) auto;justify-content:stretch;}
+  body[data-mtab="view"] .simulation-settings-panel #qualityGroup{display:flex;}
+  body[data-mtab="view"] .simulation-settings-panel #qualityGroup .btn-tog{flex:1;min-height:0;height:34px;padding:0 7px;display:flex;align-items:center;justify-content:center;}
+  body[data-mtab="view"] .simulation-settings-panel #compatModeToggle{height:36px;padding:0 12px;}
   /* view switcher tabs (3D / XY toolpath / Tool Table) share the width evenly,
      capped so they don't stretch edge-to-edge on tablet-sized Android devices. */
   body[data-mtab="view"] .view-tabs .tab{flex:1;max-width:190px;text-align:center;padding-left:4px;padding-right:4px;}

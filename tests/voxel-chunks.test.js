@@ -137,7 +137,7 @@ assert.strictEqual(context.VX.chunks,null);
 assert.strictEqual(compatibilityMesh.geometry.attributes.color,undefined);
 assert.strictEqual(compatibilityMesh.geometry.normalsComputed,true);
 assert.strictEqual(compatibilityMesh.material.options.color,0x8c949e);
-assert.strictEqual(compatibilityMesh.material.options.side,0);
+assert.strictEqual(compatibilityMesh.material.options.side,2);
 context.VX.mesh=compatibilityMesh;
 scene.add(compatibilityMesh);
 context.VX.dirty=true;

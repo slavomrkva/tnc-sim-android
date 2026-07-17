@@ -309,7 +309,10 @@ function vxBuildMesh(){
     var fullGeometry=vxBuildGeometryRange(0,VX.nx-1,0,VX.ny-1);
     fullGeometry.deleteAttribute('color');
     fullGeometry.computeVertexNormals();
-    var fullMaterial=new THREE.MeshLambertMaterial({color:_stockHex(),side:THREE.FrontSide});
+    // Marching Cubes can expose triangles with the opposite winding on the
+    // positive stock faces. DoubleSide keeps the complete workpiece visible
+    // without adding another mesh or vertex buffer.
+    var fullMaterial=new THREE.MeshLambertMaterial({color:_stockHex(),side:THREE.DoubleSide});
     var fullMesh=new THREE.Mesh(fullGeometry,fullMaterial);
     fullMesh.frustumCulled=false;
     VX.chunks=null;

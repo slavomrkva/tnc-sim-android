@@ -95,11 +95,13 @@ The detailed module-split rationale is in
     guards during shared-core ports.
 16. **Zero is a valid Q value:** use `Q !== undefined ? Q : default`, never
     `Q || default` for cycle parameters.
-17. **Adaptive Android WebGL:** healthy devices must start with the normal
-    quality renderer. Persist the explicit WebGL1 safe mode only after a
-    context loss remains unrestored while the app is visible; a background
-    loss waits until foreground. Key it to the Android WebView user-agent so a
-    WebView update retries normal quality, and never force safe mode globally.
+17. **Manual Android WebGL compatibility:** always start in the user's selected
+    mode and never switch renderers automatically after a context loss. Expose
+    Compatibility mode in the persistent Simulation controls drawer outside the
+    WebGL surface and in the error panel, persist only an explicit tap, preserve
+    the program/view across its clean reload and always provide a Normal mode
+    return path. Persist the drawer's open state independently until the user
+    closes it.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

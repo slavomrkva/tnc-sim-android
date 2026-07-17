@@ -7,6 +7,23 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.54 — manual Compatibility mode
+
+- Removed the automatic context-loss watcher and its persistent WebView-UA
+  decision. Normal rendering remains active until the user explicitly selects
+  Compatibility mode.
+- Added the same manual mode switch as a compact Compatibility toggle in a
+  collapsible Simulation controls drawer outside the WebGL surface and to every
+  3D error panel. The drawer groups Quality and Mode and remembers its open
+  state, while Speed sits with Measure and the other simulation-surface controls.
+  Refine occupies a dedicated second row when it becomes available, preventing
+  the first-row controls from shifting after a simulation.
+  The mode toggle remains accessible if the whole rendering surface turns white.
+  Switching preserves the current program/view, reloads cleanly, persists only
+  the user's choice and always offers a return to Normal mode.
+- Clears the legacy APP_VERSION 1.0.53 automatic marker and uses a double-sided
+  uniform material in Compatibility mode so no stock wall is back-face culled.
+
 ## APP_VERSION 1.0.53 — adaptive voxel compatibility candidate
 
 - Redmi Note 14 completed visible material cutting in APP_VERSION 1.0.52,

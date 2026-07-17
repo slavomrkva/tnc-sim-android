@@ -314,17 +314,26 @@ END PGM PROGRAM MM</textarea>
         <button class="btn btn-step" onclick="onStep()" title="Step" data-help="step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="3,4 13,12 3,20"/><polygon points="12,4 22,12 12,20"/></svg><span class="btn-label">Step</span></button>
         <button class="btn btn-stop" onclick="onStop()" title="Stop" data-help="stop"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="16" rx="1"/><rect x="13" y="4" width="7" height="16" rx="1"/></svg><span class="btn-label">Stop</span></button>
         <button class="btn btn-reset" onclick="onReset()" title="Reset" data-help="reset"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span class="btn-label">Reset</span></button>
-        <div style="display:flex;flex-direction:column;gap:1px;"><span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.05em;">QUALITY</span><div class="btn-group" id="qualityGroup"><button class="btn btn-tog" onclick="setQuality(0)" data-help="q-low">Low</button><button class="btn btn-tog active" onclick="setQuality(1)" data-help="q-med">Def</button><button class="btn btn-tog" onclick="setQuality(2)" data-help="q-high">High</button></div></div>
-        <div style="display:flex;flex-direction:column;gap:1px;"><span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.05em;">SPEED</span><div class="speed-ctrl" data-help="speed">
-          <button class="speed-btn" onclick="changeSpeed(-1)">&#8722;</button>
-          <span class="speed-val" id="speedVal">1.0&#215;</span>
-          <button class="speed-btn" onclick="changeSpeed(1)">+</button>
-        </div></div>
       </div>
       <div class="view-tabs">
         <div class="tab active" id="tab3d" onclick="switchView('3d')" data-help="view-3d">3D view</div>
         <div class="tab" id="tab2d" onclick="switchView('2d')" data-help="view-2d">XY toolpath</div>
         <div class="tab" id="tabTools" onclick="switchView('tools')" data-help="view-tools">Tool Table</div>
+      </div>
+      <div class="simulation-settings-drawer">
+        <button id="simulationSettingsToggle" class="simulation-settings-toggle" type="button" onclick="toggleSimulationSettings()" aria-expanded="false" aria-controls="simulationSettingsPanel">
+          <span>Simulation controls</span><span id="simulationSettingsChevron" aria-hidden="true">&#9662;</span>
+        </button>
+        <div id="simulationSettingsPanel" class="simulation-settings-panel" hidden>
+          <div class="simulation-setting">
+            <span class="simulation-setting-label">QUALITY</span>
+            <div class="btn-group" id="qualityGroup"><button class="btn btn-tog" onclick="setQuality(0)" data-help="q-low">Low</button><button class="btn btn-tog active" onclick="setQuality(1)" data-help="q-med">Def</button><button class="btn btn-tog" onclick="setQuality(2)" data-help="q-high">High</button></div>
+          </div>
+          <div class="simulation-setting simulation-mode-setting" id="simulationModeSetting">
+            <span class="simulation-setting-label">MODE</span>
+            <button id="compatModeToggle" type="button" onclick="AndroidWebGLCompat.toggleMode()" title="Restart 3D with the low-memory WebGL1 renderer" aria-pressed="false">Compatibility</button>
+          </div>
+        </div>
       </div>
       <div class="view-area">
         <div class="scroll-rail" aria-hidden="true"><span>&#8645;</span></div>
@@ -335,9 +344,10 @@ END PGM PROGRAM MM</textarea>
 
         <div id="canvasTopButtons" style="position:absolute;top:10px;left:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;z-index:5;">
           <button id="measureBtn" onclick="toggleMeasure()" data-help="measure" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">&#x25CE; Measure</button>
-          <button id="refineBtnCanvas" onclick="triggerRefine()" title="Compute high-precision mesh" style="display:none;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(74,158,255,.4);border-radius:5px;background:rgba(14,16,20,.7);color:rgba(74,158,255,.8);cursor:pointer;backdrop-filter:blur(4px);">&#x25C6; Refine</button>
           <button id="pathToggle" onclick="togglePaths()" title="Show/hide toolpath" data-help="path" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">⛶ Path</button>
           <button id="stockToggle" onclick="toggleStockVisibility()" title="Hide workpiece and show only the toolpath" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">BLKFORM OFF</button>
+          <div id="canvasSpeedControl" class="speed-ctrl canvas-speed" data-help="speed" aria-label="Simulation speed"><button class="speed-btn" onclick="changeSpeed(-1)">&#8722;</button><span class="speed-val" id="speedVal">1.0&#215;</span><button class="speed-btn" onclick="changeSpeed(1)">+</button></div>
+          <div class="refine-control-row"><button id="refineBtnCanvas" onclick="triggerRefine()" title="Compute high-precision mesh" style="display:none;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(74,158,255,.4);border-radius:5px;background:rgba(14,16,20,.7);color:rgba(74,158,255,.8);cursor:pointer;backdrop-filter:blur(4px);">&#x25C6; Refine</button></div>
         </div>
         <div id="simInfoPanel" style="position:absolute;top:38px;left:10px;font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.9;display:none;pointer-events:none;"></div>
         <div id="toolLegend" style="position:absolute;bottom:36px;left:10px;font-family:var(--mono);font-size:10px;background:rgba(14,16,20,.75);border:1px solid var(--border);border-radius:6px;padding:8px 12px;display:none;pointer-events:none;backdrop-filter:blur(4px);max-width:200px;"></div>

@@ -45,6 +45,9 @@ function show3DError(msg){
     }
     box.innerHTML = '<div><div style="font-size:22px;margin-bottom:10px;">\u26A0\uFE0F</div>'
       + '<div>' + (msg||'3D view is not available on this device.') + '</div></div>';
+    if(window.AndroidWebGLCompat && typeof window.AndroidWebGLCompat.attachErrorButton === 'function'){
+      window.AndroidWebGLCompat.attachErrorButton(box);
+    }
     box.style.display = 'flex';
   }catch(e){}
 }

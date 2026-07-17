@@ -140,8 +140,10 @@ function switchView(v){
   if(_measureBtn) _measureBtn.style.visibility = v==='3d'?'visible':'hidden';
   var _pathBtn = document.getElementById('pathToggle');
   var _stockBtn = document.getElementById('stockToggle');
+  var _speedControl = document.getElementById('canvasSpeedControl');
   if(_pathBtn) _pathBtn.style.visibility = v==='tools'?'hidden':'visible';
   if(_stockBtn) _stockBtn.style.visibility = v==='tools'?'hidden':'visible';
+  if(_speedControl) _speedControl.style.visibility = v==='tools'?'hidden':'visible';
   if(_refineBtn)  _refineBtn.style.visibility  = v==='tools'?'hidden':'visible';
   var _tb2 = document.getElementById('activeToolBadge');
   if(_tb2) _tb2.style.visibility = v==='tools'?'hidden':'visible';

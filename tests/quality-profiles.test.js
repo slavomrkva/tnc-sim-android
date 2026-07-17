@@ -19,7 +19,7 @@ assert.match(voxel, /var CELL_CAP = \[1\.0, 0\.7, 0\.5\]/);
 assert.match(voxel, /CELL_CAP = \[2\.0, 1\.5, 1\.0\]/);
 assert.match(voxel, /typeof VX_COMPAT_MODE/);
 assert.match(voxel, /fullGeometry\.deleteAttribute\('color'\)/);
-assert.match(voxel, /new THREE\.MeshLambertMaterial\(\{color:_stockHex\(\),side:THREE\.FrontSide\}\)/);
+assert.match(voxel, /new THREE\.MeshLambertMaterial\(\{color:_stockHex\(\),side:THREE\.DoubleSide\}\)/);
 assert.match(voxel, /var VOXEL_BUDGET = 12000000;/);
 assert.match(parser, /var HI_LEVELS = \[300, 400, 500\];/);
 assert.match(parser, /var HI_CELL_CAP = \[0\.5, 0\.4, 0\.3\]/);

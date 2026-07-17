@@ -105,12 +105,21 @@ The APK shows the 3D fallback before simulation. Device logs report
   device with a persistent visible context loss restarts into WebGL1/DPR 1,
   monolithic 50/75/100 rendering keyed to its current WebView user-agent.
   Refine is unavailable only in that mode to avoid its 300–500 coloured mesh.
+- Attempt 11 — APP_VERSION 1.0.54 removes the untestable automatic decision.
+  Normal rendering stays selected until the user taps Compatibility in either
+  the persistent Simulation controls drawer outside the WebGL surface or a 3D
+  error panel;
+  the same control returns to Normal mode. The manual choice survives restart,
+  while the old automatic
+  marker is cleared. The reduced monolithic mesh now uses DoubleSide so the top
+  and positive side walls are not hidden by back-face culling.
 ### Status
-APP_VERSION 1.0.53 needs two clean-session checks: a healthy device must stay
-on normal Default without reloading, while Redmi Note 14 or Vivo V21 must lose
-the normal context once, restart automatically at compatibility Low, and keep
-cutting. A second app launch must enter compatibility directly without another
-loss. Keep C15 open until both adaptive branches are verified.
+APP_VERSION 1.0.54 needs a simple device check: Normal mode must never switch
+automatically; the Compatibility control outside the WebGL surface and the
+error-panel button must both enter Compatibility mode and return to Normal without
+losing the program. The Simulation controls drawer must preserve its open state,
+and the reduced mesh must cut material with all visible stock walls. Keep C15
+open until that manual flow is verified.
 
 ## C12 — Light-theme 3D table grid is too dark
 **Reported:** 2026-07-15. **Repro:** open the 3D simulation in the light theme.

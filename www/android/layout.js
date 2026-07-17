@@ -37,6 +37,34 @@ function showKpHelp(key, anchorEl){
 
 function _isMTab(){ return true; }
 
+var SIMULATION_SETTINGS_OPEN_KEY = 'tncSimSimulationControlsOpenV1';
+
+function setSimulationSettingsOpen(open, persist){
+  var panel = document.getElementById('simulationSettingsPanel');
+  var toggle = document.getElementById('simulationSettingsToggle');
+  var chevron = document.getElementById('simulationSettingsChevron');
+  if(!panel || !toggle) return false;
+  open = !!open;
+  panel.hidden = !open;
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if(chevron) chevron.innerHTML = open ? '&#9652;' : '&#9662;';
+  if(persist){
+    try{ localStorage.setItem(SIMULATION_SETTINGS_OPEN_KEY, open ? '1' : '0'); }catch(e){}
+  }
+  return open;
+}
+
+function toggleSimulationSettings(){
+  var panel = document.getElementById('simulationSettingsPanel');
+  return setSimulationSettingsOpen(panel ? panel.hidden : true, true);
+}
+
+(function(){
+  var open = false;
+  try{ open = localStorage.getItem(SIMULATION_SETTINGS_OPEN_KEY) === '1'; }catch(e){}
+  setSimulationSettingsOpen(open, false);
+})();
+
 /* Mobile uses a bounded editor viewport: controls stay in normal flex flow and
    only the textarea scrolls. Shared render paths still call the legacy
    _growCode hook, so keep it as a stale inline-size cleanup. */
