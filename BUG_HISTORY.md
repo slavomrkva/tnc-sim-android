@@ -13,6 +13,17 @@ Newest first.
 
 ---
 
+## 2026-07-17 — ported mobile numeric editing and TNC 640 RL/RR corrections
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.55, from accepted web v0.868 behavior.
+
+### Ported correction
+- Mobile minus input now normalizes to the front of BLK FORM, guided L/C/CC/CR and cycle Q values and toggles a negative value back to positive. The Q editor requests the decimal keypad.
+- L builder fields are XYZ/R/F/M; temporary radius-compensation diagnostics while composing an L block are consolidated to one warning.
+- The shared parser now retains exact supported contour primitives through RL/RR calculation instead of offsetting display chords. It covers L, C, CR, CT, CP, RND and CHF with exact analytic offsets, inner intersections, outer transition arcs and the correct RND tangency distance.
+
+### Verification
+- Android parser and focused editing regressions cover the reported PROGRAM.H geometry, valid/invalid radii, entry activation, R0, circles, RND, CR, CT and CP. Native keyboard/device verification remains a recommended final smoke check after installation.
+
 ## C19 — CALL LBL status was blank in the 3D simulation
 **Repos:** Android `tnc-sim-android` APP_VERSION 1.0.47, ported from accepted
 web v0.866. **Resolved/accepted:** 2026-07-16.
