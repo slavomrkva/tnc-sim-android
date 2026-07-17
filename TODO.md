@@ -6,6 +6,16 @@
 > from this file and moved to `BUG_HISTORY.md`** (with root cause + all the
 > attempts). Open bugs live here; resolved bugs live in `BUG_HISTORY.md`.
 
+## Feature requests
+
+- **German (DE) localization for the app.** Web (`slavomrkva/tnc-sim`) already
+  has a full EN/DE language switch: UI, Help/Tool Table tooltips, M list +
+  auto-inserted M comments, cycle names/parameters, demo program comments,
+  all 16 Learn lessons, and the About popup — see that repo's
+  `docs/history/changelog.md` v0.869–v0.872. Port the same web-only overlay
+  approach here (`www/android/`), keeping `www/core/` byte-identical to web's
+  `core/`. **Not started — do not begin until explicitly requested.**
+
 ## Open bugs
 
 ## C18 — HEIDENHAIN cycles, compensated cutting and validator audit
