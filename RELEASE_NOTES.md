@@ -12,6 +12,11 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.55)
+- Mobile number fields now place a pressed minus before the entered value and pressing minus again restores the positive value. Cycle editing opens a numeric keypad.
+- Corrected supported TNC 640 RL/RR tool-centre paths and valid-radius checks for lines, circles, RND and CHF; interim L-block diagnostics are now one non-blocking warning.
+- The L-block panel orders its parameters as XYZ, R, F, M.
+
 ## Unreleased test build (APP_VERSION 1.0.54)
 - Groups Quality and the fully manual Compatibility mode toggle in a compact
   Simulation controls drawer outside the WebGL surface, while Speed stays close

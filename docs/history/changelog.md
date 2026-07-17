@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.55 — mobile editor and analytic radius compensation
+
+- Ported the accepted web mobile sign toggle and decimal Q-field keyboard; L builder order is XYZ/R/F/M.
+- Ported analytic TNC 640 RL/RR geometry for the supported L/C/CC/CR/CT/CP/RND/CHF contour subset and regressions for the supplied valid-radius contour.
+- Collapsed temporary RL/RR diagnostics while a mobile L block is still being edited; full errors return after editing or when running the simulation.
+
 ## APP_VERSION 1.0.54 — manual Compatibility mode
 
 - Removed the automatic context-loss watcher and its persistent WebView-UA
