@@ -7,6 +7,21 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.58 — defer in-progress radius-comp errors to Run
+
+- Starting an RL/RR contour no longer flags two red errors while typing. The
+  compensation completeness checks ("RL/RR still active … program R0 before END
+  PGM" / "still active at END PGM") in `validateProgram` are now gated behind a
+  new `liveEdit` argument, and the "contour not finished yet" `_rcReport`
+  diagnostics carry an `incomplete`→`rcDefer` flag.
+- `runValidation(liveEdit)` (editor-core) defaults to `liveEdit=true` and skips
+  those deferred diagnostics; `onRun`/`onStep` (sim-controls) now call
+  `runValidation(false)` so the checks run — and block Run — at simulation start.
+- Genuine geometry errors (tool radius too large, non-positive effective radius,
+  no valid intersection, inner corner too small) still show live, per user
+  choice. Added NOTES rule 19 and `tests/radius-comp-live-defer.test.js`; bumped
+  the version-marker assertion.
+
 ## APP_VERSION 1.0.57 — rapid-into-material collision warns without stopping
 
 - `rapidCollision` (voxel-cutting.js) no longer sets `mode='idle'`, so a

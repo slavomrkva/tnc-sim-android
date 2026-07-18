@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.58)
+- Starting a radius-compensation (RL/RR) contour no longer shows "still active / program R0" errors while you are still typing it — those now appear only when you press Run/Step. Real geometry errors (e.g. tool radius too large) still show immediately.
+
 ## Unreleased test build (APP_VERSION 1.0.57)
 - A rapid (FMAX) move into material now shows a collision warning but no longer stops the simulation — it keeps running to the end so you can watch the whole program.
 
