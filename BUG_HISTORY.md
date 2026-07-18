@@ -13,6 +13,27 @@ Newest first.
 
 ---
 
+## 2026-07-18 — modal feed corrupted to FMAX after a fixed cycle / M99 call
+
+**Cross-repo bug.** Full evidence (symptom, root cause, rejected approaches) is
+recorded once in web `tnc-sim` `BUG_HISTORY.md` under the same date. Fixed there
+in v0.877 and deliberately ported here in APP_VERSION 1.0.60.
+
+**Symptom (as reported):** In a user program, after `CYCL DEF 208` was called
+via `M99`, the next contour cut the material at rapid feed (FMAX) instead of
+FAUTO. Identical `L … RL` blocks with no explicit `F` cut correctly (at the
+TOOL CALL feed) *before* the cycle; only the contours *after* it were affected.
+
+**Root cause:** `flushPending()` in `www/core/parser-engine.js` reassigns the
+shared modal `feed` per rendered move (9999 for FMAX rapids, cycle feeds inside
+a cycle) and never restored it. A contour ending in an FMAX retract — the usual
+predecessor of a `CYCL DEF`/`M99` block — left the modal feed stuck at 9999, so
+the next no-`F` cutting move was pushed with `feed:9999` while `rapid:false`.
+
+**Fix:** `flushPending()` snapshots `feed` on entry and restores it on exit,
+keeping its per-move bookkeeping local to rendering. Regression added to
+`tests/parser-cycles.test.js`.
+
 ## 2026-07-17 — garbled `Ready â€" press Run` status line (Android only)
 
 **Symptom (as reported):** In the app (but not the mobile web version), the

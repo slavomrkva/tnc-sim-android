@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.60)
+- A contour after a drilling/milling cycle (e.g. CYCL DEF 208 called with M99) no longer cuts the material at rapid speed (FMAX) when its first cutting move has no F programmed — it now uses the last programmed feed (FAUTO). Previously the modal feed got stuck at FMAX after the cycle.
+
 ## Unreleased test build (APP_VERSION 1.0.59)
 - The program name in the top-left header now follows the file: it shows the demo's name when you pick a demo, the file name when you import, the saved name when you export, and "program.H" for a new (cleared) program — instead of always showing "PROGRAM.H".
 
