@@ -8,6 +8,33 @@
 
 ## Open bugs
 
+## V1 — Verify the new one-click Bug Report / Suggestion in the app
+**Added:** 2026-07-18. **Repro:** APP_VERSION 1.0.64, on a real device with
+network. This is a verification task, not a bug — no defect is known yet.
+### What to check
+The bug report was reworked to post to the website's `/api/report`
+(`https://tncsim.org/api/report`) with invisible Cloudflare Turnstile, opening a
+public GitHub issue without a GitHub account. It could not be exercised in the
+build environment (Google SDK/Maven hosts were network-blocked, so no APK could
+be built; the live Turnstile + network round-trip needs a device).
+- Open "Report a problem" and "Suggest improvement": confirm the state-based
+  prefill and the public-GitHub warning, and that Suggest keeps Send disabled
+  until text is entered.
+- Send a real report; confirm a public GitHub issue is created and its URL is
+  shown in the dialog. Suggestions must NOT attach the NC program; bug reports
+  must include it plus version/device/validator/area/JS-error context.
+- Confirm graceful errors when offline / verification unavailable.
+### Prerequisites (server-side, one-time)
+- Cloudflare Pages secrets `GITHUB_TOKEN` + `TURNSTILE_SECRET_KEY` set and
+  deployed.
+- Real Turnstile site key in `www/android/turnstile-config.js` (currently the
+  test placeholder), matching the website key, with `localhost` added as an
+  allowed widget hostname so the WebView can obtain a token.
+### Status
+Open until verified on a device. Cross-repo: the website endpoint shipped in
+`slavomrkva/tnc-sim` (see its changelog v0.882); setup in that repo's
+`docs/bug-report-setup.md`.
+
 ## C18 — HEIDENHAIN cycles, compensated cutting and validator audit
 **Reported:** 2026-07-16. **Repro:** cycles 200/201/208/209, Complete Part and
 Angle Mill on the accepted web v0.863 programs.
