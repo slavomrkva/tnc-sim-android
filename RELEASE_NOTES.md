@@ -12,6 +12,12 @@ user-facing history.
 
 ---
 
+## 1.0.4 (versionCode 5)
+- More reliable 3D simulation: safer cycle feeds, FMAX handling, clean reruns
+  and clearer recovery on affected Android WebViews.
+- Improved CNC programming with more accurate radius compensation and validation.
+- Better Tool Table workflows, demo programs and interactive Learn content.
+
 ## Unreleased test build (APP_VERSION 1.0.62)
 - The initial 3D error now explains that the app must be fully closed and reopened after selecting Compatibility mode on affected Android WebViews.
 

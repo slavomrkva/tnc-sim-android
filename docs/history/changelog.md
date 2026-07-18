@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.63 — Prepare Play Closed testing release 1.0.4 (code 5)
+
+- Bumps the Play identifiers from versionName 1.0.3 / versionCode 4 to 1.0.4 /
+  5 and records the user-facing release summary. No app-source behavior changes
+  beyond the displayed build marker.
+
 ## APP_VERSION 1.0.62 — Compatibility restart instruction
 
 - Adds a contextual restart instruction to the initial Android 3D error that
