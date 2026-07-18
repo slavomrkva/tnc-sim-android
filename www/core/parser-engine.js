@@ -2574,7 +2574,7 @@ function resetState(){
   if(sub.length){ toolPos = {x:sub[0].from.x, y:sub[0].from.y, z:sub[0].from.z}; }
   else if(prog){ toolPos = {x:prog.start.x, y:prog.start.y, z:prog.start.z}; }
   if(THREE_OK){ bufClear(feedBuf); bufClear(rapidBuf); placeTool(); }
-  updateStatus('Ready â€” press Run', false);
+  updateStatus('Ready — press Run', false);
   var rbb=document.getElementById('refineBtnCanvas'); if(rbb){ rbb.style.display='none'; }
   var _tb=document.getElementById('activeToolBadge'); if(_tb){ _tb.style.display='none'; }
   clearSimInfoPanel();

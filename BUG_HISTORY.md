@@ -13,6 +13,29 @@ Newest first.
 
 ---
 
+## 2026-07-17 — garbled `Ready â€" press Run` status line (Android only)
+
+**Symptom (as reported):** In the app (but not the mobile web version), the
+status line at the bottom-left of the 3D simulation view read `Ready â€" press
+Run` — "Ready" followed by strange symbols instead of a dash.
+
+**Root cause:** `www/core/parser-engine.js` (the sim-reset path) held a
+double-encoded em-dash literal. A real `—` (U+2014, UTF-8 `e2 80 94`) had at
+some point been decoded as Windows-1252 (`â` `€` `"`) and re-saved as UTF-8,
+producing the byte sequence `c3 a2 e2 82 ac e2 80 9d`. The source file, not the
+WebView, carried the corruption, which is why the web repo `tnc-sim` — whose
+literal was never mangled — rendered correctly. Not a cross-repo bug.
+
+**Fix:** Restored the correct `—` in the `updateStatus('Ready — press Run', …)`
+call. This also realigned it with the collision-active guard in `view2d.js`,
+which compares against the exact string `'Ready — press Run'` and had never
+matched the corrupted literal.
+
+**Note for future sessions:** many code *comments* in `parser-engine.js` still
+contain the same `â€"` mojibake. They are harmless (never shown to the user) and
+were deliberately left untouched to keep this fix's diff to the one user-visible
+string.
+
 ## 2026-07-17 — ported mobile numeric editing and TNC 640 RL/RR corrections
 **Repos:** Android `tnc-sim-android` APP_VERSION 1.0.55, from accepted web v0.868 behavior.
 

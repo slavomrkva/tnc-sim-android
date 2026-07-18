@@ -7,6 +7,17 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.56 — fix mojibake in reset status line
+
+- `parser-engine.js` reset built the status message from a double-encoded
+  em-dash (UTF-8 `—` mangled through Windows-1252 into `â€"`), so the 3D view
+  showed `Ready â€" press Run`. Replaced the corrupted literal with a real `—`
+  (bytes `e2 80 94`). The web repo `tnc-sim` was unaffected — its literal was
+  already correct — so this is Android-only.
+- Side effect fixed: `view2d.js` guards a collision-active status against the
+  exact string `'Ready — press Run'`; the corrupted literal never matched, so
+  the reset message was mishandled while a collision was active. It matches now.
+
 ## APP_VERSION 1.0.55 — mobile editor and analytic radius compensation
 
 - Ported the accepted web mobile sign toggle and decimal Q-field keyboard; L builder order is XYZ/R/F/M.
