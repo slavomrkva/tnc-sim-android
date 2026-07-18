@@ -149,10 +149,25 @@ assert.strictEqual(remembered.window.AndroidWebGLCompat.setMode(false), true);
 assert.strictEqual(normalLocal.getItem('tncSimWebglCompatibilityModeV1'), null);
 assert.doesNotMatch(remembered.navigations[0].target, /tncWebglCompat=1/);
 
-// The error panel receives the same manual toggle as the permanent toolbar.
+// A normal-mode error explains the required full restart before the user taps
+// Compatibility; the error panel also receives the same manual toggle.
+const normalError = environment(storage(), storage());
+const normalErrorContainer = domElement();
+normalErrorContainer.firstElementChild = domElement();
+normalError.window.AndroidWebGLCompat.attachErrorButton(normalErrorContainer);
+const normalErrorHint = normalErrorContainer.firstElementChild.children[0];
+const normalErrorButton = normalErrorContainer.firstElementChild.children[1];
+assert.strictEqual(normalErrorHint.id, 'view3dCompatibilityRestartHint');
+assert.strictEqual(normalErrorHint.textContent,
+  'After selecting Compatibility, fully close and reopen the app.');
+assert.strictEqual(normalErrorButton.textContent, 'Compatibility mode');
+
+// If the same WebView session cannot create WebGL1 immediately after the
+// switch, do not repeat the restart hint: Compatibility is already selected.
 const errorContainer = domElement();
 errorContainer.firstElementChild = domElement();
 normal.window.AndroidWebGLCompat.attachErrorButton(errorContainer);
+assert.strictEqual(errorContainer.firstElementChild.children.length, 1);
 const errorButton = errorContainer.firstElementChild.children[0];
 assert.strictEqual(errorButton.id, 'view3dCompatibilityButton');
 assert.strictEqual(errorButton.textContent, 'Normal mode');
@@ -207,7 +222,7 @@ assert.ok(compatibilityToggleIndex < viewAreaIndex,
 assert.doesNotMatch(index.slice(viewAreaIndex), /id="compatModeToggle"/);
 assert.match(index, /id="simulationSettingsPanel"[^>]*hidden/);
 assert.match(render3d, /AndroidWebGLCompat\.attachErrorButton\(box\)/);
-assert.match(app, /var APP_VERSION = '1\.0\.61';/);
+assert.match(app, /var APP_VERSION = '1\.0\.62';/);
 assert.match(app, /var VX_COMPAT_MODE = !!\(window\.AndroidWebGLCompat/);
 assert.match(app, /VX_RES_LEVELS = \[50, 75, 100\]/);
 

@@ -113,13 +113,18 @@ The APK shows the 3D fallback before simulation. Device logs report
   while the old automatic
   marker is cleared. The reduced monolithic mesh now uses DoubleSide so the top
   and positive side walls are not hidden by back-face culling.
+- Attempt 12 — BrowserStack Redmi Note 12 Pro accepted the manual Compatibility
+  choice but the same WebView session then reported `C15-MC0`; fully closing and
+  reopening the app started the simulation successfully. The initial 3D error
+  panel that offers Compatibility now tells the user to perform that full restart.
 ### Status
-APP_VERSION 1.0.54 needs a simple device check: Normal mode must never switch
+APP_VERSION 1.0.62 needs a simple device check: Normal mode must never switch
 automatically; the Compatibility control outside the WebGL surface and the
 error-panel button must both enter Compatibility mode and return to Normal without
 losing the program. The Simulation controls drawer must preserve its open state,
-and the reduced mesh must cut material with all visible stock walls. Keep C15
-open until that manual flow is verified.
+the reduced mesh must cut material with all visible stock walls, and the restart
+instruction must be readable on the failing device. Keep C15 open until that
+manual flow is verified.
 
 ## C12 — Light-theme 3D table grid is too dark
 **Reported:** 2026-07-15. **Repro:** open the 3D simulation in the light theme.

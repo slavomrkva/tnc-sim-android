@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.62)
+- The initial 3D error now explains that the app must be fully closed and reopened after selecting Compatibility mode on affected Android WebViews.
+
 ## Unreleased test build (APP_VERSION 1.0.61)
 - Re-running (Run/Step) a finished program no longer leaves coloured leftover cut surfaces from the previous run (e.g. purple countersink walls/spikes) where material was removed — every run now starts from clean stock, just like after Reset. Previously only a manual Reset cleared them.
 

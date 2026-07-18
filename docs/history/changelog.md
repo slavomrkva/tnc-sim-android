@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.62 — Compatibility restart instruction
+
+- Adds a contextual restart instruction to the initial Android 3D error that
+  offers Compatibility: affected WebViews may require the app to be fully closed
+  and reopened before their GPU process will provide the requested WebGL1 context.
+
 ## APP_VERSION 1.0.61 — Run/Step from the start resets the voxel workpiece (no leftover coloured cuts)
 
 - Re-running or stepping a finished program showed leftover coloured cut

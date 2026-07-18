@@ -141,8 +141,11 @@ html[data-theme="light"] #measureOverlay{
 }
 #stockToggle:disabled,#measureBtn:disabled{opacity:.42;cursor:not-allowed !important;}
 .compat-mode-action{
-  margin-top:16px;padding:8px 14px;border:1px solid var(--accent);border-radius:6px;
+  margin-top:12px;padding:8px 14px;border:1px solid var(--accent);border-radius:6px;
   background:transparent;color:var(--accent);font:11px var(--mono);cursor:pointer;
+}
+.compat-mode-restart-hint{
+  max-width:310px;margin:12px auto 0;color:var(--text3);font:11px/1.5 var(--mono);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;}

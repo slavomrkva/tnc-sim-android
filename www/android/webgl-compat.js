@@ -231,7 +231,16 @@
     if(!container || !isAndroidApp() || !global.document) return;
     var old = global.document.getElementById('view3dCompatibilityButton');
     if(old && old.parentNode) old.parentNode.removeChild(old);
+    var oldHint = global.document.getElementById('view3dCompatibilityRestartHint');
+    if(oldHint && oldHint.parentNode) oldHint.parentNode.removeChild(oldHint);
     var target = container.firstElementChild || container;
+    if(!compatibilityMode){
+      var hint = global.document.createElement('div');
+      hint.id = 'view3dCompatibilityRestartHint';
+      hint.className = 'compat-mode-restart-hint';
+      hint.textContent = 'After selecting Compatibility, fully close and reopen the app.';
+      target.appendChild(hint);
+    }
     var button = global.document.createElement('button');
     button.id = 'view3dCompatibilityButton';
     button.type = 'button';
