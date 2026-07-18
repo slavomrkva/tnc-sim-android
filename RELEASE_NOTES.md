@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased
+- New one-click bug report: pick "Report a problem" or "Suggest improvement", optionally add a note, and tap Send — a public GitHub issue is opened for you, no GitHub account needed. Bug reports attach the current program, version and device details; suggestions attach only basic context (no program). A clear warning explains the report becomes a public GitHub issue.
+
 ## 1.0.4 (versionCode 5)
 - More reliable 3D simulation: safer cycle feeds, FMAX handling, clean reruns
   and clearer recovery on affected Android WebViews.

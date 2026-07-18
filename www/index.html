@@ -424,39 +424,25 @@ END PGM PROGRAM MM</textarea>
   </div>
 </div>
 <div class="help-overlay" id="bugOverlay" onclick="if(event.target===this)closeBugReport()">
-  <div class="help-modal" style="max-width:560px;">
-    <h2 style="font-family:var(--mono);">🐛 Bug Report <button class="help-close" onclick="closeBugReport()">&times;</button></h2>
-    <div class="help-body" style="display:flex;flex-direction:column;gap:12px;">
-      <div>
-        <label style="font-family:var(--mono);font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Description</label>
-        <textarea id="bugDesc" rows="4" placeholder="Describe what happened and what you expected…" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+  <div class="help-modal" style="max-width:520px;">
+    <h2 style="font-family:var(--mono);">🐛 Report a problem or suggestion <button class="help-close" onclick="closeBugReport()">&times;</button></h2>
+    <div class="help-body" style="display:flex;flex-direction:column;gap:14px;">
+      <div class="bug-choice">
+        <button type="button" id="bugChoiceProblem" class="bug-choice-btn on" onclick="bugSetKind('bug')">🐛 Report a problem</button>
+        <button type="button" id="bugChoiceSuggest" class="bug-choice-btn" onclick="bugSetKind('suggest')">💡 Suggest improvement</button>
       </div>
       <div>
-        <label style="font-family:var(--mono);font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Screenshot <span style="color:var(--text3);font-size:10px;">(optional)</span></label>
-        <button onclick="bugCopyScreenshot()" style="font-family:var(--mono);font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text2);cursor:pointer;">📋 Copy image to clipboard</button>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;">Paste it (<b style="color:var(--text2);">Ctrl+V</b>) wherever you're filing the report.</div>
+        <textarea id="bugDesc" rows="5" oninput="_bugUpdateSendState()" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
       </div>
-      <div>
-        <label style="font-family:var(--mono);font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Program <span id="bugProgLines" style="color:var(--text3);font-size:10px;"></span></label>
-        <pre id="bugProgPreview" style="font-family:var(--mono);font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text2);overflow-y:auto;max-height:100px;margin:0;white-space:pre-wrap;"></pre>
-      </div>
-        <pre id="bugDebug" style="font-family:var(--mono);font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text3);overflow-y:auto;max-height:120px;margin:0;white-space:pre-wrap;"></pre>
-      </div>
+      <div id="bugWarn" style="font-family:var(--mono);font-size:10px;line-height:1.5;color:var(--accent-warm);background:rgba(245,137,58,.10);border:1px solid rgba(245,137,58,.35);border-radius:6px;padding:8px 10px;">This report, including the NC program and details you enter, will be published publicly on GitHub. Do not include confidential or company program data.</div>
+      <div id="bugTurnstile"></div>
+      <div id="bugStatus" style="display:none;font-family:var(--mono);font-size:11px;line-height:1.5;word-break:break-word;"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
         <button onclick="closeBugReport()" style="font-family:var(--mono);font-size:12px;padding:6px 16px;border:1px solid var(--border);border-radius:5px;background:none;color:var(--text3);cursor:pointer;">Cancel</button>
-        <button onclick="bugSubmit()" style="font-family:var(--mono);padding:6px 16px;border:1px solid var(--accent);border-radius:5px;background:var(--accent);color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.4;">
-          <span style="font-size:12px;">🔗 GitHub Issue</span>
-          <span style="font-size:9px;opacity:0.85;">needs GitHub account</span>
-        </button>
-        <button onclick="bugEmailReport()" style="font-family:var(--mono);padding:6px 16px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.4;">
-          <span style="font-size:12px;">✉️ Email</span>
-          <span style="font-size:9px;color:var(--text3);">no account needed</span>
-        </button>
-        <button onclick="bugCopyReport()" style="font-family:var(--mono);font-size:12px;padding:6px 16px;border:1px solid var(--border);border-radius:5px;background:none;color:var(--text2);cursor:pointer;">📋 Copy report</button>
+        <button id="bugSendBtn" onclick="sendReport()" style="font-family:var(--mono);font-size:12px;padding:6px 20px;border:1px solid var(--accent);border-radius:5px;background:var(--accent);color:#fff;cursor:pointer;">Send report</button>
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <div class="help-overlay" id="helpOverlay" onclick="if(event.target===this)closeHelp()">
@@ -473,6 +459,8 @@ END PGM PROGRAM MM</textarea>
 
 <script src="core/data-tables.js" defer></script>
 <script src="core/block-form-panel.js" defer></script>
+<script src="android/turnstile-config.js" defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="core/bug-report.js" defer></script>
 <script src="core/cycle-picker.js" defer></script>
 <script src="core/demo-programs.js" defer></script>
