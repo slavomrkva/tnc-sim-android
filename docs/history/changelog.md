@@ -256,3 +256,20 @@ History through APP_VERSION 1.0.36 is preserved in
 - Replaced the growing root project notes with a concise current contract,
   archived the complete former notes, and routed future technical entries here.
 - Tightened `CLAUDE.md` session routing so history is loaded only when relevant.
+
+## APP_VERSION 1.0.64 — one-click bug report / suggestion
+
+- Replaced the multi-button Bug Report dialog with a single problem/suggestion
+  chooser plus one textarea, mirroring the website. Bug reports pre-fill a
+  state-based description (JS error / lesson active / validator error / default)
+  and attach program, version, device, validator messages, app area and recent
+  JS errors; suggestions require text, attach only basic context, and never
+  include the program.
+- `www/core/bug-report.js` now posts to the website's `/api/report` Cloudflare
+  Pages Function at the ABSOLUTE `https://tncsim.org/api/report` URL (the WebView
+  origin is `https://localhost`), opening a public GitHub issue with no visitor
+  account. Added invisible Cloudflare Turnstile via `www/android/turnstile-config.js`
+  (public site key; the widget must allow the `localhost` hostname). Removed the
+  old GitHub-account/Email/Copy/screenshot controls and the previews.
+- The website endpoint was generalised in the same change to accept the app
+  origin; see slavomrkva/tnc-sim v0.882.
