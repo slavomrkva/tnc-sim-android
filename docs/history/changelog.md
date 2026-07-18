@@ -7,6 +7,19 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.59 — header shows the document (file) name
+
+- The `#progTitleName` header no longer always reads "PROGRAM.H". It now tracks
+  a `_docName` set from the file identity: the friendly demo name on demo pick,
+  the imported filename on import, the saved filename on export, and `program.H`
+  on Clear. `editor-core.js` owns `_docName`/`_setDocName`; `panels.js` renders
+  it; `app.js` seeds it with the starter demo. Root cause: every demo/imported
+  program uses `BEGIN PGM PROGRAM` internally, so the old `_progFileName(code)`
+  parse always yielded `PROGRAM.H`.
+- Export prefers a `.H` `_docName` (round-trips an imported filename) and
+  otherwise falls back to the BEGIN PGM-derived name, then reflects it in the
+  header. Adds `tests/doc-name-header.test.js` and NOTES rule 20.
+
 ## APP_VERSION 1.0.58 — defer in-progress radius-comp errors to Run
 
 - Starting an RL/RR contour no longer flags two red errors while typing. The

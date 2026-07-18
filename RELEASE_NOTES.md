@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.59)
+- The program name in the top-left header now follows the file: it shows the demo's name when you pick a demo, the file name when you import, the saved name when you export, and "program.H" for a new (cleared) program — instead of always showing "PROGRAM.H".
+
 ## Unreleased test build (APP_VERSION 1.0.58)
 - Starting a radius-compensation (RL/RR) contour no longer shows "still active / program R0" errors while you are still typing it — those now appear only when you press Run/Step. Real geometry errors (e.g. tool radius too large) still show immediately.
 
