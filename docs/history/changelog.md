@@ -7,6 +7,22 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.57 — rapid-into-material collision warns without stopping
+
+- `rapidCollision` (voxel-cutting.js) no longer sets `mode='idle'`, so a
+  detected FMAX-into-material collision reports its pinned red warning but the
+  simulation plays through to the end instead of halting. Real machine-proven
+  programs (e.g. a rapid onto a pre-drilled floor) must not be blocked.
+- Re-report guard changed from `mode==='idle'` to `window._collisionActive`, so
+  only the first hit is reported and it stays latched via `updateStatus` until
+  reset; `mode` is left untouched.
+- Verified headless against a user program whose only real hit is a 0.5 mm
+  rapid past a Ø15 CYCL 208 pre-drill floor: at High quality the warning fires
+  and all segments still run; the 0.5 mm step is sub-voxel at Def/Low/compat so
+  nothing is detected there (documented as a known voxel-resolution limit).
+- Added NOTES rule 18. Bumps the version-marker assertion in
+  `android-webgl-compat.test.js`.
+
 ## APP_VERSION 1.0.56 — fix mojibake in reset status line
 
 - `parser-engine.js` reset built the status message from a double-encoded

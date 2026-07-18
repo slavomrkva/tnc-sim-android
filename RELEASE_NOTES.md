@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.57)
+- A rapid (FMAX) move into material now shows a collision warning but no longer stops the simulation — it keeps running to the end so you can watch the whole program.
+
 ## Unreleased test build (APP_VERSION 1.0.56)
 - Fixed the garbled characters in the "Ready — press Run" status line at the bottom of the simulation view.
 

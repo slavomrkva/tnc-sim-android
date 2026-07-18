@@ -102,6 +102,14 @@ The detailed module-split rationale is in
     the program/view across its clean reload and always provide a Normal mode
     return path. Persist the drawer's open state independently until the user
     closes it.
+18. **Collision is a warning, never a stop:** a rapid-into-material (FMAX)
+    collision must report a pinned warning but must NOT halt the run — real
+    machine-proven programs (e.g. a rapid onto a pre-drilled floor) play
+    through to the end. `rapidCollision` leaves `mode` untouched and latches
+    `window._collisionActive` so `updateStatus` keeps the warning until reset;
+    never re-add `mode='idle'` there. Note the voxel check is resolution-bound,
+    so sub-voxel gouges surface only at finer quality — do not "fix" that by
+    stopping the sim.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and
