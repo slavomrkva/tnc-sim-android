@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.61)
+- Re-running (Run/Step) a finished program no longer leaves coloured leftover cut surfaces from the previous run (e.g. purple countersink walls/spikes) where material was removed — every run now starts from clean stock, just like after Reset. Previously only a manual Reset cleared them.
+
 ## Unreleased test build (APP_VERSION 1.0.60)
 - A contour after a drilling/milling cycle (e.g. CYCL DEF 208 called with M99) no longer cuts the material at rapid speed (FMAX) when its first cutting move has no F programmed — it now uses the last programmed feed (FAUTO). Previously the modal feed got stuck at FMAX after the cycle.
 

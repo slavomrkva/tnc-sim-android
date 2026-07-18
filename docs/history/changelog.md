@@ -7,6 +7,22 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.61 — Run/Step from the start resets the voxel workpiece (no leftover coloured cuts)
+
+- Re-running or stepping a finished program showed leftover coloured cut
+  surfaces from the previous run (e.g. purple tool-5 countersink walls / spikes)
+  where material had been removed, until a manual Reset cleared them. Root cause:
+  only `onReset()` reset the workpiece (`vxReset()`); `onRun()`/`onStep()` rewound
+  the sim with `resetState()` alone (`www/core/sim-controls.js`), which resets the
+  block index but never the voxel grid/cut/mesh, so a restarted run replayed onto
+  the previous run's carved, tool-colour-tagged voxels.
+- Fix: the rewind branch in `onRun()`/`onStep()` now also calls `vxReset()`, so a
+  fresh run always starts from clean stock — identical to Reset+Run. A mid-run
+  resume still leaves the workpiece untouched. Regression added in
+  `tests/sim-run-resets-workpiece.test.js`. Cross-repo — same fix as web
+  `tnc-sim` v0.878. Investigation ruled out the incremental chunk meshing and the
+  light-mode colour change as causes (see web BUG_HISTORY).
+
 ## APP_VERSION 1.0.60 — modal feed no longer corrupted by a fixed cycle / M99 call
 
 - A contour that came after a fixed cycle (e.g. CYCL DEF 208 called with M99)

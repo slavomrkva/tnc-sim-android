@@ -13,6 +13,30 @@ Newest first.
 
 ---
 
+## 2026-07-18 — coloured leftover cut surfaces when re-running without Reset
+
+**Cross-repo bug.** Full evidence (symptom, ruled-out causes, root cause,
+rejected approaches) is recorded once in web `tnc-sim` `BUG_HISTORY.md` under the
+same date. Fixed there in v0.878 and deliberately ported here in APP_VERSION
+1.0.61.
+
+**Symptom (as reported):** Both web and app sometimes showed coloured artifacts
+(purple/tool-5 spikes and walls) at the start of a simulation, where material is
+removed. A Reset made them disappear.
+
+**Root cause:** Only `onReset()` reset the voxel workpiece (`vxReset()`);
+`onRun()`/`onStep()`, when rewinding a finished run, called `resetState()` alone
+(`www/core/sim-controls.js`), which resets the block index but never the voxel
+grid/cut/mesh. A restarted run replayed onto the previous run's carved,
+tool-colour-tagged voxels; each triangle is coloured by
+`TOOL_CUT_COLORS[VX.cut(nearest)]`, so the stale surfaces kept their tool colour.
+Ruled out: incremental chunk meshing (byte-identical to a full rebuild) and the
+light-mode colour change (theme applied synchronously before build).
+
+**Fix:** the rewind branch of `onRun()`/`onStep()` now also calls `vxReset()`, so
+a fresh run starts from clean stock; a mid-run resume leaves the workpiece
+untouched. Regression: `tests/sim-run-resets-workpiece.test.js`.
+
 ## 2026-07-18 — modal feed corrupted to FMAX after a fixed cycle / M99 call
 
 **Cross-repo bug.** Full evidence (symptom, root cause, rejected approaches) is
