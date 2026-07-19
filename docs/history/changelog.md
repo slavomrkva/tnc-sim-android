@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.68 — current Android and Play Store icon set
+
+- Replaced every legacy, round and adaptive launcher density with the current
+  TNC Sim design, including the Android 13+ monochrome layer.
+- Updated the Play Store icon and feature graphic supplied with the same set,
+  and removed the superseded drawable/color launcher layers.
+
 ## APP_VERSION 1.0.67 — close the report dialog after success
 
 - After a bug report or suggestion is posted, the send button becomes Close.
