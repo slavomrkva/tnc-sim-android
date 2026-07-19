@@ -15,7 +15,7 @@
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1784491346.3851924,
+    "mtime": 1784492869.3985326,
     "ast_hash": "8aea139b9c2d569ae99534d3a3feba8b",
     "semantic_hash": ""
   },
@@ -40,7 +40,7 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1784491346.3851924,
+    "mtime": 1784492869.3985326,
     "ast_hash": "0f7623fa0d0b4163cb03f56f2c3c024b",
     "semantic_hash": ""
   },
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "www/android/app.js": {
-    "mtime": 1784491275.779233,
-    "ast_hash": "fbda5e4636b15ad57f04db0b4ae69b8b",
+    "mtime": 1784492793.5173225,
+    "ast_hash": "0b76c820012671c521c5a20b6fbf7834",
     "semantic_hash": ""
   },
   "www/android/keyboard.js": {
@@ -125,8 +125,8 @@
     "semantic_hash": "13a278ef3d4c6fd794ac263aee5aaedc"
   },
   "www/core/data-tables.js": {
-    "mtime": 1784284958.2885294,
-    "ast_hash": "77c41ab077e5f2c6e9ee7e7233ee75ab",
+    "mtime": 1784492677.897174,
+    "ast_hash": "72924cac946cd0bad3af29ae08a46de0",
     "semantic_hash": ""
   },
   "www/core/editor-core.js": {
@@ -225,8 +225,8 @@
     "semantic_hash": "8524cd01c45671cc93ea6ab9e73494e7"
   },
   "tests/parser-cycles.test.js": {
-    "mtime": 1784476055.371981,
-    "ast_hash": "d73a48865d2c146a292e5c083c5dade0",
+    "mtime": 1784492728.9757633,
+    "ast_hash": "a9d51f638458c80d8ae4a1462f302064",
     "semantic_hash": ""
   },
   "tests/quality-profiles.test.js": {
@@ -270,13 +270,13 @@
     "semantic_hash": ""
   },
   "RELEASE_NOTES.md": {
-    "mtime": 1784491275.781296,
-    "ast_hash": "76bce0d4634af060e2499d28257543bc",
+    "mtime": 1784492793.5188246,
+    "ast_hash": "5e340e9f03f8a0e47a88aa0d8ab4dc03",
     "semantic_hash": ""
   },
   "TODO.md": {
-    "mtime": 1784491275.7803,
-    "ast_hash": "baf526d2441ac0baefa0072f0a582800",
+    "mtime": 1784492793.5208392,
+    "ast_hash": "3f19a47f66999031926307b0bb00e0af",
     "semantic_hash": ""
   },
   "docs/history/module-split-refactor.md": {
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "www/index.html": {
-    "mtime": 1784476055.386586,
-    "ast_hash": "fe59be9bdb73ebcddcc207cfc9540143",
+    "mtime": 1784492704.3042758,
+    "ast_hash": "96fc99f6cc5a90ffa63fa223b9c804ea",
     "semantic_hash": ""
   },
   "android/app/src/main/res/drawable-land-hdpi/splash.png": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "docs/history/changelog.md": {
-    "mtime": 1784491275.781296,
-    "ast_hash": "f9f5449b55e974ff5f2bbe83fddcc05e",
+    "mtime": 1784492793.5198312,
+    "ast_hash": "04eb156c23695fc51513f11c7ad7ec67",
     "semantic_hash": ""
   },
   "docs/history/project-notes-through-1.0.36.md": {
@@ -485,13 +485,13 @@
     "semantic_hash": ""
   },
   "tests/demo-programs.test.js": {
-    "mtime": 1784294015.4623148,
-    "ast_hash": "11cdf6f9113630cf9a92c99dc3fd38c1",
+    "mtime": 1784492932.5935757,
+    "ast_hash": "2cb1ae654be64ebfc51e0297c4ac330a",
     "semantic_hash": ""
   },
   "www/core/demo-programs.js": {
-    "mtime": 1784284958.2885294,
-    "ast_hash": "ced26bd9f4526b1143094a5d51c15123",
+    "mtime": 1784492704.3042758,
+    "ast_hash": "33d29613219154d872bd483fcb8ab6ed",
     "semantic_hash": ""
   },
   "tests/ui-demos-light-check.html": {
@@ -500,8 +500,8 @@
     "semantic_hash": ""
   },
   "tests/android-webgl-compat.test.js": {
-    "mtime": 1784491308.5547638,
-    "ast_hash": "c6f6c07efe34bc146f03cf5731f12a40",
+    "mtime": 1784492830.9312406,
+    "ast_hash": "e83aa9d084e13f93686261f242668d40",
     "semantic_hash": ""
   },
   "www/android/webgl-compat.js": {

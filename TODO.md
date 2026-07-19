@@ -21,8 +21,11 @@ range is `0...360` degrees.
   applicable TNC 640 rules in the locked offline manuals.
 - Attempt 2 — ported the corrected web parser semantics and matching focused
   regressions into the Android `www/core` implementation.
+- Attempt 3 — exposed the complete Cycle 208 parameter set, including Q370, in
+  both insertion interfaces and added Q370 to every supplied Cycle 208 demo and
+  applicable Learn program in Android APP_VERSION 1.0.70 and web v0.890.
 ### Status
-Implemented in Android APP_VERSION 1.0.69 together with web v0.889. Automated
+Implemented in Android APP_VERSION 1.0.70 together with web v0.890. Automated
 verification is in progress; keep open until both repository changes and a
 real simulator/device run are accepted.
 

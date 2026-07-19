@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.69';
+var APP_VERSION = '1.0.70';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -538,13 +538,17 @@ var BUILDERS = {
     {p:'Q204', prompt:'2nd safety clearance (mm)', type:'num', opt:false},
     {p:'Q211', prompt:'Dwell time at depth (s)', type:'num', opt:false},
   ]},
-  'CYCL DEF 208':{title:'CYCL DEF 208 — Boring/Reaming', cmd:'CYCL DEF 208', fields:[
+  'CYCL DEF 208':{title:'CYCL DEF 208 — Bore Milling', cmd:'CYCL DEF 208', fields:[
     {p:'Q200', prompt:'Safety clearance (mm)', type:'num', opt:false},
     {p:'Q201', prompt:'Depth (mm, negative)', type:'num', opt:false},
     {p:'Q206', prompt:'Feed rate for plunging (mm/min)', type:'num', opt:false},
-    {p:'Q208', prompt:'Feed rate for retract (mm/min)', type:'num', opt:false},
+    {p:'Q334', prompt:'Infeed per helix revolution (mm)', type:'num', opt:false},
     {p:'Q203', prompt:'Surface coordinate (mm)', type:'num', opt:false},
     {p:'Q204', prompt:'2nd safety clearance (mm)', type:'num', opt:false},
+    {p:'Q335', prompt:'Nominal diameter (mm)', type:'num', opt:false},
+    {p:'Q342', prompt:'Pre-drilled diameter (mm)', type:'num', opt:false},
+    {p:'Q351', prompt:'Milling mode (+1 climb, -1 conventional)', type:'num', opt:false},
+    {p:'Q370', prompt:'Path overlap factor (× tool radius; 0 = automatic)', type:'num', opt:false},
   ]},
 
   'TOOL CALL':{title:'TOOL CALL — select tool', cmd:'TOOL CALL', fields:[

@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.70)
+- Cycle 208 now offers its full bore-milling parameter set, including `Q370`, and all supplied Cycle 208 programs and lessons include the path-overlap value.
+
 ## Unreleased test build (APP_VERSION 1.0.69)
 - Corrected decimal Tool Call feeds and `L ... FAUTO`, added the documented Cycle 208 `Q370` path overlap, and reject negative Cycle 209 `Q336` spindle angles.
 

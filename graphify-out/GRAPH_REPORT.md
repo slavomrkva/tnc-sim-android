@@ -1,16 +1,16 @@
 # Graph Report - tnc-sim-android-github-main-2026-07-17-6bddc4eb04  (2026-07-19)
 
 ## Corpus Check
-- 77 files · ~272,494 words
+- 77 files · ~272,875 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2476 nodes · 4461 edges · 162 communities (98 shown, 64 thin omitted)
+- 2483 nodes · 4468 edges · 168 communities (107 shown, 61 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.51)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fb96d705`
+- Built from commit: `0d9a01de`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,11 +42,11 @@
 - WebGL Parameter Management
 - Camera Projection Setup
 - CNC Parser Engine
-- Frustum and Plane Math
 - Geometry Normal Computation
 - Matrix3 Math
 - Render Object Lifecycle
 - Triangle Geometry Math
+- Buffer Attribute Transforms
 - Quaternion Interpolation
 - Bounding Box Math
 - Ray and Sphere Math
@@ -59,7 +59,6 @@
 - Render Target Setup
 - Ray Casting Math
 - Camera Ray Utilities
-- Animation Interpolant Update
 - Bounding Geometry Utils
 - Shadow Map Management
 - Keyframe Track Interpolation
@@ -77,7 +76,6 @@
 - Web App Manifest
 - Orbit Camera Controls
 - Vector Angle and Events
-- Scene Graph Management
 - Shape and Font Parsing
 - Radius Comp Tests
 - App Input Handling
@@ -125,7 +123,6 @@
 - Onboarding Flow
 - Mobile Tab Navigation
 - Ll
-- .setStyle
 - Copy Constructor Pair
 - tc
 - Asset Loader
@@ -133,7 +130,6 @@
 - ExampleUnitTest
 - capacitor.build.gradle
 - Module-split refactor — historical context
-- Clone Constructor Pair
 - ol
 - ai
 - .fromJSON
@@ -152,13 +148,18 @@
 - .equals
 - .findNode
 - Rl
+- Aa
+- ac
 - Ll
 - el
+- bind
+- Mh
 - ss
 - tc
+- .copyLinearToSRGB
 - tc
+- ti
 - Do
-- go
 - hs
 - Rs
 - setFromCamera
@@ -173,7 +174,7 @@
 7. `Ce` - 43 edges
 8. `tn` - 43 edges
 9. `ws()` - 42 edges
-10. `se` - 38 edges
+10. `TNC Sim (Android) — Release notes` - 39 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `selectCycle()` --references--> `CYCLES`  [EXTRACTED]
@@ -184,31 +185,27 @@
 ## Import Cycles
 - None detected.
 
-## Communities (162 total, 64 thin omitted)
+## Communities (168 total, 61 thin omitted)
 
 ### Community 0 - "Three.js Core Engine"
-Cohesion: 0.04
-Nodes (43): _allocateTargets(), _applyPMREM(), Ba, _blur(), $c(), _cleanup(), compileCubemapShader(), compileEquirectangularShader() (+35 more)
+Cohesion: 0.03
+Nodes (34): Ba, ci, compileCubemapShader(), compileEquirectangularShader(), _compileMaterial(), Da, er(), fs (+26 more)
 
 ### Community 1 - "WebGL Texture Binding"
 Cohesion: 0.03
-Nodes (29): Aa, br(), cr(), dr(), er(), fr(), gr(), Hi() (+21 more)
+Nodes (20): br(), cr(), dr(), fr(), gr(), hl, hr(), lr() (+12 more)
 
 ### Community 3 - "Code Editor Core"
 Cohesion: 0.07
 Nodes (37): _applyEditorFs(), applyFix(), applyNumericSign(), computeBlockNumbers(), deleteCurrentLine(), deleteLineN(), editorClear(), _editorConfirm() (+29 more)
 
 ### Community 7 - "Clock and Audio Analyzer"
-Cohesion: 0.08
-Nodes (4): bc, getInput(), getOutput(), Lc
+Cohesion: 0.07
+Nodes (5): bc, getInput(), getOutput(), ic, Lc
 
 ### Community 8 - "Learn Tutorial System"
 Cohesion: 0.06
 Nodes (23): closeLearn(), learnBackToList(), learnCheck(), _learnCycleBlocks(), _learnEndEditorInput(), learnEvalChecks(), _learnExecutableCode(), learnExit() (+15 more)
-
-### Community 9 - "Spherical Harmonics Math"
-Cohesion: 0.14
-Nodes (3): bl, dc, mc()
 
 ### Community 10 - "Tool Table Management"
 Cohesion: 0.11
@@ -216,7 +213,7 @@ Nodes (28): buildToolIntoGroup(), calcToolTimes(), effectiveToolRadius(), field(
 
 ### Community 11 - "3D Object Transforms"
 Cohesion: 0.10
-Nodes (16): co(), eo(), ho(), io(), ja(), ka(), no(), oo() (+8 more)
+Nodes (18): ao(), co(), eo(), ho(), io(), ja(), ka(), lo() (+10 more)
 
 ### Community 12 - "Asset Loading Pipeline"
 Cohesion: 0.06
@@ -251,12 +248,24 @@ Cohesion: 0.17
 Nodes (11): background_color, description, display, icons, id, name, orientation, screenshots (+3 more)
 
 ### Community 31 - "Triangle Geometry Math"
-Cohesion: 0.06
-Nodes (19): Ah, ao(), ar(), ci, cl, en, gn(), ir() (+11 more)
+Cohesion: 0.11
+Nodes (3): Ah, bo, setFromCamera()
+
+### Community 32 - "Buffer Attribute Transforms"
+Cohesion: 0.21
+Nodes (3): dc, mc(), pc
 
 ### Community 33 - "Quaternion Interpolation"
 Cohesion: 0.05
 Nodes (23): appSource, assert, before, boundaryDirty, BufferAttribute, BufferGeometry, chunkTriangles, compatibilityMesh (+15 more)
+
+### Community 34 - "Bounding Box Math"
+Cohesion: 0.18
+Nodes (3): jo, wo, xo
+
+### Community 35 - "Ray and Sphere Math"
+Cohesion: 0.10
+Nodes (3): fa, Ga, jt()
 
 ### Community 36 - "Raycaster Intersection"
 Cohesion: 0.18
@@ -275,16 +284,20 @@ Cohesion: 0.06
 Nodes (32): 0. The app is ALWAYS single-column/mobile — never desktop side-by-side, 10. `www/index.html` is now split into `core/`/`android/` modules — see "Module map" above, 11. Drop the editor's bottom-tab reservation while the keyboard is open, 12. Resize the 3D renderer from the render loop, not only on window 'resize', 13. The bottom tab bar must NOT animate (no transform transition), 14. Bug lifecycle: TODO.md while open (log every attempt), BUG_HISTORY.md when fixed, 15. Chunked voxel meshing and Android memory limits, 16. Q-value fallbacks must treat 0 as valid (+24 more)
 
 ### Community 40 - "Animation Parsing Utils"
-Cohesion: 0.06
-Nodes (19): bo, ei, fi(), gi(), hl, i(), Mh, mi() (+11 more)
+Cohesion: 0.07
+Nodes (17): ar(), ds(), ei, en, gi(), ir(), li(), mi() (+9 more)
 
 ### Community 41 - "Bone Transform Updates"
 Cohesion: 0.18
 Nodes (10): appSource, assert, completedProblems, context, fs, liveProblems, path, qPanelSource (+2 more)
 
 ### Community 42 - "Render Target Setup"
-Cohesion: 0.07
-Nodes (11): bind(), ds(), ge, getValue(), mt(), pc, ps(), setValue() (+3 more)
+Cohesion: 0.12
+Nodes (8): $c(), ge, intersectObject(), intersectObjects(), Kc(), mt(), sl, _t
+
+### Community 43 - "Ray Casting Math"
+Cohesion: 0.08
+Nodes (3): Ea(), re, rh
 
 ### Community 46 - "Bounding Geometry Utils"
 Cohesion: 0.33
@@ -303,20 +316,20 @@ Cohesion: 0.28
 Nodes (15): _bugArea(), _bugBuildBody(), _bugContext(), _bugGetToken(), _bugPrefill(), _bugRenderTurnstile(), bugSetKind(), _bugSetStatus() (+7 more)
 
 ### Community 51 - "Geometry Transform Helpers"
-Cohesion: 0.11
-Nodes (4): as(), copy(), Ll, setFromCamera()
+Cohesion: 0.12
+Nodes (3): as(), copy(), ec
 
 ### Community 52 - "Buffer Geometry Groups"
 Cohesion: 0.22
 Nodes (4): assert, fs, source, vm
 
+### Community 53 - "Curve Path Building"
+Cohesion: 0.06
+Nodes (5): il(), Ll, ml, nl, Rl
+
 ### Community 54 - "PMREM Texture Processing"
 Cohesion: 0.18
 Nodes (16): afterBoot(), attachErrorButton(), buildReloadUrl(), cleanupLegacyAutomaticMode(), isAndroidApp(), modeLabel(), modeRequestedByUrl(), readMode() (+8 more)
-
-### Community 55 - "Skeleton Management"
-Cohesion: 0.14
-Nodes (3): fh, la, oi()
 
 ### Community 57 - "3D Scene Rendering"
 Cohesion: 0.06
@@ -330,10 +343,6 @@ Nodes (7): draw2dFull(), onResize(), resize2d(), resizeToDisplay(), sc2d(), swit
 Cohesion: 0.22
 Nodes (12): advance(), placeTool(), segSpeed(), shouldHoldVisibleSegment(), vxBuildGeometryRange(), vxBuildMesh(), vxCut(), vxDisposeObject() (+4 more)
 
-### Community 60 - "Web App Manifest"
-Cohesion: 0.08
-Nodes (3): ai, ht(), Ne
-
 ### Community 61 - "Orbit Camera Controls"
 Cohesion: 0.18
 Nodes (9): assert, classList, context, elements, fs, overlayClasses, path, source (+1 more)
@@ -343,8 +352,8 @@ Cohesion: 0.14
 Nodes (11): assert, first, fs, index, local, path, restarted, root (+3 more)
 
 ### Community 64 - "Shape and Font Parsing"
-Cohesion: 0.14
-Nodes (11): assert, context, firstCycle208, fs, html, parserSource, path, playbackSource (+3 more)
+Cohesion: 0.11
+Nodes (15): appSource, assert, context, cycle208Builder, cycle208Table, cycleTableSource, firstCycle208, fs (+7 more)
 
 ### Community 65 - "Radius Comp Tests"
 Cohesion: 0.24
@@ -362,13 +371,13 @@ Nodes (5): ensurePrepared(), onReset(), onRun(), onStep(), prepare()
 Cohesion: 0.39
 Nodes (7): CYCLES, closeCtxPanel(), closeCyclePicker(), openCyclePicker(), selectCycle(), showCycleList(), showCycleParams()
 
+### Community 71 - "2D Path Drawing"
+Cohesion: 0.12
+Nodes (3): la, parseObject(), parseTextures()
+
 ### Community 73 - "String Utility Helpers"
 Cohesion: 0.33
 Nodes (5): Documentation budget, graphify, Non-negotiables, Start of every session, TNC Sim Android
-
-### Community 75 - "Xn"
-Cohesion: 0.18
-Nodes (4): an, Ea(), ln, mn
 
 ### Community 76 - "M-Code Panel UI"
 Cohesion: 0.42
@@ -381,6 +390,10 @@ Nodes (6): closeQPopup(), openQParamPanel(), openQPopup(), qPanelConfirm(), qPan
 ### Community 78 - "Path Curve Building"
 Cohesion: 0.36
 Nodes (11): _coachEnsureTabFor(), _coachMarkSeen(), _coachPaint(), _coachSeen(), _coachTarget(), learnCoachEnd(), learnCoachMaybeStart(), learnCoachNext() (+3 more)
+
+### Community 79 - "Line Geometry Utils"
+Cohesion: 0.11
+Nodes (17): _allocateTargets(), _applyPMREM(), _blur(), cl, _cleanup(), fh, fromCubemap(), fromEquirectangular() (+9 more)
 
 ### Community 80 - "Instanced Mesh Management"
 Cohesion: 0.25
@@ -400,10 +413,10 @@ Nodes (6): Current non-obvious invariants, Edit, build, and release, Product and
 
 ### Community 88 - "Property Binding Values"
 Cohesion: 0.07
-Nodes (13): ca, el, fo(), hh, Jr(), li(), _o, os() (+5 more)
+Nodes (10): ca, el, fo(), mo(), _o, os(), po, qc (+2 more)
 
 ### Community 91 - "README.md"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (14): angleCode, angleMatch, appSource, assert, completeMatch, context, fs, indexHtml (+6 more)
 
 ### Community 92 - "build.gradle"
@@ -413,10 +426,6 @@ Nodes (8): assert, chamfer, context, fs, intro, path, root, vm
 ### Community 94 - "Help Popup UI"
 Cohesion: 0.60
 Nodes (3): hideHelpPopup(), openHelp(), toggleKpHelp()
-
-### Community 96 - ".getCamera"
-Cohesion: 0.13
-Nodes (4): Da, parseObject(), xs, ys
 
 ### Community 97 - "Android Unit Test"
 Cohesion: 0.40
@@ -431,8 +440,8 @@ Cohesion: 1.00
 Nodes (3): _synEscHtml(), _synHighlightLine(), _synLineWithColor()
 
 ### Community 102 - "Clone Constructor Update Pattern"
-Cohesion: 0.08
-Nodes (5): gl, qn, _s(), updateMatrixWorld(), Yl
+Cohesion: 0.12
+Nodes (4): gl, _s(), updateMatrixWorld(), Yl
 
 ### Community 103 - "UV and Matrix Transforms"
 Cohesion: 0.18
@@ -451,8 +460,8 @@ Cohesion: 0.25
 Nodes (7): Build, Disclaimer, License, Project layout, Status, TNC Sim — Android app, What it does
 
 ### Community 113 - "Ll"
-Cohesion: 0.09
-Nodes (7): _a, bs, dispose(), Et, ft(), Tt, ws()
+Cohesion: 0.07
+Nodes (12): _a, bs, dispose(), Et, ft(), ni, pi(), Tt (+4 more)
 
 ### Community 115 - "Copy Constructor Pair"
 Cohesion: 0.83
@@ -464,15 +473,15 @@ Nodes (3): 2026-07-17 — ported mobile numeric editing and TNC 640 RL/RR correc
 
 ### Community 117 - "Asset Loader"
 Cohesion: 0.05
-Nodes (38): 1.0.1 (versionCode 2), 1.0.2 (versionCode 3), 1.0.3 (versionCode 4), 1.0.4 (versionCode 5), 1.0 (versionCode 1), Diagnostic test build (APP_VERSION 1.0.49), Diagnostic test build (APP_VERSION 1.0.50), Diagnostic test build (APP_VERSION 1.0.51) (+30 more)
+Nodes (39): 1.0.1 (versionCode 2), 1.0.2 (versionCode 3), 1.0.3 (versionCode 4), 1.0.4 (versionCode 5), 1.0 (versionCode 1), Diagnostic test build (APP_VERSION 1.0.49), Diagnostic test build (APP_VERSION 1.0.50), Diagnostic test build (APP_VERSION 1.0.51) (+31 more)
 
 ### Community 118 - "uc"
 Cohesion: 0.67
 Nodes (3): Accepted fix and verification, C19 — CALL LBL status was blank in the 3D simulation, Symptom and root cause
 
 ### Community 123 - "ol"
-Cohesion: 0.07
-Nodes (16): bindSkeletons(), ic, il(), load(), oc, ol, parse(), parseAnimations() (+8 more)
+Cohesion: 0.06
+Nodes (16): bindSkeletons(), dl, i(), load(), oc, ol, parse(), parseAnimations() (+8 more)
 
 ### Community 124 - "ai"
 Cohesion: 0.67
@@ -488,7 +497,7 @@ Nodes (5): assert, ctx, harness, inProgress, unfitCorner
 
 ### Community 136 - "Module-split refactor — historical context"
 Cohesion: 0.06
-Nodes (32): APP_VERSION 1.0.37 — documentation damage control, APP_VERSION 1.0.38 — machining demos and accepted web ports, APP_VERSION 1.0.41 — adaptive Android WebGL compatibility, APP_VERSION 1.0.42 — accepted Learn audit port, APP_VERSION 1.0.43 — accepted shorter tutorial port, APP_VERSION 1.0.44 — Tool Table workflow hardening, APP_VERSION 1.0.45 — HEIDENHAIN cycle, cutting and validator corrections, APP_VERSION 1.0.46 — first tutorial orientation lesson (+24 more)
+Nodes (33): APP_VERSION 1.0.37 — documentation damage control, APP_VERSION 1.0.38 — machining demos and accepted web ports, APP_VERSION 1.0.41 — adaptive Android WebGL compatibility, APP_VERSION 1.0.42 — accepted Learn audit port, APP_VERSION 1.0.43 — accepted shorter tutorial port, APP_VERSION 1.0.44 — Tool Table workflow hardening, APP_VERSION 1.0.45 — HEIDENHAIN cycle, cutting and validator corrections, APP_VERSION 1.0.46 — first tutorial orientation lesson (+25 more)
 
 ### Community 143 - "sim-run-resets-workpiece.test.js"
 Cohesion: 0.25
@@ -518,25 +527,33 @@ Nodes (3): C5 — Editor text passed behind mobile control panels, Root cause an
 Cohesion: 0.67
 Nodes (3): C6 — Measure panel overlapped the mobile BLKFORM control, Root cause and fix, Symptom
 
+### Community 158 - "tc"
+Cohesion: 0.13
+Nodes (12): constructor(), fi(), $h(), hh, Kh(), qh(), setDirection(), setLength() (+4 more)
+
+### Community 159 - "ti"
+Cohesion: 0.25
+Nodes (3): setValue(), Si(), ti
+
 ## Knowledge Gaps
-- **384 isolated node(s):** `name`, `version`, `description`, `main`, `test` (+379 more)
+- **390 isolated node(s):** `name`, `version`, `description`, `main`, `test` (+385 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **61 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `St` connect `3D Vector Math` to `Three.js Core Engine`, `Buffer Attribute Transforms`, `Vector3 Operations`, `Geometry Transform Helpers`, `Curve Length Mapping`, `Frustum and Plane Math`?**
-  _High betweenness centrality (0.046) - this node is a cross-community bridge._
-- **Why does `copy()` connect `Geometry Transform Helpers` to `Three.js Core Engine`, `WebGL Texture Binding`, `Quaternion Math Operations`, `zo`, `Spherical Harmonics Math`, `.updateMatrices`, `3D Object Transforms`, `Skeleton Bone Binding`, `.scale`, `Object Cloning Utilities`, `Buffer Attribute Management`, `Scene Object Traversal`, `Buffer Geometry Arrays`, `Camera Projection Setup`, `Frustum and Plane Math`, `tc`, `Triangle Geometry Math`, `Buffer Attribute Transforms`, `Do`, `go`, `Ray and Sphere Math`, `hs`, `Rs`, `Animation Parsing Utils`, `setFromCamera`, `Render Target Setup`, `Ray Casting Math`, `Camera Ray Utilities`, `Skeleton Management`, `Curve Length Mapping`, `Web App Manifest`, `Scene Graph Management`, `Buffer Attribute Data`, `LOD Object Parsing`, `Line3 Geometry Math`, `Xn`, `Line Geometry Utils`, `.multiplyMatrices`, `Rl`, `Property Binding Values`, `.equals`, `Quadratic Bezier Curve`, `Euler Rotation Clone`, `.getCamera`, `Clone Constructor Update Pattern`, `.getNormalMatrix`, `.computeBoundingBox`, `Ll`, `.setStyle`, `Clone Constructor Pair`, `.fromJSON`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
-- **Why does `vt` connect `WebGL Texture Binding` to `Three.js Core Engine`, `Vector3 Operations`, `Clock and Audio Analyzer`, `Skeleton Bone Binding`, `Buffer Attribute Management`, `Frustum and Plane Math`, `Triangle Geometry Math`, `Buffer Attribute Transforms`, `Bounding Box Math`, `Ray and Sphere Math`, `Animation Parsing Utils`, `Render Target Setup`, `Geometry Transform Helpers`, `Curve Path Building`, `Skeleton Management`, `Curve Length Mapping`, `LOD Object Parsing`, `Property Binding Values`, `Ll`, `.setStyle`, `ol`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `St` connect `3D Vector Math` to `Three.js Core Engine`, `Buffer Geometry Arrays`, `Frustum and Plane Math`, `Scene Graph Management`, `Triangle Geometry Math`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Why does `vt` connect `WebGL Texture Binding` to `Three.js Core Engine`, `Clock and Audio Analyzer`, `Skeleton Bone Binding`, `Buffer Attribute Management`, `Aa`, `Buffer Geometry Arrays`, `Frustum and Plane Math`, `tc`, `ti`, `Triangle Geometry Math`, `Ray and Sphere Math`, `Animation Parsing Utils`, `Geometry Transform Helpers`, `Curve Path Building`, `Skeleton Management`, `Scene Graph Management`, `LOD Object Parsing`, `Property Binding Values`, `Ll`, `ol`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `At` connect `Quaternion Math Operations` to `Three.js Core Engine`, `.getCamera`, `Object Cloning Utilities`, `Ll`, `Buffer Geometry Arrays`, `Quadratic Bezier Curve`, `Triangle Geometry Math`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `description` to the rest of the system?**
-  _384 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _390 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Three.js Core Engine` be split into smaller, more focused modules?**
-  _Cohesion score 0.03555686159271231 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.034782608695652174 - nodes in this community are weakly interconnected._
 - **Should `WebGL Texture Binding` be split into smaller, more focused modules?**
-  _Cohesion score 0.028971028971028972 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0289738430583501 - nodes in this community are weakly interconnected._
 - **Should `Quaternion Math Operations` be split into smaller, more focused modules?**
-  _Cohesion score 0.10344827586206896 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06377551020408163 - nodes in this community are weakly interconnected._
