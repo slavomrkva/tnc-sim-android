@@ -7,6 +7,22 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.70 — expose Q370 throughout Cycle 208
+
+- Replaced the incomplete Cycle 208 builder with the full bore-milling
+  parameter set and exposed `Q370` in both cycle insertion paths.
+- Added `Q370=+1` to every supplied Cycle 208 demo, Complete Part program and
+  applicable Learn example, starter, solution and check.
+- Added regressions that require the form definition and every shipped Cycle
+  208 demo block to contain Q370.
+
+## APP_VERSION 1.0.69 — documented feed and cycle semantics
+
+- Ported the web parser fix that preserves decimal `TOOL CALL F`, makes
+  ordinary `L ... FAUTO` use that feed, implements Cycle 208 `Q370`, and
+  restricts Cycle 209 `Q336` to `0...360` degrees.
+- Added matching Android parser regressions for all four confirmed failures.
+
 ## APP_VERSION 1.0.68 — current Android and Play Store icon set
 
 - Replaced every legacy, round and adaptive launcher density with the current

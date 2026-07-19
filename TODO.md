@@ -8,6 +8,27 @@
 
 ## Open bugs
 
+## C22 — Cutting-logic reference failures in feeds and fixed cycles
+**Reported:** 2026-07-19. **Repro:** run the offline cutting-logic reference and
+the focused parser cycle regression against GitHub `main`.
+### Symptom
+Decimal `TOOL CALL F` values were truncated; `L ... FAUTO` retained the prior
+modal numeric feed instead of using the active Tool Call feed; Cycle 208 ignored
+documented `Q370`; and Cycle 209 accepted negative `Q336` although the documented
+range is `0...360` degrees.
+### Attempts
+- Attempt 1 — traced all four failures to the shared parser and verified the
+  applicable TNC 640 rules in the locked offline manuals.
+- Attempt 2 — ported the corrected web parser semantics and matching focused
+  regressions into the Android `www/core` implementation.
+- Attempt 3 — exposed the complete Cycle 208 parameter set, including Q370, in
+  both insertion interfaces and added Q370 to every supplied Cycle 208 demo and
+  applicable Learn program in Android APP_VERSION 1.0.70 and web v0.890.
+### Status
+Implemented in Android APP_VERSION 1.0.70 together with web v0.890. Automated
+verification is in progress; keep open until both repository changes and a
+real simulator/device run are accepted.
+
 ## V1 — Verify the new one-click Bug Report / Suggestion in the app
 **Added:** 2026-07-18. **Repro:** APP_VERSION 1.0.64, on a real device with
 network. This is a verification task, not a bug — no defect is known yet.
