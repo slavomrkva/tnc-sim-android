@@ -12,6 +12,10 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.66)
+- Unified the light and dark themes with consistent neutral grays, teal actions and amber highlights; the 3D view, scrollbars and toolbar controls now match the same visual style.
+- The one-click report dialog now explains its privacy behavior and the basic technical diagnostics it sends in a calmer, clearer way.
+
 ## Unreleased
 - New one-click bug report: pick "Report a problem" or "Suggest improvement", optionally add a note, and tap Send — a public GitHub issue is opened for you, no GitHub account needed. Bug reports attach the current program, version and device details; suggestions attach only basic context (no program). A clear warning explains the report becomes a public GitHub issue.
 
