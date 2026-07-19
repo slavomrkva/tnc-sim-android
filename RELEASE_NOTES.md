@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.67)
+- After a report or suggestion is posted, the send button becomes Close instead of allowing the same item to be submitted again.
+
 ## Unreleased test build (APP_VERSION 1.0.66)
 - Unified the light and dark themes with consistent neutral grays, teal actions and amber highlights; the 3D view, scrollbars and toolbar controls now match the same visual style.
 - The one-click report dialog now explains its privacy behavior and the basic technical diagnostics it sends in a calmer, clearer way.
