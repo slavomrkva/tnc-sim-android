@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.64';
+var APP_VERSION = '1.0.65';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';

@@ -1,5 +1,5 @@
 // bug-report -- ANDROID app copy. Diverges from the old shared version on
-// purpose: it posts to the tncsim.org /api/report Cloudflare Pages Function so
+// purpose: it posts to the tncsim.org /api/report Cloudflare Worker so
 // the app can open a public GitHub issue without the visitor having a GitHub
 // account. The WebView runs at https://localhost, so the endpoint is the
 // ABSOLUTE tncsim.org URL (a relative "/api/report" would hit localhost).

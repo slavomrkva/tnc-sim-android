@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.65 — production Turnstile Site Key
+
+- Replaced Cloudflare's always-pass test Site Key with the real public Site Key
+  for the shared Invisible `tncsim.org`/`localhost` widget. It matches web
+  v0.884; the private Turnstile and GitHub secrets remain outside both
+  repositories as encrypted Cloudflare Worker secrets.
+- Updated the Android endpoint documentation from the unused Pages Function to
+  the Worker implementation in web PR #19. Device verification remains open in
+  V1 until the Worker is merged and configured.
+
 ## APP_VERSION 1.0.63 — Prepare Play Closed testing release 1.0.4 (code 5)
 
 - Bumps the Play identifiers from versionName 1.0.3 / versionCode 4 to 1.0.4 /

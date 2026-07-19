@@ -25,14 +25,15 @@ be built; the live Turnstile + network round-trip needs a device).
   must include it plus version/device/validator/area/JS-error context.
 - Confirm graceful errors when offline / verification unavailable.
 ### Prerequisites (server-side, one-time)
-- Cloudflare Pages secrets `GITHUB_TOKEN` + `TURNSTILE_SECRET_KEY` set and
-  deployed.
-- Real Turnstile site key in `www/android/turnstile-config.js` (currently the
-  test placeholder), matching the website key, with `localhost` added as an
-  allowed widget hostname so the WebView can obtain a token.
+- Cloudflare Worker deployment from web PR #19, with encrypted
+  `GITHUB_TOKEN` + `TURNSTILE_SECRET_KEY` secrets set and deployed.
+- Real Turnstile Site Key is installed in `www/android/turnstile-config.js`,
+  matching the website key. The widget must keep `localhost` as an allowed
+  hostname so the WebView can obtain a token.
 ### Status
-Open until verified on a device. Cross-repo: the website endpoint shipped in
-`slavomrkva/tnc-sim` (see its changelog v0.882); setup in that repo's
+APP_VERSION 1.0.65 contains the production public Site Key. Keep open until the
+Worker is merged/configured and the complete flow is verified on a device.
+Cross-repo setup lives in `slavomrkva/tnc-sim` PR #19 and its
 `docs/bug-report-setup.md`.
 
 ## C18 — HEIDENHAIN cycles, compensated cutting and validator audit
