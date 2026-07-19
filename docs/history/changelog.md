@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.67 — close the report dialog after success
+
+- After a bug report or suggestion is posted, the send button becomes Close.
+  Closing it cannot submit the same item again, and reopening the dialog
+  restores the appropriate send action.
+
 ## APP_VERSION 1.0.66 — unified color identity
 
 - Ported the web palette unification to Android: cool-neutral light and dark
