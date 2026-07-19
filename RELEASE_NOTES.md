@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.68)
+- Updated the Android launcher, round and themed icons to the current TNC Sim design.
+
 ## Unreleased test build (APP_VERSION 1.0.67)
 - After a report or suggestion is posted, the send button becomes Close instead of allowing the same item to be submitted again.
 
