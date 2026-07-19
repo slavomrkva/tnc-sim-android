@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.69 — documented feed and cycle semantics
+
+- Ported the web parser fix that preserves decimal `TOOL CALL F`, makes
+  ordinary `L ... FAUTO` use that feed, implements Cycle 208 `Q370`, and
+  restricts Cycle 209 `Q336` to `0...360` degrees.
+- Added matching Android parser regressions for all four confirmed failures.
+
 ## APP_VERSION 1.0.68 — current Android and Play Store icon set
 
 - Replaced every legacy, round and adaptive launcher density with the current

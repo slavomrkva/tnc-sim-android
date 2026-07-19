@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.69)
+- Corrected decimal Tool Call feeds and `L ... FAUTO`, added the documented Cycle 208 `Q370` path overlap, and reject negative Cycle 209 `Q336` spindle angles.
+
 ## Unreleased test build (APP_VERSION 1.0.68)
 - Updated the Android launcher, round and themed icons to the current TNC Sim design.
 
