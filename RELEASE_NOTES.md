@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.73)
+- Closing a lesson now immediately returns the editor to the saved main program state; the stale “Lesson — changes are not saved” message no longer remains until tabs are switched.
+
 ## Unreleased test build (APP_VERSION 1.0.72)
 - The bottom navigation now shows a clear play icon and the label **Simulate** for the 3D simulation screen.
 

@@ -7,6 +7,14 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.73 — resume autosave when closing practice
+
+- Ported the shared Learn close fix: the practice close button now uses the
+  complete shutdown path, clears `LEARN.open` and resumes main-program
+  autosave immediately instead of waiting for a tab round trip.
+- Added the matching regression and recorded the cross-repository device
+  verification item.
+
 ## APP_VERSION 1.0.72 — clearer simulation tab
 
 - Replaced the cube icon and `3D` label in the Android bottom navigation with
