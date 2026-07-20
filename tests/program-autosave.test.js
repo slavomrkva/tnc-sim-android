@@ -42,7 +42,7 @@ function boot(options = {}){
     sessionStorage,
     Date,
     JSON,
-    setTimeout(fn){ timers.push(fn); return timers.length; },
+    setTimeout(fn, delay){ fn.delay = delay; timers.push(fn); return timers.length; },
     clearTimeout(){},
     document:{
       visibilityState:'visible',
@@ -60,7 +60,11 @@ function boot(options = {}){
 const typed = boot({docName:'part.H'});
 typed.codeEl.value = 'BEGIN PGM PART MM\nEND PGM PART MM';
 typed.codeEvents.input();
-assert.strictEqual(typed.status.state, 'unsaved');
+assert.strictEqual(typed.status.state, 'pending');
+assert.strictEqual(typed.timers[0].delay, 30000);
+typed.codeEl.value = 'BEGIN PGM PART MM\nL X+20\nEND PGM PART MM';
+typed.codeEvents.input();
+assert.strictEqual(typed.timers.length, 1, 'continuous typing must not postpone the scheduled save');
 typed.timers.shift()();
 const payload = JSON.parse(typed.localStorage.value('tncsim.programDraft.v1'));
 assert.strictEqual(payload.code, typed.codeEl.value);
@@ -139,5 +143,8 @@ assert.ok(appSource.indexOf('initProgramAutosave()') < appSource.indexOf('restor
 const indexSource = fs.readFileSync(path.join(root, 'www', 'index.html'), 'utf8');
 assert.match(indexSource, /id="programAutosaveStatus"/);
 assert.match(indexSource, /core\/program-autosave\.js/);
+const stylesSource = fs.readFileSync(path.join(root, 'www', 'android', 'styles.css'), 'utf8');
+assert.match(stylesSource, /data-state="pending"[^}]*color:var\(--text3\)/);
+assert.match(stylesSource, /data-state="error"[^}]*color:var\(--accent-warm\)/);
 
 console.log('program-autosave.test.js: Android draft persistence and Learn isolation verified');

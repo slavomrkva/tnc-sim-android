@@ -18,9 +18,13 @@ are not saved. Switching to Simulate and back finally changes it to Saved.
 - Attempt 1 — the web preview traced this to the practice close button calling
   partial `learnExit()` while `LEARN.open` remained true. Ported its complete
   `closeLearn()` handler and matching regression to Android APP_VERSION 1.0.73.
+- Attempt 2 — user testing found the 700 ms green/orange alternation distracting
+  while typing. Android APP_VERSION 1.0.74 now schedules one write within 30
+  seconds, uses a neutral pending state and reserves orange for a real storage
+  error, matching web v0.893.
 ### Status
-Automated web and Android verification passes. Keep open until the corrected
-preview and APK are accepted on their real target devices.
+Automated web and Android verification is in progress. Keep open until the
+corrected preview and APK are accepted on their real target devices.
 
 ## C22 — Cutting-logic reference failures in feeds and fixed cycles
 **Reported:** 2026-07-19. **Repro:** run the offline cutting-logic reference and

@@ -127,7 +127,10 @@ The detailed module-split rationale is in
 21. **Autosave protects only the main program:** persist the current NC code,
     document name and save time in the app-private
     `tncsim.programDraft.v1` WebView record, restore it before normal editor
-    boot, and surface unsaved/saving/saved/error state in the editor header.
+    boot, and surface neutral pending/saving, green saved and orange error state
+    in the editor header. Schedule at most one write 30 seconds after the first
+    pending change, without postponing it on further typing; lifecycle hiding
+    still flushes immediately.
     Entering Learn must first force-save the main program and then suspend
     autosave; lesson code is transient and closing Learn restores the main
     draft. A process or Compatibility-mode reload during Learn must ignore

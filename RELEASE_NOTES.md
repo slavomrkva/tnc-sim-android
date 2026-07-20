@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.74)
+- Autosave now writes at most every 30 seconds while typing. Pending changes use a quiet neutral status; orange is reserved for an actual save problem.
+
 ## Unreleased test build (APP_VERSION 1.0.73)
 - Closing a lesson now immediately returns the editor to the saved main program state; the stale “Lesson — changes are not saved” message no longer remains until tabs are switched.
 

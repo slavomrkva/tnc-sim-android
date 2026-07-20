@@ -7,6 +7,14 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.74 — calmer 30-second autosave cadence
+
+- Ported the shared throttled autosave: one write is scheduled 30 seconds after
+  the first pending change and continuous typing no longer postpones it;
+  lifecycle hiding still flushes immediately.
+- Pending/saving states are neutral gray, saved/restored stay green and actual
+  storage failures are orange. Expanded timing and styling regressions.
+
 ## APP_VERSION 1.0.73 — resume autosave when closing practice
 
 - Ported the shared Learn close fix: the practice close button now uses the
