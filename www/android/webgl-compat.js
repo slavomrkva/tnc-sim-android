@@ -138,6 +138,7 @@
       var code = global.document.getElementById('code');
       var state = {
         code:code ? code.value : null,
+        docName:typeof global._docName === 'string' ? global._docName : null,
         selectionStart:code && typeof code.selectionStart === 'number' ? code.selectionStart : 0,
         selectionEnd:code && typeof code.selectionEnd === 'number' ? code.selectionEnd : 0,
         tab:global.document.body ? global.document.body.getAttribute('data-mtab') : 'editor',
@@ -155,6 +156,9 @@
       restoredState = JSON.parse(raw);
       if(code && typeof restoredState.code === 'string'){
         code.value = restoredState.code;
+        if(typeof restoredState.docName === 'string' && typeof global._setDocName === 'function'){
+          global._setDocName(restoredState.docName);
+        }
         var end = code.value.length;
         code.selectionStart = Math.min(restoredState.selectionStart || 0, end);
         code.selectionEnd = Math.min(restoredState.selectionEnd || 0, end);

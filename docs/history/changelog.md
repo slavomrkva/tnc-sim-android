@@ -7,6 +7,17 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.71 — local program autosave with Learn isolation
+
+- Added a debounced app-private draft containing the NC code, document name
+  and save time, with immediate lifecycle flushing and visible
+  unsaved/saving/saved, restored and error states.
+- Learn now force-saves and suspends the main draft before replacing the
+  editor. Lesson work stays transient through Finish; exit, process restart
+  and Compatibility-mode reload recover the stored main program instead.
+- Added focused persistence, lifecycle, Learn-isolation and transient-reload
+  regressions.
+
 ## APP_VERSION 1.0.70 — expose Q370 throughout Cycle 208
 
 - Replaced the incomplete Cycle 208 builder with the full bore-milling

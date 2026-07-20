@@ -124,6 +124,14 @@ The detailed module-split rationale is in
     writer and app.js seeds it with the starter demo. Do not revert the header
     to `_progFileName(code)` — every demo/imported file uses `BEGIN PGM PROGRAM`
     internally, so parsing the body always yields `PROGRAM.H`.
+21. **Autosave protects only the main program:** persist the current NC code,
+    document name and save time in the app-private
+    `tncsim.programDraft.v1` WebView record, restore it before normal editor
+    boot, and surface unsaved/saving/saved/error state in the editor header.
+    Entering Learn must first force-save the main program and then suspend
+    autosave; lesson code is transient and closing Learn restores the main
+    draft. A process or Compatibility-mode reload during Learn must ignore
+    transient lesson text and recover the main draft.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

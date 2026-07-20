@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.70';
+var APP_VERSION = '1.0.71';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -1441,8 +1441,14 @@ var measureRaycaster = null;
 
 
 // ---------- boot ----------
+if(typeof initProgramAutosave === 'function') initProgramAutosave();
 var _androidWebGLCompat = window.AndroidWebGLCompat || null;
-if(_androidWebGLCompat) _androidWebGLCompat.restoreSessionState(codeEl);
+if(_androidWebGLCompat){
+  var _ignoreTransientLearnCode = typeof programAutosaveWasInterruptedInLearn === 'function'
+    && programAutosaveWasInterruptedInLearn();
+  _androidWebGLCompat.restoreSessionState(_ignoreTransientLearnCode ? null : codeEl);
+  if(typeof programAutosaveChanged === 'function') programAutosaveChanged();
+}
 if(VX_COMPAT_MODE && typeof setQuality === 'function'){
   setQuality(0);
 }

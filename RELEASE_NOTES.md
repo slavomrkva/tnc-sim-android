@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.71)
+- The current NC program is now saved automatically on this device and restored after the app is reopened. The editor shows the save state; lesson exercises remain temporary and never overwrite the saved main program.
+
 ## Unreleased test build (APP_VERSION 1.0.70)
 - Cycle 208 now offers its full bore-milling parameter set, including `Q370`, and all supplied Cycle 208 programs and lessons include the path-overlap value.
 

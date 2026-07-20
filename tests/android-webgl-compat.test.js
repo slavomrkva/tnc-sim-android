@@ -52,7 +52,7 @@ function environment(local, session, options = {}){
   const toasts = [];
   const timers = [];
   const code = domElement('textarea');
-  code.value = 'BEGIN PGM TEST';
+  code.value = options.code || 'BEGIN PGM TEST';
   code.selectionStart = 2;
   code.selectionEnd = 4;
   const toggle = domElement('button');
@@ -91,11 +91,13 @@ function environment(local, session, options = {}){
     location,
     document,
     curView:'3d',
+    _docName:options.docName || 'part.H',
     show3DError:message => errors.push(message),
     _toast:message => toasts.push(message),
     setTimeout(fn){ timers.push(fn); return timers.length; },
     clearTimeout(){}
   };
+  window._setDocName = name => { window._docName = name; };
   window.window = window;
   vm.runInNewContext(source, {window});
   return {window, document, elements, toggle, navigations, errors, toasts, timers};
@@ -127,6 +129,12 @@ assert.strictEqual(normalLocal.getItem('tncSimWebglCompatibilityModeV1'), '1');
 assert.strictEqual(normal.navigations.length, 1);
 assert.match(normal.navigations[0].target, /tncWebglCompat=1/);
 assert.ok(normalSession.getItem('tncSimWebglReloadStateV1'));
+const reloadState = JSON.parse(normalSession.getItem('tncSimWebglReloadStateV1'));
+assert.strictEqual(reloadState.docName, 'part.H');
+const reloaded = environment(normalLocal, normalSession, {code:'DEFAULT CODE', docName:'program.H'});
+reloaded.window.AndroidWebGLCompat.restoreSessionState(reloaded.elements.get('code'));
+assert.strictEqual(reloaded.elements.get('code').value, 'BEGIN PGM TEST');
+assert.strictEqual(reloaded.window._docName, 'part.H');
 
 // A manually remembered mode starts the proven WebGL1/DPR1 renderer.
 const remembered = environment(normalLocal, storage());
@@ -222,7 +230,7 @@ assert.ok(compatibilityToggleIndex < viewAreaIndex,
 assert.doesNotMatch(index.slice(viewAreaIndex), /id="compatModeToggle"/);
 assert.match(index, /id="simulationSettingsPanel"[^>]*hidden/);
 assert.match(render3d, /AndroidWebGLCompat\.attachErrorButton\(box\)/);
-assert.match(app, /var APP_VERSION = '1\.0\.70';/);
+assert.match(app, /var APP_VERSION = '1\.0\.71';/);
 assert.match(app, /var VX_COMPAT_MODE = !!\(window\.AndroidWebGLCompat/);
 assert.match(app, /VX_RES_LEVELS = \[50, 75, 100\]/);
 
