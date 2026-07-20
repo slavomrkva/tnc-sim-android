@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.72 — clearer simulation tab
+
+- Replaced the cube icon and `3D` label in the Android bottom navigation with
+  a play icon and `Simulate`, while preserving the existing 3D tab behavior.
+- Added a focused markup regression for the visible and accessible labels.
+
 ## APP_VERSION 1.0.71 — local program autosave with Learn isolation
 
 - Added a debounced app-private draft containing the NC code, document name

@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.72)
+- The bottom navigation now shows a clear play icon and the label **Simulate** for the 3D simulation screen.
+
 ## Unreleased test build (APP_VERSION 1.0.71)
 - The current NC program is now saved automatically on this device and restored after the app is reopened. The editor shows the save state; lesson exercises remain temporary and never overwrite the saved main program.
 
