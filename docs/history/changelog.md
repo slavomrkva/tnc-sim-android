@@ -7,6 +7,15 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.76 — parser comment encoding repair and C24 tracking
+
+- Repaired double-encoded UTF-8 sequences in `www/core/parser-engine.js`
+  comments (mojibake from an earlier port); code behavior is unchanged and
+  the file now differs from web `core/` only in the intended platform lines.
+- Logged shared open bug C24: a compensated single-block full circle silently
+  collapses to zero-length segments (found by the web cutting-logic package,
+  which now also carries C/CC/CR arc witnesses that both platforms pass).
+
 ## APP_VERSION 1.0.75 — compact autosave status
 
 - Shortened the saved, restored and storage-error labels while keeping the
