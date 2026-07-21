@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.75 — compact autosave status
+
+- Shortened the saved, restored and storage-error labels while keeping the
+  save time and existing green/orange state colours.
+- Added exact-copy regressions for all three result states.
+
 ## APP_VERSION 1.0.74 — calmer 30-second autosave cadence
 
 - Ported the shared throttled autosave: one write is scheduled 30 seconds after

@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.75)
+- Autosave results now use compact Saved, Restored and Save failed labels with the save time, so the status stays on one line.
+
 ## Unreleased test build (APP_VERSION 1.0.74)
 - Autosave now writes at most every 30 seconds while typing. Pending changes use a quiet neutral status; orange is reserved for an actual save problem.
 

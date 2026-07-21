@@ -70,6 +70,7 @@ const payload = JSON.parse(typed.localStorage.value('tncsim.programDraft.v1'));
 assert.strictEqual(payload.code, typed.codeEl.value);
 assert.strictEqual(payload.docName, 'part.H');
 assert.strictEqual(typed.status.state, 'saved');
+assert.match(typed.status.textContent, /^Saved .+$/);
 
 const restored = boot({
   code:'STALE WEBVIEW VALUE',
@@ -80,6 +81,7 @@ const restored = boot({
 assert.strictEqual(restored.codeEl.value, 'MAIN PROGRAM');
 assert.strictEqual(restored.context._docName, 'main.H');
 assert.strictEqual(restored.status.state, 'restored');
+assert.match(restored.status.textContent, /^Restored .+$/);
 
 const learn = boot({code:'MY MAIN PROGRAM', docName:'mine.H'});
 vm.runInContext('programAutosaveSuspendForLearn()', learn.context);
@@ -113,7 +115,7 @@ failed.codeEl.value = 'CANNOT SAVE';
 failed.codeEvents.input();
 failed.timers.shift()();
 assert.strictEqual(failed.status.state, 'error');
-assert.match(failed.status.textContent, /could not be saved/i);
+assert.strictEqual(failed.status.textContent, 'Save failed');
 
 const learnSource = fs.readFileSync(path.join(root, 'www', 'core', 'learn-tutorial.js'), 'utf8');
 const finishBody = learnSource.slice(learnSource.indexOf('function learnFinishLesson'), learnSource.indexOf('function learnExit'));
