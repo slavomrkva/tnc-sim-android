@@ -836,6 +836,64 @@ html[data-theme="light"] .learn-svg [stroke="#5dcaa5"]{stroke:#176b58;}
   .toolbar .speed-btn{height:30px;padding:0 12px;display:flex;align-items:center;}
   .toolbar .speed-val{height:30px;display:inline-flex;align-items:center;justify-content:center;}
 }
+/* ── Custom TNC keyboard (android/custom-keyboard.js) ──────────────
+   Shown only while guided field editing is active (html.ck-open). Compact
+   keys, visually larger symbols, orange P/I. The interactive panel (.ctx-panel)
+   is re-ordered to sit directly above the keyboard at the bottom of the
+   editor column. */
+#ckKeyboard{
+  display:none;
+  grid-template-columns:repeat(4,1fr);gap:5px;
+  background:var(--surface2);border-top:1px solid var(--border);
+  padding:5px 6px calc(5px + env(safe-area-inset-bottom));
+  flex-shrink:0;
+}
+html.ck-open body[data-mtab="editor"] #ckKeyboard{display:grid;order:99;}
+/* interactive panel slides above the keyboard */
+html.ck-open body[data-mtab="editor"] .ctx-panel{order:98;border-bottom:none;}
+/* no native keyboard is open, so hide the bottom tab bar ourselves and drop
+   the body's tab-bar reservation (same as the kbd-open rules do) */
+html.ck-open .mtab-bar{transform:translateY(120%) translateZ(0) !important;}
+html.ck-open body[data-mtab="editor"]{padding-bottom:0 !important;}
+/* duplicate P / I / Q / ENT / NO ENT controls hidden while the keyboard is up */
+html.ck-open .keypad .key.pi-key{display:none;}
+html.ck-open .ctx-panel .fbar-fmax{display:none;}
+html.ck-open .ctx-panel .fbar-drbtn[title="Skip this field"]{display:none;}
+html.ck-open .ctx-panel .fbar-nav[onclick="fieldNext()"]{display:none;}
+.ck-key{
+  min-height:40px;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);color:var(--text);font:700 21px var(--mono);
+  line-height:1;display:flex;align-items:center;justify-content:center;
+  padding:0 2px;cursor:pointer;user-select:none;touch-action:manipulation;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset;
+}
+.ck-key:active{transform:scale(.98);background:var(--surface2);}
+.ck-key.ck-action{font-size:15px;}
+.ck-key.ck-pi{background:rgba(232,162,58,.14);border-color:var(--accent-warm);color:var(--accent-warm);}
+.ck-key.ck-pi:active{background:rgba(232,162,58,.28);}
+.ck-key.ck-ent{background:rgba(var(--accent-rgb),.16);border-color:var(--accent);color:var(--accent);}
+.ck-key.ck-end{background:rgba(74,158,255,.14);border-color:var(--accent3);color:var(--accent3);}
+.ck-key.ck-noent{font-size:10px;line-height:1.1;}
+.ck-key.ck-close{font-size:24px;}
+.ck-key[data-key=","]{font-size:26px;}
+.ck-key[data-action="backspace"]{font-size:22px;}
+.ck-key[data-action="sign"]{font-size:18px;}
+/* light theme: keyboard belongs to the dark chrome like .keypad/.ctx-panel */
+html[data-theme="light"] #ckKeyboard{
+  color:#edeef0;
+  --surface:#404346; --surface2:#26282b; --key-pale:#373a3d;
+  --border:#474a4e; --text:#edeef0; --text2:#cacccf; --text3:#9da0a5;
+  background:#26282b !important;
+}
+/* floating reopen button after ⌄ hid the keyboard mid-edit */
+#ckReopen{
+  position:fixed;right:12px;bottom:calc(58px + env(safe-area-inset-bottom));
+  width:46px;height:46px;border-radius:50%;border:1px solid var(--accent);
+  background:rgba(var(--accent-rgb),.92);color:#fff;font-size:20px;
+  z-index:8500;display:none;cursor:pointer;
+}
+#ckReopen.show{display:block;}
+
 /* themed scrollbars (panels, editor, modals) */
 *{scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 ::-webkit-scrollbar{width:10px;height:10px;}

@@ -136,6 +136,14 @@ The detailed module-split rationale is in
     draft. A process or Compatibility-mode reload during Learn must ignore
     transient lesson text and recover the main draft.
 
+22. **Custom TNC keyboard owns field-mode input:** while FM is active,
+    `www/android/custom-keyboard.js` replaces the native keyboard — never focus
+    `#mobileInput` (or add anything that does) during field mode, or both
+    keyboards appear. The script must stay loaded after `android/app.js`
+    because it wraps the global `selectField`/`exitFieldMode`/
+    `focusMobileInput`. Free-text editing (comments, Q-line text) still uses
+    the native keyboard and rule #7's viewport detection.
+
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and
 the technical log belong in `docs/history/`.

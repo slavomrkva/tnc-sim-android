@@ -7,6 +7,18 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.76 — custom TNC keyboard for guided field editing
+
+- Added the Android-only custom numeric keyboard (`www/android/custom-keyboard.js`)
+  from the approved prototype: 7-9/4-6/1-3 digits, backspace, sign toggle,
+  decimal comma writing `.`, orange P/I, Q reference, ENT (next field),
+  NO ENT (skip optional), END (commit + exit) and a hide/reopen control.
+- While field mode is active the native keyboard is suppressed
+  (focusMobileInput override), the interactive panel re-orders above the
+  keyboard, and duplicate P/I/Q/ENT/NO ENT controls hide via `html.ck-open`.
+- New regression `tests/custom-keyboard.test.js` drives the exposed
+  `_ckHandleKey` dispatch with the real core sanitizers.
+
 ## APP_VERSION 1.0.75 — compact autosave status
 
 - Shortened the saved, restored and storage-error labels while keeping the

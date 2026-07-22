@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.76)
+- New built-in TNC keyboard while editing a program line: digits, decimal comma, sign toggle, orange P and I, Q, ENT, NO ENT and END keys — the Android system keyboard no longer pops up during guided editing. The editing panel now sits directly above it, and an arrow key lets you hide/reshow the keyboard mid-edit.
+
 ## Unreleased test build (APP_VERSION 1.0.75)
 - Autosave results now use compact Saved, Restored and Save failed labels with the save time, so the status stays on one line.
 
