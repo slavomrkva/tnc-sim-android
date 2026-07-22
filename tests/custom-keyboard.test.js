@@ -13,15 +13,24 @@ const appSource = fs.readFileSync(path.join(root, 'www', 'android', 'app.js'), '
 // ── static wiring ──
 assert.match(htmlSource, /android\/app\.js" defer><\/script>\s*<script src="android\/custom-keyboard\.js" defer>/,
   'custom-keyboard.js loads after app.js so its global wrappers land last');
-assert.match(ckSource, /\{k:'7'\},\{k:'8'\},\{k:'9'\},\{a:'backspace'/, 'row 1 is 7 8 9 backspace');
-assert.match(ckSource, /\{k:'4'\},\{k:'5'\},\{k:'6'\},\{a:'sign'/, 'row 2 is 4 5 6 +/-');
-assert.match(ckSource, /\{k:'1'\},\{k:'2'\},\{k:'3'\},\{k:','/, 'row 3 is 1 2 3 decimal comma');
-assert.match(ckSource, /\{a:'p',t:'P',cls:'ck-pi'\},\{k:'0'\},\{a:'prev',t:'◀'\},\{a:'ent',t:'ENT ▶',cls:'ck-ent'\}/,
-  'row 4 is P 0 ◀ ENT▶ (P orange, ENT has the forward arrow)');
-assert.match(ckSource, /\{a:'i',t:'I',cls:'ck-pi'\},\{a:'q',t:'Q'\},\{a:'noent'[^]*?\{a:'end',t:'END ⌄',cls:'ck-end'\}/,
-  'row 5 is I Q NO-ENT END⌄ (I orange, END merged with the hide arrow)');
+assert.match(ckSource, /\{k:'7'\},\{k:'8'\},\{k:'9'\},\{a:'q',t:'Q'\}/, 'row 1 is 7 8 9 Q');
+assert.match(ckSource, /\{k:'4'\},\{k:'5'\},\{k:'6'\},\{a:'prev',t:'◀'\}/, 'row 2 is 4 5 6 ◀');
+assert.match(ckSource, /\{k:'1'\},\{k:'2'\},\{k:'3'\},\{a:'ent',t:'ENT ▶',cls:'ck-ent'\}/, 'row 3 is 1 2 3 ENT▶');
+assert.match(ckSource, /\{k:'0'\},\{k:',',t:','\},\{a:'sign',t:'\+\/−'\},\{a:'noent',t:'NO<br>ENT',cls:'ck-noent'\}/,
+  'row 4 is 0 , +/− NO-ENT');
+assert.match(ckSource, /\{a:'backspace',t:'⌫'\},\{a:'p',t:'P',cls:'ck-pi'\},\{a:'i',t:'I',cls:'ck-pi'\},\{a:'end',t:'END ⌄',cls:'ck-end'\}/,
+  'row 5 is ⌫ P I END⌄ (P/I orange)');
 assert.doesNotMatch(ckSource, /a:'close'/, 'the hide-only ⌄ key is merged into END ⌄');
 assert.match(ckSource, /case 'prev':/, 'the ◀ previous-field key is wired');
+// batch 1.0.81 behaviours
+assert.match(ckSource, /ent:function\(\)\{ if\(typeof blkNextStep==='function'\) blkNextStep\(\); \}/, 'BLK ENT advances to the next field');
+assert.match(ckSource, /function qParamNav\(dir\)/, 'cycle Q-parameter list navigation exists');
+assert.match(ckSource, /function ensureInsertAnchor\(\)/, 'guided inserts get a safe anchor when no caret is placed');
+assert.match(ckSource, /if\(f\.p==='S'[^]*?f\.val='10000'[^]*?if\(f\.p==='F'[^]*?f\.val='2000'/, 'TOOL CALL insert defaults S10000/F2000');
+assert.match(ckSource, /f\.type==='feed'[^]*?f\.val='AUTO'/, 'inserted move feed defaults to FAUTO');
+assert.match(ckSource, /window\.enterFieldMode=function\(label\)\{/, 'enterFieldMode is wrapped for exit-first + anchor + defaults');
+assert.match(ckSource, /ck-qp-cue/, 'Q-builder first step shows a ▶ continue cue');
+assert.doesNotMatch(appSource, /\{l:'GOTO'/, 'GOTO removed from the keypad');
 
 // v3 multi-editor routing + TOOL DEF exception
 assert.match(ckSource, /wrap\('renderBlkPanel'/, 'keyboard wires into BLK FORM wizard');
@@ -136,6 +145,7 @@ const blkInput = makeInput('-50');
 ctx.document._ids['blkFbarVal'] = blkInput;
 ctx.BLK = { active:true, step:1, editLine:null, x0:0 };
 let blkAdvanced = 0, blkInserted = 0;
+ctx.blkNextStep = function(){ blkAdvanced++; };   // ENT advances (even when editing)
 ctx.blkConfirmStep = function(){ blkAdvanced++; };
 ctx.blkStepRel = function(){ blkAdvanced++; };
 ctx.insertBlkForm = function(){ blkInserted++; };

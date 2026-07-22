@@ -7,6 +7,22 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.81 — keyboard relayout + editor fixes batch
+
+- Keyboard relaid out (right column top→bottom: Q, ◀, ENT▶, NO ENT, END⌄):
+  `7 8 9 Q` / `4 5 6 ◀` / `1 2 3 ENT▶` / `0 , +/− NO ENT` / `⌫ P I END⌄`.
+- BLK FORM edit: ENT now advances to the next field (blkNextStep) even when
+  editing an existing block; END is the explicit commit.
+- Cycle Q-parameter list: ENT confirms and hops to the next Q line (down), ◀ to
+  the previous (up) — `qParamNav` in custom-keyboard.js.
+- Q-assignment builder step 0 (parameter number) shows a ▶ continue cue.
+- Guided inserts (CHF/RND/L/…): `enterFieldMode` is wrapped to commit any
+  in-progress edit first (no dangling half-line) and `ensureInsertAnchor` puts a
+  new block before END PGM instead of the program top when no caret is placed.
+- TOOL CALL insert defaults to S10000 / F2000; any freshly inserted move's feed
+  defaults to FAUTO (`applyInsertDefaults`).
+- Removed GOTO from the keypad.
+
 ## APP_VERSION 1.0.80 — keyboard layout revision (◀ prev, ENT▶, merged END⌄)
 
 - Reworked the bottom two keyboard rows: `P 0 ◀ ENT▶` / `I Q NO ENT END⌄`.

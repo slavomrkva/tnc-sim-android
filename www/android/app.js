@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.80';
+var APP_VERSION = '1.0.81';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -417,7 +417,6 @@ var PROG_KEYS=[
   {l:'TOOL DEF', code:'TOOL DEF', toolDef:true},
   {l:'LBL SET',   code:'LBL 1', bld:'LBL'},
   {l:'LBL CALL',  code:'CALL LBL 1', bld:'LBL CALL'},
-  {l:'GOTO', code:'GOTO', gotoLine:true},
 ];
 // P and I are removed from the keypad — they live on the Android custom
 // keyboard (android/custom-keyboard.js): P toggles polar, I toggles

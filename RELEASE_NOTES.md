@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.81)
+- Rearranged the keyboard again and fixed several editor behaviours: ENT moves to the next field when editing a BLK FORM; in cycle parameters ENT/◀ move down/up between parameters; new TOOL CALL defaults to S10000 F2000; a new move's feed defaults to FAUTO; CHF/RND no longer jump to the top of the program when no line is selected; and the GOTO button was removed.
+
 ## Unreleased test build (APP_VERSION 1.0.80)
 - Reorganised the keyboard: 0 and I swapped, added a ◀ key to jump back to the previous field, ENT now shows a forward arrow, and END also hides the keyboard (one key instead of two). The keyboard is also a little shorter for more editing space.
 

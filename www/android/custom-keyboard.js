@@ -3,11 +3,11 @@
 /* Android-only custom numeric TNC keyboard (approved prototype v3).
 
    Layout:
-     7   8   9      ⌫
-     4   5   6      +/−
-     1   2   3      ,
-     P   0   ◀      ENT ▶
-     I   Q   NO ENT END ⌄
+     7   8   9      Q
+     4   5   6      ◀
+     1   2   3      ENT ▶
+     0   ,   +/−    NO ENT
+     ⌫   P   I      END ⌄
 
    The keyboard replaces the native Android soft keyboard for EVERY numeric /
    parameter interactive editor:
@@ -51,11 +51,11 @@
   var freshInput=false;
 
   var KEYS=[
-    {k:'7'},{k:'8'},{k:'9'},{a:'backspace',t:'⌫'},
-    {k:'4'},{k:'5'},{k:'6'},{a:'sign',t:'+/−'},
-    {k:'1'},{k:'2'},{k:'3'},{k:',',t:','},
-    {a:'p',t:'P',cls:'ck-pi'},{k:'0'},{a:'prev',t:'◀'},{a:'ent',t:'ENT ▶',cls:'ck-ent'},
-    {a:'i',t:'I',cls:'ck-pi'},{a:'q',t:'Q'},{a:'noent',t:'NO<br>ENT',cls:'ck-noent'},{a:'end',t:'END ⌄',cls:'ck-end'}
+    {k:'7'},{k:'8'},{k:'9'},{a:'q',t:'Q'},
+    {k:'4'},{k:'5'},{k:'6'},{a:'prev',t:'◀'},
+    {k:'1'},{k:'2'},{k:'3'},{a:'ent',t:'ENT ▶',cls:'ck-ent'},
+    {k:'0'},{k:',',t:','},{a:'sign',t:'+/−'},{a:'noent',t:'NO<br>ENT',cls:'ck-noent'},
+    {a:'backspace',t:'⌫'},{a:'p',t:'P',cls:'ck-pi'},{a:'i',t:'I',cls:'ck-pi'},{a:'end',t:'END ⌄',cls:'ck-end'}
   ];
 
   function el(id){ return document.getElementById(id); }
@@ -154,7 +154,9 @@
     if(typeof BLK!=='undefined' && BLK.active) return {
       kind:'input', input:el('blkFbarVal'), sign:true, digitsOnly:false,
       prev:function(){ if(typeof blkStepRel==='function') blkStepRel(-1); },
-      ent:function(){ if(typeof blkConfirmStep==='function') blkConfirmStep(); },
+      // ENT ▶ = advance to the next field (even when editing an existing BLK);
+      // on the last field blkNextStep commits. END is the explicit commit.
+      ent:function(){ if(typeof blkNextStep==='function') blkNextStep(); },
       noent:function(){ if(typeof blkStepRel==='function') blkStepRel(1); },
       end:function(){ if(typeof insertBlkForm==='function') insertBlkForm(); }
     };
@@ -169,8 +171,11 @@
     if(q) return {
       kind:'input', input:q, sign:true, digitsOnly:false,
       q:function(){ if(typeof qPanelInsertQ==='function') qPanelInsertQ(); },
-      ent:function(){ if(typeof qPanelConfirm==='function') qPanelConfirm(); },
-      noent:function(){},
+      // In a cycle's Q-parameter list, ENT ▶ confirms and jumps to the next
+      // Q line (down), ◀ to the previous (up); END just confirms and closes.
+      prev:function(){ qParamNav(-1); },
+      ent:function(){ qParamNav(1); },
+      noent:function(){ qParamNav(1); },
       end:function(){ if(typeof qPanelConfirm==='function') qPanelConfirm(); }
     };
     // Q-parameter assignment builder (openQParamPanel): virtual QP state, its
@@ -209,6 +214,49 @@
     else if(typeof qpInsert==='function') qpInsert();
   }
   function qpPrev(){ if(QP.step>0){ QP.step--; if(typeof renderQParamPanel==='function') renderQParamPanel(); } }
+
+  // ── cycle Q-parameter list: confirm current line, hop to the adjacent Q line ──
+  function qParamNav(dir){
+    if(typeof _qPopupLine==='undefined' || _qPopupLine<0) return;
+    var cur=_qPopupLine;
+    if(typeof qPanelConfirm==='function') qPanelConfirm();
+    if(el('qPanelInput')) return; // validation failed → popup still open, don't move
+    var lines=codeEl.value.split('\n');
+    var i=cur+dir;
+    while(i>=0 && i<lines.length){
+      if(/^\s*Q\d+\s*=/.test(lines[i])){ if(typeof openQPopup==='function') openQPopup(i); return; }
+      // a non-empty, non-Q line means we've left the cycle's parameter block
+      if(lines[i].trim()!=='' && !/^\s*Q\d+/.test(lines[i])) return;
+      i+=dir;
+    }
+  }
+
+  // ── insertion anchor + per-block defaults for guided inserts (FM) ──
+  function ensureInsertAnchor(){
+    // Only when there is no live editor caret (mobile: the custom keyboard has
+    // blurred #code). If nothing was ever placed (lastSel still 0/0), anchor a
+    // new CHF/RND/L before END PGM instead of dropping it at the program top.
+    if(document.activeElement===codeEl) return;
+    if(!lastSel || lastSel.start!==0 || lastSel.end!==0) return;
+    var lines=codeEl.value.split('\n');
+    var target=lines.length-1;
+    for(var i=0;i<lines.length;i++){ if(/END PGM/i.test(lines[i])){ target=Math.max(0,i-1); break; } }
+    var pos=0; for(var j=0;j<target;j++) pos+=lines[j].length+1;
+    lastSel={start:pos,end:pos};
+  }
+  function applyInsertDefaults(label){
+    if(typeof FM==='undefined' || !FM.active) return;
+    var changed=false;
+    if(label==='TOOL CALL'){
+      FM.fields.forEach(function(f){
+        if(f.p==='S' && (f.val===null||f.val===''||f.val==='0')){ f.val='10000'; changed=true; }
+        if(f.p==='F' && (f.val===null||f.val==='')){ f.val='2000'; changed=true; }
+      });
+    }
+    // A freshly inserted move's feed defaults to FAUTO instead of an empty "—".
+    FM.fields.forEach(function(f){ if(f.type==='feed' && (f.val===null||f.val==='')){ f.val='AUTO'; changed=true; } });
+    if(changed && typeof selectField==='function') selectField(FM.idx);
+  }
 
   // ── FM (guided field) input — virtual values on FM.fields[FM.idx] ──
   function fmField(){ return FM.active ? FM.fields[FM.idx] : null; }
@@ -323,6 +371,19 @@
   // FM (path functions / cycle builders)
   wrap('selectField', function(){ if(FM.active) show(); });
   wrap('exitFieldMode', function(){ if(!FM.active) hide(false); });
+  // Guided insert (CHF/RND/L/TOOL CALL…): commit any in-progress edit first so
+  // no half-filled line is left dangling, fix the anchor when no caret is placed,
+  // and apply per-block defaults (TOOL CALL S/F, feed→FAUTO).
+  var _efmOrig=window.enterFieldMode;
+  if(typeof _efmOrig==='function'){
+    window.enterFieldMode=function(label){
+      if(typeof FM!=='undefined' && FM.active){ if(typeof exitFieldMode==='function') try{ exitFieldMode(); }catch(e){} }
+      else ensureInsertAnchor();
+      var r=_efmOrig.apply(this, arguments);
+      applyInsertDefaults(label);
+      return r;
+    };
+  }
   // Never raise the native keyboard for FM fields — this keyboard owns them.
   var _fmiOrig=window.focusMobileInput;
   if(typeof _fmiOrig==='function'){
@@ -353,8 +414,22 @@
     if(i){ i.inputMode='none'; freshInput=true; show(); }
   });
   // Q-parameter assignment builder — show keyboard on every step (the operator
-  // step has no numeric field, but ENT must still advance it).
-  wrap('renderQParamPanel', function(){ if(qpBuilderOpen()) show(); });
+  // step has no numeric field, but ENT must still advance it). On the first
+  // step (parameter number) add a ▶ cue so it's clear entry continues.
+  wrap('renderQParamPanel', function(){
+    if(!qpBuilderOpen()) return;
+    show();
+    if(QP.step===0){
+      var val=el('qpFbarVal');
+      if(val && val.parentNode && !val.parentNode.querySelector('.ck-qp-cue')){
+        var cue=document.createElement('span');
+        cue.className='ck-qp-cue';
+        cue.textContent='▶';
+        cue.style.cssText='color:var(--accent);font-size:15px;margin-left:6px;font-family:var(--mono);';
+        val.parentNode.insertBefore(cue, val.nextSibling);
+      }
+    }
+  });
   // Its focus helper would raise the native keyboard on #mobileInput — the
   // custom keyboard owns QP input, so keep the native keyboard closed.
   var _qpfmOrig=window._qpFocusMobile;
