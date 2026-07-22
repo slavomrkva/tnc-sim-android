@@ -7,6 +7,18 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.80 — keyboard layout revision (◀ prev, ENT▶, merged END⌄)
+
+- Reworked the bottom two keyboard rows: `P 0 ◀ ENT▶` / `I Q NO ENT END⌄`.
+  `0` and `I` swapped (0 now sits under the digit column), added `◀` = step to
+  previous field, `ENT` shows a forward arrow, and the standalone hide-only `⌄`
+  is merged into `END ⌄` (finish edit + hide). Removed the dead `close` action
+  and `ck-close` style.
+- `◀` routes per editor: FM `fieldPrev`, BLK `blkStepRel(-1)`, Q-builder step
+  back; no-op where a panel has a single field.
+- Made the keyboard a bit shorter (key min-height 40→36 px, gap/padding trimmed)
+  for more editor space; symbols stay large.
+
 ## APP_VERSION 1.0.79 — Problems collapse, BLK step-0 keyboard, Q-edit + TOOL DEF fixes
 
 - Problems panel now starts collapsed: only the error/warning summary row shows;

@@ -3,11 +3,11 @@
 /* Android-only custom numeric TNC keyboard (approved prototype v3).
 
    Layout:
-     7   8   9   ⌫
-     4   5   6   +/−
-     1   2   3   ,
-     P   I   Q   ENT
-     0  NO ENT END  ⌄
+     7   8   9      ⌫
+     4   5   6      +/−
+     1   2   3      ,
+     P   0   ◀      ENT ▶
+     I   Q   NO ENT END ⌄
 
    The keyboard replaces the native Android soft keyboard for EVERY numeric /
    parameter interactive editor:
@@ -20,13 +20,14 @@
    TOOL DEF is the exception: editing it opens NO keyboard (custom or native),
    only its docked picker panel in the bottom interaction area.
 
-   Behavior (spec v3):
+   Behavior (spec v3, layout revised):
      - "," writes the "." decimal form the editor expects.
      - +/− toggles the sign of the current numeric token (never appends).
-     - ENT confirms the current field and advances.
+     - ◀ steps back to the previous field.
+     - ENT ▶ confirms the current field and advances to the next.
      - NO ENT skips the current optional field.
-     - END finishes the interactive edit and hides the keyboard.
-     - ⌄ only hides the keyboard (edit stays active; floating ⌃ reopens it).
+     - END ⌄ finishes the interactive edit AND hides the keyboard (the old
+       hide-only ⌄ was merged into END).
      - P and I are orange; P toggles polar (L↔LP), I toggles incremental,
        Q inserts a Q-parameter reference into the active numeric field.
 
@@ -53,8 +54,8 @@
     {k:'7'},{k:'8'},{k:'9'},{a:'backspace',t:'⌫'},
     {k:'4'},{k:'5'},{k:'6'},{a:'sign',t:'+/−'},
     {k:'1'},{k:'2'},{k:'3'},{k:',',t:','},
-    {a:'p',t:'P',cls:'ck-pi'},{a:'i',t:'I',cls:'ck-pi'},{a:'q',t:'Q'},{a:'ent',t:'ENT',cls:'ck-ent'},
-    {k:'0'},{a:'noent',t:'NO<br>ENT',cls:'ck-noent'},{a:'end',t:'END',cls:'ck-end'},{a:'close',t:'⌄',cls:'ck-close'}
+    {a:'p',t:'P',cls:'ck-pi'},{k:'0'},{a:'prev',t:'◀'},{a:'ent',t:'ENT ▶',cls:'ck-ent'},
+    {a:'i',t:'I',cls:'ck-pi'},{a:'q',t:'Q'},{a:'noent',t:'NO<br>ENT',cls:'ck-noent'},{a:'end',t:'END ⌄',cls:'ck-end'}
   ];
 
   function el(id){ return document.getElementById(id); }
@@ -152,6 +153,7 @@
     // #blkFbarVal — the keyboard still shows so ENT advances to the first field.
     if(typeof BLK!=='undefined' && BLK.active) return {
       kind:'input', input:el('blkFbarVal'), sign:true, digitsOnly:false,
+      prev:function(){ if(typeof blkStepRel==='function') blkStepRel(-1); },
       ent:function(){ if(typeof blkConfirmStep==='function') blkConfirmStep(); },
       noent:function(){ if(typeof blkStepRel==='function') blkStepRel(1); },
       end:function(){ if(typeof insertBlkForm==='function') insertBlkForm(); }
@@ -206,6 +208,7 @@
     if(QP.step<2){ QP.step++; if(typeof renderQParamPanel==='function') renderQParamPanel(); }
     else if(typeof qpInsert==='function') qpInsert();
   }
+  function qpPrev(){ if(QP.step>0){ QP.step--; if(typeof renderQParamPanel==='function') renderQParamPanel(); } }
 
   // ── FM (guided field) input — virtual values on FM.fields[FM.idx] ──
   function fmField(){ return FM.active ? FM.fields[FM.idx] : null; }
@@ -292,10 +295,10 @@
       // append to the "Q", not be treated as the first char that replaces the
       // preselected value (that wiped the Q on the first try before).
       case 'q': if(t.kind==='fm') fmQ(); else if(t.kind==='qp') qpType('Q'); else if(t.q){ freshInput=false; t.q(); } break;
+      case 'prev':  t.kind==='fm' ? (typeof fieldPrev==='function'&&fieldPrev()) : t.kind==='qp' ? qpPrev() : (t.prev&&t.prev()); break;
       case 'ent':   t.kind==='fm' ? fieldNext() : t.kind==='qp' ? qpEnt() : t.ent(); break;
       case 'noent': t.kind==='fm' ? fmNoEnt()   : t.kind==='qp' ? qpEnt() : t.noent(); break;
-      case 'end':   t.kind==='fm' ? exitFieldMode() : t.kind==='qp' ? (typeof qpInsert==='function'&&qpInsert()) : t.end(); break; // panel's own close wrapper hides the keyboard
-      case 'close': hide(true); break; // hide only — edit stays active
+      case 'end':   t.kind==='fm' ? exitFieldMode() : t.kind==='qp' ? (typeof qpInsert==='function'&&qpInsert()) : t.end(); break; // END ⌄ — the panel's own close wrapper also hides the keyboard
     }
   }
   window._ckHandleKey=handleKey; // exposed for regression tests

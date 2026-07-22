@@ -230,7 +230,7 @@ assert.ok(compatibilityToggleIndex < viewAreaIndex,
 assert.doesNotMatch(index.slice(viewAreaIndex), /id="compatModeToggle"/);
 assert.match(index, /id="simulationSettingsPanel"[^>]*hidden/);
 assert.match(render3d, /AndroidWebGLCompat\.attachErrorButton\(box\)/);
-assert.match(app, /var APP_VERSION = '1\.0\.79';/);
+assert.match(app, /var APP_VERSION = '1\.0\.80';/);
 assert.match(app, /var VX_COMPAT_MODE = !!\(window\.AndroidWebGLCompat/);
 assert.match(app, /VX_RES_LEVELS = \[50, 75, 100\]/);
 

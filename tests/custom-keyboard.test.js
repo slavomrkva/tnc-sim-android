@@ -16,8 +16,12 @@ assert.match(htmlSource, /android\/app\.js" defer><\/script>\s*<script src="andr
 assert.match(ckSource, /\{k:'7'\},\{k:'8'\},\{k:'9'\},\{a:'backspace'/, 'row 1 is 7 8 9 backspace');
 assert.match(ckSource, /\{k:'4'\},\{k:'5'\},\{k:'6'\},\{a:'sign'/, 'row 2 is 4 5 6 +/-');
 assert.match(ckSource, /\{k:'1'\},\{k:'2'\},\{k:'3'\},\{k:','/, 'row 3 is 1 2 3 decimal comma');
-assert.match(ckSource, /\{a:'p',t:'P',cls:'ck-pi'\},\{a:'i',t:'I',cls:'ck-pi'\},\{a:'q',t:'Q'\},\{a:'ent'/, 'row 4 is P I Q ENT, P/I orange');
-assert.match(ckSource, /\{k:'0'\},\{a:'noent'[^]*?\{a:'end'[^]*?\{a:'close'/, 'row 5 is 0 NO-ENT END hide');
+assert.match(ckSource, /\{a:'p',t:'P',cls:'ck-pi'\},\{k:'0'\},\{a:'prev',t:'◀'\},\{a:'ent',t:'ENT ▶',cls:'ck-ent'\}/,
+  'row 4 is P 0 ◀ ENT▶ (P orange, ENT has the forward arrow)');
+assert.match(ckSource, /\{a:'i',t:'I',cls:'ck-pi'\},\{a:'q',t:'Q'\},\{a:'noent'[^]*?\{a:'end',t:'END ⌄',cls:'ck-end'\}/,
+  'row 5 is I Q NO-ENT END⌄ (I orange, END merged with the hide arrow)');
+assert.doesNotMatch(ckSource, /a:'close'/, 'the hide-only ⌄ key is merged into END ⌄');
+assert.match(ckSource, /case 'prev':/, 'the ◀ previous-field key is wired');
 
 // v3 multi-editor routing + TOOL DEF exception
 assert.match(ckSource, /wrap\('renderBlkPanel'/, 'keyboard wires into BLK FORM wizard');

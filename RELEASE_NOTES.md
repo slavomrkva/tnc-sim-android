@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.80)
+- Reorganised the keyboard: 0 and I swapped, added a ◀ key to jump back to the previous field, ENT now shows a forward arrow, and END also hides the keyboard (one key instead of two). The keyboard is also a little shorter for more editing space.
+
 ## Unreleased test build (APP_VERSION 1.0.79)
 - Problems are now collapsed to a single summary row; tap it to see the full list, and it no longer covers the keyboard while you type.
 - The keyboard now appears right on the first step when you insert a new BLK FORM (box/cylinder), and TOOL DEF editing shows only its tool picker with no keyboard.

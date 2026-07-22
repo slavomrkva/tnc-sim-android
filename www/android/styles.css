@@ -843,9 +843,9 @@ html[data-theme="light"] .learn-svg [stroke="#5dcaa5"]{stroke:#176b58;}
    editor column. */
 #ckKeyboard{
   display:none;
-  grid-template-columns:repeat(4,1fr);gap:5px;
+  grid-template-columns:repeat(4,1fr);gap:4px;
   background:var(--surface2);border-top:1px solid var(--border);
-  padding:5px 6px calc(5px + env(safe-area-inset-bottom));
+  padding:4px 6px calc(4px + env(safe-area-inset-bottom));
   flex-shrink:0;
 }
 html.ck-open body[data-mtab="editor"] #ckKeyboard{display:grid;order:99;}
@@ -867,7 +867,7 @@ html.ck-open .ctx-panel .fbar-done{display:none;}
 html.ck-open .ctx-panel .fbar-fmax{display:none;}
 html.ck-open .ctx-panel .fbar-drbtn[title="Skip this field"]{display:none;}
 .ck-key{
-  min-height:40px;border:1px solid var(--border);border-radius:7px;
+  min-height:36px;border:1px solid var(--border);border-radius:7px;
   background:var(--surface);color:var(--text);font:700 21px var(--mono);
   line-height:1;display:flex;align-items:center;justify-content:center;
   padding:0 2px;cursor:pointer;user-select:none;touch-action:manipulation;
@@ -880,7 +880,7 @@ html.ck-open .ctx-panel .fbar-drbtn[title="Skip this field"]{display:none;}
 .ck-key.ck-ent{background:rgba(var(--accent-rgb),.16);border-color:var(--accent);color:var(--accent);}
 .ck-key.ck-end{background:rgba(74,158,255,.14);border-color:var(--accent3);color:var(--accent3);}
 .ck-key.ck-noent{font-size:10px;line-height:1.1;}
-.ck-key.ck-close{font-size:24px;}
+.ck-key[data-action="prev"]{font-size:18px;}
 .ck-key[data-key=","]{font-size:26px;}
 .ck-key[data-action="backspace"]{font-size:22px;}
 .ck-key[data-action="sign"]{font-size:18px;}
