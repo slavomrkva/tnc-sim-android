@@ -36,9 +36,14 @@ assert.doesNotMatch(cssSource, /fbar-nav\[onclick="fieldNext\(\)"\]\{display:non
 assert.match(cssSource, /html\.ck-open body\[data-mtab="editor"\] \.ctx-panel\{order:98/,
   'interactive panel re-orders to sit directly above the keyboard');
 
-// P / I / Q permanently removed from the keypad (only M remains)
-assert.match(appSource, /var PI_KEYS=\[\s*\{l:'M', sub:'M function',  code:'M', mPicker:true\},\s*\];/,
-  'PI_KEYS keypad row keeps only M; P, I and Q are removed');
+// P and I removed from the keypad; Q stays (it opens the Q-assignment builder)
+assert.doesNotMatch(appSource, /var PI_KEYS=\[[^]*?\{l:'P'/, 'P removed from the keypad PI_KEYS row');
+assert.doesNotMatch(appSource, /var PI_KEYS=\[[^]*?\{l:'I'/, 'I removed from the keypad PI_KEYS row');
+assert.match(appSource, /var PI_KEYS=\[\s*\{l:'M'[^]*?\{l:'Q', sub:'Q parameter', code:'Q', qParam:true\},\s*\];/,
+  'PI_KEYS keeps M and Q (Q opens the multi-step assignment builder)');
+// keyboard wires the Q-builder numeric steps (operators stay panel buttons)
+assert.match(ckSource, /wrap\('renderQParamPanel'/, 'keyboard drives the Q-assignment builder numeric steps');
+assert.match(ckSource, /window\._qpFocusMobile=function/, 'native keyboard suppressed for the Q-builder');
 
 // ── FM (guided field) behavior via the exposed dispatch ──
 const ctx = {};

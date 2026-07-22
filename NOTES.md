@@ -148,11 +148,14 @@ The detailed module-split rationale is in
     script must load after `android/app.js` because it wraps the global
     `selectField`/`exitFieldMode`/`focusMobileInput`/`renderBlkPanel`/
     `openMPanel`/`openQPopup`/`openToolDefEdit`/`closeCtxPanel`/`closeQPopup`.
-    P, I and Q are intentionally absent from the keypad `PI_KEYS` row (only M
-    remains) — they live on the keyboard; removing them also retired the
-    standalone Q-assignment builder's entry point. Free-text editing (comments,
-    raw Q-line text) still uses the native keyboard and rule #7's viewport
-    detection.
+    The Q-assignment builder (`openQParamPanel`) is also keyboard-driven: it is
+    detected by the `QP.*` onclick handlers its panel renders (so the operator
+    step, which has no numeric field, still advances on ENT), operators/
+    functions stay panel buttons, and `_qpFocusMobile` is overridden to keep the
+    native keyboard closed. P and I are intentionally absent from the keypad
+    `PI_KEYS` row — they live on the keyboard — but Q stays there because it is
+    that builder's entry point. Free-text editing (comments, raw Q-line text)
+    still uses the native keyboard and rule #7's viewport detection.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

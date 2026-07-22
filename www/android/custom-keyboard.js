@@ -87,11 +87,21 @@
     document.body.appendChild(reopenBtn);
   }
 
+  // The Q-assignment builder renders into #ctxPanel across three steps
+  // (Q number → operator → value); only steps 0 and 2 expose #qpFbarVal, so
+  // detect it by the QP.* onclick handlers its panel always emits.
+  function qpBuilderOpen(){
+    if(typeof QP==='undefined') return false;
+    var cp=el('ctxPanel');
+    return !!cp && /QP\.(step|op|fn)\s*=/.test(cp.innerHTML);
+  }
+
   function anEditorActive(){
     return (typeof FM!=='undefined' && FM.active)
       || (typeof BLK!=='undefined' && BLK.active && el('blkFbarVal'))
       || !!el('mCustomInput')
-      || !!el('qPanelInput');
+      || !!el('qPanelInput')
+      || qpBuilderOpen();
   }
 
   function suppressNative(){
@@ -150,7 +160,40 @@
       noent:function(){},
       end:function(){ if(typeof qPanelConfirm==='function') qPanelConfirm(); }
     };
+    // Q-parameter assignment builder (openQParamPanel): virtual QP state, its
+    // operators/functions are panel buttons, so only the numeric Q-number and
+    // value steps take keyboard input.
+    if(qpBuilderOpen()) return {kind:'qp'};
     return null;
+  }
+
+  // ── Q builder (QP) — numeric entry on QP.num (step 0) / QP.val (step 2) ──
+  function qpKey(){ return QP.step===0 ? 'num' : (QP.step===2 ? 'val' : null); }
+  function qpShow(t){ var e=el('qpFbarVal'); if(e) e.textContent=QP[t]||(t==='num'?'1':'0'); }
+  function qpType(ch){
+    var t=qpKey(); if(!t) return;
+    if(ch===',') ch='.';
+    var allowed = t==='num' ? /[0-9]/ : /[0-9Qq.+\-*\/()]/;
+    if(!allowed.test(ch)) return;
+    if(!QP._typing){ QP[t]=''; QP._typing=true; }
+    QP[t]=String(QP[t])+(ch==='q'?'Q':ch);
+    qpShow(t);
+  }
+  function qpBackspace(){
+    var t=qpKey(); if(!t) return;
+    QP._typing=true;
+    QP[t]=String(QP[t]).slice(0,-1);
+    qpShow(t);
+  }
+  function qpSign(){
+    if(QP.step!==2) return;
+    QP._typing=true;
+    QP.val=applyNumericSign(QP.val, String(QP.val).charAt(0)==='-' ? '+' : '-');
+    qpShow('val');
+  }
+  function qpEnt(){
+    if(QP.step<2){ QP.step++; if(typeof renderQParamPanel==='function') renderQParamPanel(); }
+    else if(typeof qpInsert==='function') qpInsert();
   }
 
   // ── FM (guided field) input — virtual values on FM.fields[FM.idx] ──
@@ -223,18 +266,20 @@
     var t=currentTarget();
     if(!t) return;
     if(key!==undefined && key!==null){
-      if(t.kind==='fm') fmType(key); else inputType(t,key);
+      if(t.kind==='fm') fmType(key);
+      else if(t.kind==='qp') qpType(key);
+      else inputType(t,key);
       return;
     }
     switch(action){
-      case 'backspace': t.kind==='fm' ? fmBackspace() : inputBackspace(t); break;
-      case 'sign':      t.kind==='fm' ? fmSign()      : inputSign(t); break;
+      case 'backspace': t.kind==='fm' ? fmBackspace() : t.kind==='qp' ? qpBackspace() : inputBackspace(t); break;
+      case 'sign':      t.kind==='fm' ? fmSign()      : t.kind==='qp' ? qpSign()      : inputSign(t); break;
       case 'p': if(t.kind==='fm' && typeof switchFieldMode==='function') switchFieldMode(FM.builderKey==='P'?'L':'P'); break;
       case 'i': if(t.kind==='fm' && typeof toggleIncrementalToken==='function') toggleIncrementalToken(); break;
-      case 'q': if(t.kind==='fm') fmQ(); else if(t.q) t.q(); break;
-      case 'ent':   t.kind==='fm' ? fieldNext() : t.ent(); break;
-      case 'noent': t.kind==='fm' ? fmNoEnt()   : t.noent(); break;
-      case 'end':   t.kind==='fm' ? exitFieldMode() : t.end(); break; // panel's own close wrapper hides the keyboard
+      case 'q': if(t.kind==='fm') fmQ(); else if(t.kind==='qp') qpType('Q'); else if(t.q) t.q(); break;
+      case 'ent':   t.kind==='fm' ? fieldNext() : t.kind==='qp' ? qpEnt() : t.ent(); break;
+      case 'noent': t.kind==='fm' ? fmNoEnt()   : t.kind==='qp' ? qpEnt() : t.noent(); break;
+      case 'end':   t.kind==='fm' ? exitFieldMode() : t.kind==='qp' ? (typeof qpInsert==='function'&&qpInsert()) : t.end(); break; // panel's own close wrapper hides the keyboard
       case 'close': hide(true); break; // hide only — edit stays active
     }
   }
@@ -285,6 +330,16 @@
     var i=el('qPanelInput');
     if(i){ i.inputMode='none'; freshInput=true; show(); }
   });
+  // Q-parameter assignment builder — show keyboard on every step (the operator
+  // step has no numeric field, but ENT must still advance it).
+  wrap('renderQParamPanel', function(){ if(qpBuilderOpen()) show(); });
+  // Its focus helper would raise the native keyboard on #mobileInput — the
+  // custom keyboard owns QP input, so keep the native keyboard closed.
+  var _qpfmOrig=window._qpFocusMobile;
+  if(typeof _qpfmOrig==='function'){
+    window._qpFocusMobile=function(){ if(qpBuilderOpen()){ blurCodeSoon(); return; } return _qpfmOrig.apply(this, arguments); };
+  }
+
   // TOOL DEF exception — no keyboard, only the docked picker panel
   wrap('openToolDefEdit', function(){ hide(false); });
 

@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.78)
+- The Q key is back on the keypad and opens the Q-parameter builder; its numbers are now typed with the built-in keyboard (the ×, ÷ and + operators stay as on-screen buttons). P and I remain on the keyboard.
+
 ## Unreleased test build (APP_VERSION 1.0.77)
 - The built-in TNC keyboard now works everywhere you edit numbers: path functions, BLK FORM blank size, M functions and cycle parameters — the Android system keyboard no longer appears while editing. Editing a TOOL DEF still shows only its tool picker. The editing panel sits directly above the keyboard, and P / I / Q moved from the keypad onto the keyboard.
 

@@ -7,6 +7,19 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.78 — keep Q in the keypad; keyboard drives the Q builder
+
+- Reverted the removal of Q from the keypad `PI_KEYS` row (P and I stay on the
+  keyboard only). Q reopens the multi-step Q-parameter assignment builder,
+  whose `= / × / ÷` operators and functions are panel buttons — so no operator
+  keys are needed on the keyboard.
+- Wired that builder into the custom keyboard: the Q-number and value steps take
+  numeric input from the keyboard (comma → ".", sign toggle, Q key inserts a Q
+  reference in the value), ENT advances each step and END inserts. The builder
+  is detected by its rendered `QP.*` handlers so the operator step (which has no
+  numeric field) still advances on ENT; its native keyboard is suppressed via a
+  `_qpFocusMobile` override.
+
 ## APP_VERSION 1.0.77 — custom keyboard across all interactive editors (v3)
 
 - Extended `www/android/custom-keyboard.js` beyond guided field mode to every
