@@ -855,6 +855,11 @@ html.ck-open body[data-mtab="editor"] .ctx-panel{order:98;border-bottom:none;}
    the body's tab-bar reservation (same as the kbd-open rules do) */
 html.ck-open .mtab-bar{transform:translateY(120%) translateZ(0) !important;}
 html.ck-open body[data-mtab="editor"]{padding-bottom:0 !important;}
+/* The Problems bar lives at the bottom of the editor column. While either
+   keyboard is open it must not sit above the keys — hide it; it reappears
+   (collapsed to its summary row) the moment the keyboard is dismissed. */
+html.ck-open  body[data-mtab="editor"] .problems,
+html.kbd-open body[data-mtab="editor"] .problems{display:none !important;}
 /* Duplicate controls hidden while the keyboard is up: DONE/Insert (ENT is on
    the keyboard), the Q toggle (Q key), and the skip "—" (NO ENT key). The ▶
    nav stays visible — it is the spec's "→ next value" control. */

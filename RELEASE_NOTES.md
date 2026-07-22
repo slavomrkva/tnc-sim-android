@@ -12,6 +12,11 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.79)
+- Problems are now collapsed to a single summary row; tap it to see the full list, and it no longer covers the keyboard while you type.
+- The keyboard now appears right on the first step when you insert a new BLK FORM (box/cylinder), and TOOL DEF editing shows only its tool picker with no keyboard.
+- Fixed editing a cycle parameter: switching a value to a Q reference and then typing a number now keeps the Q on the first try.
+
 ## Unreleased test build (APP_VERSION 1.0.78)
 - The Q key is back on the keypad and opens the Q-parameter builder; its numbers are now typed with the built-in keyboard (the ×, ÷ and + operators stay as on-screen buttons). P and I remain on the keyboard.
 

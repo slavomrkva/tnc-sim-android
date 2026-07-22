@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.78';
+var APP_VERSION = '1.0.79';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -759,7 +759,10 @@ var ctx2d = canvas2d.getContext('2d');
 
 // ---------- line numbers ----------
 var problemsData = [];
-var problemsOpen = true;
+// Collapsed by default: only the summary row (error/warning counts) shows; the
+// full list — including warnings — unfolds when the row is tapped. Pressing Run
+// with errors still force-expands it (sim-controls.js).
+var problemsOpen = false;
 /* Heidenhain-like behaviour: a real TNC evaluates a block when you confirm
    it, not on every keystroke. While the user is typing on a line, problems
    for THAT line are hidden; they appear the moment the caret leaves the line

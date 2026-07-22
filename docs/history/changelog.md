@@ -7,6 +7,24 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.79 — Problems collapse, BLK step-0 keyboard, Q-edit + TOOL DEF fixes
+
+- Problems panel now starts collapsed: only the error/warning summary row shows;
+  the list (warnings included) unfolds on tap. `problemsOpen` defaults to false
+  (Run-with-errors still force-expands via sim-controls).
+- Problems bar is hidden while either keyboard is open (`html.ck-open` /
+  `html.kbd-open`) so it never appears above the keys; it returns collapsed when
+  the keyboard is dismissed.
+- BLK FORM new insert: the keyboard now shows on step 0 (BOX/CYL shape picker)
+  so ENT advances to the first field. The BLK target is active on every step;
+  input helpers no-op when a step has no numeric field.
+- Cycle-parameter Q editing: pressing Q now clears `freshInput`, so the next
+  digit appends to the inserted Q instead of replacing it (previously worked
+  only on the second attempt).
+- TOOL DEF edit opens no keyboard at all — the custom one stays hidden and the
+  native one that a code tap would raise is blurred away; only the docked tool
+  picker shows.
+
 ## APP_VERSION 1.0.78 — keep Q in the keypad; keyboard drives the Q builder
 
 - Reverted the removal of Q from the keypad `PI_KEYS` row (P and I stay on the

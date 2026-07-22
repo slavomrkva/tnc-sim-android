@@ -23,7 +23,18 @@ assert.match(ckSource, /\{k:'0'\},\{a:'noent'[^]*?\{a:'end'[^]*?\{a:'close'/, 'r
 assert.match(ckSource, /wrap\('renderBlkPanel'/, 'keyboard wires into BLK FORM wizard');
 assert.match(ckSource, /wrap\('openMPanel'/, 'keyboard wires into Edit M panel');
 assert.match(ckSource, /wrap\('openQPopup'/, 'keyboard wires into cycle-parameter Q editing');
-assert.match(ckSource, /wrap\('openToolDefEdit', function\(\)\{ hide\(false\); \}\)/, 'TOOL DEF opens NO keyboard');
+assert.match(ckSource, /wrap\('openToolDefEdit', function\(\)\{ hide\(false\); blurEditorNow\(\); \}\)/,
+  'TOOL DEF opens NO keyboard — custom hidden and native blurred away');
+// BLK wizard active on every step (step 0 shape picker also shows the keyboard)
+assert.match(ckSource, /if\(typeof BLK!=='undefined' && BLK\.active\) return \{\s*\n\s*kind:'input', input:el\('blkFbarVal'\)/,
+  'BLK target is active on every step, not only when #blkFbarVal exists');
+// Cycle-parameter Q bug: inserting Q clears freshInput so the next digit appends
+assert.match(ckSource, /else if\(t\.q\)\{ freshInput=false; t\.q\(\); \}/,
+  'Q insertion clears freshInput so the following digit appends to Q');
+// Problems collapsed by default and hidden above the keyboard
+assert.match(appSource, /var problemsOpen = false;/, 'Problems list is collapsed by default (summary row only)');
+assert.match(cssSource, /html\.ck-open\s+body\[data-mtab="editor"\] \.problems,\s*\n\s*html\.kbd-open body\[data-mtab="editor"\] \.problems\{display:none !important;\}/,
+  'Problems bar is hidden while either keyboard is open');
 assert.match(ckSource, /window\.focusMobileInput=function\(\)\{\s*if\(FM\.active\)/,
   'native keyboard is suppressed while field mode owns input');
 

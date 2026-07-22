@@ -12,11 +12,13 @@
    The keyboard replaces the native Android soft keyboard for EVERY numeric /
    parameter interactive editor:
      - PATH FUNCTIONS guided fields (FM: L / C / CR / cycles …) — virtual values.
-     - BLK FORM wizard        (#blkFbarVal input).
+     - BLK FORM wizard        (from the BOX/CYL shape picker through every field).
      - Edit M function        (#mCustomInput input).
      - Cycle parameter Q line (#qPanelInput input, openQPopup).
-   TOOL DEF is the exception: editing it opens NO keyboard, only its docked
-   picker panel in the bottom interaction area.
+     - Q-parameter builder    (openQParamPanel — operators/functions stay panel
+                               buttons; number and value steps take keys).
+   TOOL DEF is the exception: editing it opens NO keyboard (custom or native),
+   only its docked picker panel in the bottom interaction area.
 
    Behavior (spec v3):
      - "," writes the "." decimal form the editor expects.
@@ -122,6 +124,14 @@
     },0);
   }
 
+  function blurEditorNow(){
+    // Unconditionally drop editor focus (TOOL DEF: no keyboard of any kind —
+    // neither the custom one nor the native one that a codeEl tap would raise).
+    setTimeout(function(){
+      [codeEl, el('mobileInput')].forEach(function(x){ if(x){ try{ x.blur(); }catch(e){} } });
+    },0);
+  }
+
   function show(){
     ensureBuilt();
     if(!kb) return;
@@ -138,9 +148,10 @@
   // ── target abstraction: which editor is currently accepting input ──
   function currentTarget(){
     if(typeof FM!=='undefined' && FM.active) return {kind:'fm'};
-    var b=el('blkFbarVal');
-    if(b && typeof BLK!=='undefined' && BLK.active) return {
-      kind:'input', input:b, sign:true, digitsOnly:false,
+    // BLK wizard: active on every step. Step 0 (BOX/CYL shape picker) has no
+    // #blkFbarVal — the keyboard still shows so ENT advances to the first field.
+    if(typeof BLK!=='undefined' && BLK.active) return {
+      kind:'input', input:el('blkFbarVal'), sign:true, digitsOnly:false,
       ent:function(){ if(typeof blkConfirmStep==='function') blkConfirmStep(); },
       noent:function(){ if(typeof blkStepRel==='function') blkStepRel(1); },
       end:function(){ if(typeof insertBlkForm==='function') insertBlkForm(); }
@@ -242,7 +253,7 @@
   //    editing its input value and dispatching an input event ──
   function fireInput(i){ i.dispatchEvent(new Event('input',{bubbles:true})); }
   function inputType(t, ch){
-    var i=t.input;
+    var i=t.input; if(!i) return; // e.g. BLK shape-picker step — nothing to type
     if(ch===',') ch='.';
     if(t.digitsOnly){ if(!/[0-9]/.test(ch)) return; }
     if(freshInput){ i.value=''; freshInput=false; }
@@ -250,12 +261,13 @@
     fireInput(i);
   }
   function inputBackspace(t){
+    if(!t.input) return;
     freshInput=false;
     t.input.value=String(t.input.value).slice(0,-1);
     fireInput(t.input);
   }
   function inputSign(t){
-    if(!t.sign) return;
+    if(!t.sign || !t.input) return;
     freshInput=false;
     var cur=String(t.input.value);
     t.input.value=applyNumericSign(cur, cur.charAt(0)==='-' ? '+' : '-');
@@ -276,7 +288,10 @@
       case 'sign':      t.kind==='fm' ? fmSign()      : t.kind==='qp' ? qpSign()      : inputSign(t); break;
       case 'p': if(t.kind==='fm' && typeof switchFieldMode==='function') switchFieldMode(FM.builderKey==='P'?'L':'P'); break;
       case 'i': if(t.kind==='fm' && typeof toggleIncrementalToken==='function') toggleIncrementalToken(); break;
-      case 'q': if(t.kind==='fm') fmQ(); else if(t.kind==='qp') qpType('Q'); else if(t.q) t.q(); break;
+      // Inserting a Q reference is a deliberate edit — the next digit must
+      // append to the "Q", not be treated as the first char that replaces the
+      // preselected value (that wiped the Q on the first try before).
+      case 'q': if(t.kind==='fm') fmQ(); else if(t.kind==='qp') qpType('Q'); else if(t.q){ freshInput=false; t.q(); } break;
       case 'ent':   t.kind==='fm' ? fieldNext() : t.kind==='qp' ? qpEnt() : t.ent(); break;
       case 'noent': t.kind==='fm' ? fmNoEnt()   : t.kind==='qp' ? qpEnt() : t.noent(); break;
       case 'end':   t.kind==='fm' ? exitFieldMode() : t.kind==='qp' ? (typeof qpInsert==='function'&&qpInsert()) : t.end(); break; // panel's own close wrapper hides the keyboard
@@ -314,11 +329,15 @@
     };
   }
 
-  // BLK FORM wizard (renderBlkPanel runs on open and every field step)
+  // BLK FORM wizard (renderBlkPanel runs on open and every step). Show the
+  // keyboard on every step, including step 0's BOX/CYL shape picker, so ENT
+  // can advance from there; only the field steps have an input to type into.
   wrap('renderBlkPanel', function(){
-    var i=el('blkFbarVal');
-    if(typeof BLK!=='undefined' && BLK.active && i){ i.inputMode='none'; freshInput=true; show(); }
-    else hide(false); // shape-picker step (no field) or closed
+    if(typeof BLK!=='undefined' && BLK.active){
+      var i=el('blkFbarVal');
+      if(i){ i.inputMode='none'; freshInput=true; }
+      show();
+    } else hide(false);
   });
   // Edit M function
   wrap('openMPanel', function(){
@@ -340,8 +359,9 @@
     window._qpFocusMobile=function(){ if(qpBuilderOpen()){ blurCodeSoon(); return; } return _qpfmOrig.apply(this, arguments); };
   }
 
-  // TOOL DEF exception — no keyboard, only the docked picker panel
-  wrap('openToolDefEdit', function(){ hide(false); });
+  // TOOL DEF exception — no keyboard at all (custom hidden AND the native one
+  // that a codeEl tap would raise is blurred away), only the docked picker.
+  wrap('openToolDefEdit', function(){ hide(false); blurEditorNow(); });
 
   // closing any editor hides the keyboard
   wrap('closeCtxPanel', function(){ hide(false); });
