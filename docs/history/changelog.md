@@ -7,6 +7,18 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.82 — cycle-edit polish, sign keep, arc FMAX/FAUTO, M3/M8 comments
+
+- Editing a cycle Q parameter now highlights the active line in the gutter
+  (`.ln.qedit`) and scrolls it into view; ENT/◀ move the marker between params.
+- Overwriting a negative value keeps its sign: −20 → typing 5 becomes −5 (until
+  +/− is pressed). Applies to FM fields, BLK/M/Q real inputs and the Q builder
+  value (`keepSign`).
+- Parser: C/CR/CT/CP arc blocks now accept `FMAX`/`FAUTO` feed like L — no more
+  false "Unsupported token" on `C … FMAX` / `C … FAUTO`.
+- A new TOOL CALL's auto-added M3/M8 now carry the same descriptive comment a
+  manual M insertion adds (Spindle ON / Coolant ON).
+
 ## APP_VERSION 1.0.81 — keyboard relayout + editor fixes batch
 
 - Keyboard relaid out (right column top→bottom: Q, ◀, ENT▶, NO ENT, END⌄):

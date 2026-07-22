@@ -457,7 +457,7 @@ function validateProgram(code, liveEdit){
 
     // â”€â”€ C arc â”€â”€
     } else if(/^C(\s|$)/.test(u)){
-      rejectUnknownTokens(toks,1,[/^[XY][+-]?\d+(?:\.\d+)?$/, /^DR[+-]$/, /^F\+?\d+(?:\.\d+)?$/, /^(?:RL|RR|R0)$/],srcI);
+      rejectUnknownTokens(toks,1,[/^[XY][+-]?\d+(?:\.\d+)?$/, /^DR[+-]$/, /^(?:FMAX|FAUTO|F\+?\d+(?:\.\d+)?)$/, /^(?:RL|RR|R0)$/],srcI);
       if(!lastCC) probs.push({line:srcI,sev:'err',msg:'Circle center undefined \u2014 program CC first'});
       if(u.indexOf('DR+')<0&&u.indexOf('DR-')<0) probs.push({line:srcI,sev:'err',msg:'Rotation direction DR missing'});
       if(/\bRL\b/.test(u)||/\bRR\b/.test(u))
@@ -478,7 +478,7 @@ function validateProgram(code, liveEdit){
 
     // â”€â”€ CR â”€â”€
     } else if(toks[0]==='CR'){
-      rejectUnknownTokens(toks,1,[/^[XY][+-]?\d+(?:\.\d+)?$/, /^R[+-]?\d+(?:\.\d+)?$/, /^DR[+-]$/, /^F\+?\d+(?:\.\d+)?$/, /^(?:RL|RR|R0)$/],srcI);
+      rejectUnknownTokens(toks,1,[/^[XY][+-]?\d+(?:\.\d+)?$/, /^R[+-]?\d+(?:\.\d+)?$/, /^DR[+-]$/, /^(?:FMAX|FAUTO|F\+?\d+(?:\.\d+)?)$/, /^(?:RL|RR|R0)$/],srcI);
       if(!/(?:^|\s)R[+-]?\d/.test(u)) probs.push({line:srcI,sev:'err',msg:'Circle radius R missing'});
       if(u.indexOf('DR+')<0&&u.indexOf('DR-')<0) probs.push({line:srcI,sev:'err',msg:'Rotation direction DR missing'});
       if(/\bRL\b/.test(u)||/\bRR\b/.test(u))
@@ -499,7 +499,7 @@ function validateProgram(code, liveEdit){
 
     // â”€â”€ CT â”€â”€
     } else if(toks[0]==='CT'){
-      rejectUnknownTokens(toks,1,[/^[XY][+-]?\d+(?:\.\d+)?$/, /^F\+?\d+(?:\.\d+)?$/, /^(?:RL|RR|R0)$/],srcI);
+      rejectUnknownTokens(toks,1,[/^[XY][+-]?\d+(?:\.\d+)?$/, /^(?:FMAX|FAUTO|F\+?\d+(?:\.\d+)?)$/, /^(?:RL|RR|R0)$/],srcI);
       if(!/X[+-]?\d/.test(u)&&!/Y[+-]?\d/.test(u))
         probs.push({line:srcI,sev:'warn',msg:'CT block without end point'});
       if(/\bRL\b/.test(u)||/\bRR\b/.test(u))
@@ -526,7 +526,7 @@ function validateProgram(code, liveEdit){
       }
       if(firstMoveLine<0) firstMoveLine=srcI;
     } else if(toks[0]==='CP'){
-      rejectUnknownTokens(toks,1,[/^PA[+-]?\d+(?:\.\d+)?$/, /^DR[+-]$/, /^F\+?\d+(?:\.\d+)?$/, /^(?:RL|RR|R0)$/],srcI);
+      rejectUnknownTokens(toks,1,[/^PA[+-]?\d+(?:\.\d+)?$/, /^DR[+-]$/, /^(?:FMAX|FAUTO|F\+?\d+(?:\.\d+)?)$/, /^(?:RL|RR|R0)$/],srcI);
       if(!lastCC) probs.push({line:srcI,sev:'err',msg:'Polar origin undefined \u2014 program CC before CP'});
       if(!/PA[+-]?\d/.test(u)) probs.push({line:srcI,sev:'err',msg:'Polar angle PA missing'});
       if(u.indexOf('DR+')<0&&u.indexOf('DR-')<0) probs.push({line:srcI,sev:'err',msg:'Rotation direction DR missing'});

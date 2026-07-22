@@ -31,6 +31,18 @@ assert.match(ckSource, /f\.type==='feed'[^]*?f\.val='AUTO'/, 'inserted move feed
 assert.match(ckSource, /window\.enterFieldMode=function\(label\)\{/, 'enterFieldMode is wrapped for exit-first + anchor + defaults');
 assert.match(ckSource, /ck-qp-cue/, 'Q-builder first step shows a ▶ continue cue');
 assert.doesNotMatch(appSource, /\{l:'GOTO'/, 'GOTO removed from the keypad');
+// follow-up batch
+const parserSource = fs.readFileSync(path.join(root, 'www', 'core', 'parser-engine.js'), 'utf8');
+const panelsSource = fs.readFileSync(path.join(root, 'www', 'android', 'panels.js'), 'utf8');
+assert.strictEqual(parserSource.indexOf('/^F\\+?\\d+(?:\\.\\d+)?$/'), -1,
+  'the bare arc feed pattern (no FMAX/FAUTO) is gone — C/CR/CT/CP accept FMAX/FAUTO');
+assert.ok(parserSource.indexOf('/^(?:FMAX|FAUTO|F\\+?\\d+(?:\\.\\d+)?)$/') !== -1, 'arc blocks accept FMAX/FAUTO feed');
+assert.match(ckSource, /function keepSign\(val\)/, 'keepSign helper preserves a leading sign on value replace');
+assert.match(ckSource, /keepSign\(f\.val\)/, 'FM value-replace keeps the sign');
+assert.match(ckSource, /keepSign\(i\.value\)/, 'real-input value-replace keeps the sign');
+assert.match(ckSource, /mm\[1\]\+' ; '\+desc/, 'auto-added TOOL CALL M3/M8 get descriptive comments');
+assert.match(panelsSource, /_qPopupLine >= 0[^]*?classList\.add\('qedit'\)/, 'the edited cycle Q line is marked in the gutter');
+assert.match(cssSource, /\.line-nums \.ln\.qedit\{/, 'the .qedit highlight style exists');
 
 // v3 multi-editor routing + TOOL DEF exception
 assert.match(ckSource, /wrap\('renderBlkPanel'/, 'keyboard wires into BLK FORM wizard');

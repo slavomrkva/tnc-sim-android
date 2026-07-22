@@ -67,6 +67,11 @@ function updateLineNums(){
     var _divs = lineNums.querySelectorAll('.ln');
     if(_divs[_selectedLine]) _divs[_selectedLine].classList.add('selected');
   }
+  // mark the cycle Q-parameter line currently being edited (custom keyboard)
+  if(typeof _qPopupLine!=='undefined' && _qPopupLine >= 0){
+    var _qd = lineNums.querySelectorAll('.ln');
+    if(_qd[_qPopupLine]) _qd[_qPopupLine].classList.add('qedit');
+  }
   // sync scroll position
   lineNums.scrollTop = codeEl.scrollTop;
   updateHighlightOverlay();

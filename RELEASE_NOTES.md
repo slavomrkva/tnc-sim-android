@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.82)
+- Editing a cycle parameter now highlights the line you're on and scrolls to it. Overwriting a negative value keeps the minus sign until you change it. Circular blocks (C) now accept FMAX/FAUTO without an error. A new TOOL CALL's automatic M3/M8 now include their descriptions.
+
 ## Unreleased test build (APP_VERSION 1.0.81)
 - Rearranged the keyboard again and fixed several editor behaviours: ENT moves to the next field when editing a BLK FORM; in cycle parameters ENT/◀ move down/up between parameters; new TOOL CALL defaults to S10000 F2000; a new move's feed defaults to FAUTO; CHF/RND no longer jump to the top of the program when no line is selected; and the GOTO button was removed.
 

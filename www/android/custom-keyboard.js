@@ -193,7 +193,7 @@
     if(ch===',') ch='.';
     var allowed = t==='num' ? /[0-9]/ : /[0-9Qq.+\-*\/()]/;
     if(!allowed.test(ch)) return;
-    if(!QP._typing){ QP[t]=''; QP._typing=true; }
+    if(!QP._typing){ QP[t]=(t==='num')?'':keepSign(QP[t]); QP._typing=true; }
     QP[t]=String(QP[t])+(ch==='q'?'Q':ch);
     qpShow(t);
   }
@@ -252,10 +252,29 @@
         if(f.p==='S' && (f.val===null||f.val===''||f.val==='0')){ f.val='10000'; changed=true; }
         if(f.p==='F' && (f.val===null||f.val==='')){ f.val='2000'; changed=true; }
       });
+      // enterFieldMode auto-appends bare "M3"/"M8" after a new TOOL CALL — give
+      // them the same descriptive comment a manual M insertion would add.
+      var tcIdx=codeEl.value.slice(0,FM.lineStart).split('\n').length-1;
+      var lines=codeEl.value.split('\n'), mEdited=false;
+      for(var k=tcIdx+1;k<=tcIdx+2 && k<lines.length;k++){
+        var mm=lines[k].match(/^\s*(M\d+)\s*$/);
+        if(mm){
+          var desc=(typeof _mDescFor==='function')?_mDescFor(mm[1]):null;
+          if(desc){ lines[k]=mm[1]+' ; '+desc; mEdited=true; }
+        }
+      }
+      if(mEdited){ codeEl.value=lines.join('\n'); changed=true; }
     }
     // A freshly inserted move's feed defaults to FAUTO instead of an empty "—".
     FM.fields.forEach(function(f){ if(f.type==='feed' && (f.val===null||f.val==='')){ f.val='AUTO'; changed=true; } });
     if(changed && typeof selectField==='function') selectField(FM.idx);
+  }
+
+  // When the first typed key replaces a field's preset value, keep any leading
+  // sign so overwriting −20 with 5 stays −5 until +/− is pressed (never wipes it).
+  function keepSign(val){
+    var s=String(val==null?'':val);
+    return (s.charAt(0)==='-'||s.charAt(0)==='+') ? s.charAt(0) : '';
   }
 
   // ── FM (guided field) input — virtual values on FM.fields[FM.idx] ──
@@ -265,7 +284,7 @@
     if(!f || f.type==='tool' || f.type==='dr' || f.type==='rc') return;
     var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9.QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
     if(patterns[f.type] && !patterns[f.type].test(ch)) return;
-    if(!FM.typing || f.type==='qval'){ f.val=''; FM.typing=true; }
+    if(!FM.typing || f.type==='qval'){ f.val=(f.type==='qval')?'':keepSign(f.val); FM.typing=true; }
     f.val+=ch;
     if(f.type==='qval') f.val=f.val.replace(/q/g,'Q').replace(/[^0-9.+\-QAUTOauto]/g,'');
     else f.val=sanitizeVal(f.val,f.type);
@@ -307,7 +326,7 @@
     var i=t.input; if(!i) return; // e.g. BLK shape-picker step — nothing to type
     if(ch===',') ch='.';
     if(t.digitsOnly){ if(!/[0-9]/.test(ch)) return; }
-    if(freshInput){ i.value=''; freshInput=false; }
+    if(freshInput){ i.value=keepSign(i.value); freshInput=false; }
     i.value+=ch;
     fireInput(i);
   }
@@ -408,10 +427,19 @@
     var i=el('mCustomInput');
     if(i){ i.inputMode='none'; freshInput=true; show(); }
   });
-  // Cycle parameter Q line
+  // Cycle parameter Q line — show keyboard, paint the .qedit line marker and
+  // scroll the edited parameter into view so it's clear which one is active.
   wrap('openQPopup', function(){
     var i=el('qPanelInput');
-    if(i){ i.inputMode='none'; freshInput=true; show(); }
+    if(i){
+      i.inputMode='none'; freshInput=true; show();
+      if(typeof updateLineNums==='function') updateLineNums();
+      if(typeof _qPopupLine!=='undefined' && _qPopupLine>=0 && codeEl){
+        var lh=parseFloat(getComputedStyle(codeEl).lineHeight)||20;
+        var t=Math.max(0,_qPopupLine*lh - codeEl.clientHeight/2);
+        codeEl.scrollTop=t; var lns=el('lineNums'); if(lns) lns.scrollTop=t;
+      }
+    }
   });
   // Q-parameter assignment builder — show keyboard on every step (the operator
   // step has no numeric field, but ENT must still advance it). On the first
@@ -443,5 +471,6 @@
 
   // closing any editor hides the keyboard
   wrap('closeCtxPanel', function(){ hide(false); });
-  wrap('closeQPopup', function(){ hide(false); });
+  // also refresh the gutter so the .qedit marker clears (closeQPopup set _qPopupLine=-1)
+  wrap('closeQPopup', function(){ hide(false); if(typeof updateLineNums==='function') updateLineNums(); });
 })();
