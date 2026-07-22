@@ -855,11 +855,12 @@ html.ck-open body[data-mtab="editor"] .ctx-panel{order:98;border-bottom:none;}
    the body's tab-bar reservation (same as the kbd-open rules do) */
 html.ck-open .mtab-bar{transform:translateY(120%) translateZ(0) !important;}
 html.ck-open body[data-mtab="editor"]{padding-bottom:0 !important;}
-/* duplicate P / I / Q / ENT / NO ENT controls hidden while the keyboard is up */
-html.ck-open .keypad .key.pi-key{display:none;}
+/* Duplicate controls hidden while the keyboard is up: DONE/Insert (ENT is on
+   the keyboard), the Q toggle (Q key), and the skip "—" (NO ENT key). The ▶
+   nav stays visible — it is the spec's "→ next value" control. */
+html.ck-open .ctx-panel .fbar-done{display:none;}
 html.ck-open .ctx-panel .fbar-fmax{display:none;}
 html.ck-open .ctx-panel .fbar-drbtn[title="Skip this field"]{display:none;}
-html.ck-open .ctx-panel .fbar-nav[onclick="fieldNext()"]{display:none;}
 .ck-key{
   min-height:40px;border:1px solid var(--border);border-radius:7px;
   background:var(--surface);color:var(--text);font:700 21px var(--mono);

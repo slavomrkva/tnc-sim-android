@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.76';
+var APP_VERSION = '1.0.77';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -419,11 +419,12 @@ var PROG_KEYS=[
   {l:'LBL CALL',  code:'CALL LBL 1', bld:'LBL CALL'},
   {l:'GOTO', code:'GOTO', gotoLine:true},
 ];
+// P, I and Q are permanently removed from the keypad — they now live on the
+// Android custom keyboard (android/custom-keyboard.js): P toggles polar, I
+// toggles incremental, Q inserts a Q-parameter reference during field editing.
+// Only M (function picker) remains in this row.
 var PI_KEYS=[
-  {l:'P', sub:'polar LP',    code:'LP PR+0 PA+0 F500', icon:'polar'},
-  {l:'I', sub:'increm.',     code:'L IX+0 IY+0 F500',  icon:'incr'},
   {l:'M', sub:'M function',  code:'M', mPicker:true},
-  {l:'Q', sub:'Q parameter', code:'Q', qParam:true},
 ];
 var ALL_KEYS=[];
 

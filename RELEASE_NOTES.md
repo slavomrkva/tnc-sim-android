@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.77)
+- The built-in TNC keyboard now works everywhere you edit numbers: path functions, BLK FORM blank size, M functions and cycle parameters — the Android system keyboard no longer appears while editing. Editing a TOOL DEF still shows only its tool picker. The editing panel sits directly above the keyboard, and P / I / Q moved from the keypad onto the keyboard.
+
 ## Unreleased test build (APP_VERSION 1.0.76)
 - New built-in TNC keyboard while editing a program line: digits, decimal comma, sign toggle, orange P and I, Q, ENT, NO ENT and END keys — the Android system keyboard no longer pops up during guided editing. The editing panel now sits directly above it, and an arrow key lets you hide/reshow the keyboard mid-edit.
 

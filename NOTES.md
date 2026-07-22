@@ -136,13 +136,23 @@ The detailed module-split rationale is in
     draft. A process or Compatibility-mode reload during Learn must ignore
     transient lesson text and recover the main draft.
 
-22. **Custom TNC keyboard owns field-mode input:** while FM is active,
-    `www/android/custom-keyboard.js` replaces the native keyboard — never focus
-    `#mobileInput` (or add anything that does) during field mode, or both
-    keyboards appear. The script must stay loaded after `android/app.js`
-    because it wraps the global `selectField`/`exitFieldMode`/
-    `focusMobileInput`. Free-text editing (comments, Q-line text) still uses
-    the native keyboard and rule #7's viewport detection.
+22. **Custom TNC keyboard owns every parameter editor:**
+    `www/android/custom-keyboard.js` replaces the native keyboard for FM guided
+    fields AND the real-input panels — BLK FORM (`#blkFbarVal`), Edit M
+    (`#mCustomInput`) and cycle-parameter Q editing (`#qPanelInput`). It routes
+    keys through a `currentTarget()` abstraction, suppresses the native keyboard
+    (FM via the `focusMobileInput` override; real inputs via `inputmode="none"`)
+    and drives real inputs by dispatching an `input` event so each panel's own
+    commit logic runs — do not reimplement those handlers. TOOL DEF is the
+    deliberate exception: it opens no keyboard, only its docked picker. The
+    script must load after `android/app.js` because it wraps the global
+    `selectField`/`exitFieldMode`/`focusMobileInput`/`renderBlkPanel`/
+    `openMPanel`/`openQPopup`/`openToolDefEdit`/`closeCtxPanel`/`closeQPopup`.
+    P, I and Q are intentionally absent from the keypad `PI_KEYS` row (only M
+    remains) — they live on the keyboard; removing them also retired the
+    standalone Q-assignment builder's entry point. Free-text editing (comments,
+    raw Q-line text) still uses the native keyboard and rule #7's viewport
+    detection.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

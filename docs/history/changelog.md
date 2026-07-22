@@ -7,6 +7,26 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.77 — custom keyboard across all interactive editors (v3)
+
+- Extended `www/android/custom-keyboard.js` beyond guided field mode to every
+  numeric/parameter editor via a target abstraction: BLK FORM wizard
+  (`#blkFbarVal`), Edit M (`#mCustomInput`) and cycle-parameter Q editing
+  (`#qPanelInput`). Real-input panels are driven by editing their input and
+  dispatching an `input` event so each panel's own commit logic runs; native
+  keyboard suppressed with `inputmode="none"`.
+- TOOL DEF exception: editing it opens no keyboard, only its docked picker
+  panel (the keyboard is hidden on `openToolDefEdit`).
+- Panel changes (`html.ck-open`): DONE/Insert, the Q toggle and the skip "—"
+  are hidden (ENT / Q / NO ENT live on the keyboard); the ▶ nav stays as the
+  "→ next value" control.
+- Permanently removed P, I and Q from the keypad `PI_KEYS` row (keep M); they
+  are provided by the keyboard during editing. This also removes the standalone
+  multi-step Q-assignment builder's only entry point.
+- Expanded `tests/custom-keyboard.test.js` with BLK real-input routing and the
+  keypad/panel assertions; verified all five editors end-to-end (Playwright,
+  Android UA).
+
 ## APP_VERSION 1.0.76 — custom TNC keyboard for guided field editing
 
 - Added the Android-only custom numeric keyboard (`www/android/custom-keyboard.js`)
