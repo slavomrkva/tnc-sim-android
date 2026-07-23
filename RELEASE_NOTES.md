@@ -12,6 +12,9 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.87)
+- Program rows now follow logical TNC blocks: every row of a cycle selects and inserts after the whole cycle, empty inserted blocks receive the next number, and Enter on END PGM does nothing.
+
 ## Unreleased test build (APP_VERSION 1.0.84)
 - Improved the built-in TNC keyboard: unavailable keys are visibly disabled, P and I show their active state, replacing a preset keeps its sign, rejected ENT/END input is highlighted, and holding backspace clears the whole current value.
 

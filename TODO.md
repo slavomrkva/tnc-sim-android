@@ -8,6 +8,28 @@
 
 ## Open bugs
 
+## C26 — Enter on a cycle can create a misnumbered row outside the program
+**Reported:** 2026-07-23. **Repro:** place the native Android keyboard caret at
+the end of any physical row of a multi-row `CYCL DEF`, then press Enter. Also
+test Enter with `END PGM` active, both with a caret and a selected row.
+### Symptom
+The inserted empty row could follow physical textarea rows instead of the
+logical TNC block, appear after `END PGM`, or be counted independently from the
+cycle's numbering. Selection, Problems labels, delete and command insertion
+used related but inconsistent physical-row rules.
+### Attempts
+- Attempt 1 — APP_VERSION 1.0.87 introduces a single logical NC block model for
+  gutter numbering, grouped selection, Enter, programming-key insertion,
+  deletion, Problems labels and export. `CYCL DEF` plus directly following Q
+  rows is one block; Enter from any of those rows inserts/reuses one numbered
+  empty block after it; Enter on `END PGM` is a no-op. A fallback also repairs
+  Android IMEs that report Enter as `insertText` with null data. Parser and
+  validator cycle-Q boundaries were aligned with the same rule.
+### Status
+All 24 Android regression tests and JavaScript syntax checks pass. Keep open
+until APP_VERSION 1.0.87 is accepted on the real Android device. The matching
+web-repository port is intentionally deferred to the next step.
+
 ## C23 — Closing practice leaves the Lesson autosave status visible
 **Reported:** 2026-07-21. **Repro:** open a lesson practice, tap its close
 button, and return to the editor without switching tabs.

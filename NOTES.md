@@ -168,6 +168,17 @@ The detailed module-split rationale is in
     editing (comments, raw Q-line text) still uses the native keyboard and rule
     #7's viewport detection.
 
+23. **Program operations use logical NC blocks, not textarea rows:**
+    `analyzeProgramRows()` is the source of truth for gutter numbering,
+    selection, Problems labels, insertion, deletion and export. `CYCL DEF` plus
+    its directly following Q parameter rows is one block; tilde continuations
+    belong to their anchor block; an internal empty row is a numbered
+    placeholder; only the final textarea newline is an artifact. Enter from
+    anywhere in a cycle targets the first block after the complete cycle, and
+    Enter on `END PGM` must remain a no-op. Every programming-key insertion
+    routes through `insertProgramBlock()` so it replaces an adjacent placeholder
+    and never writes after `END PGM`.
+
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and
 the technical log belong in `docs/history/`.

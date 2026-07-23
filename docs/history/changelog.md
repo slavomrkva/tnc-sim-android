@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.87 — logical NC block numbering and insertion
+
+- Added one logical row/block model for numbering, selection, Problems labels,
+  deletion, export and every programming-key insertion path.
+- A multi-row `CYCL DEF` is selected and deleted as one unit; Enter on any of
+  its rows creates or reuses one numbered empty block after the cycle.
+- Enter on `END PGM` is a strict no-op, including the Android IME fallback path.
+- Runtime and validation now end cycle-Q continuation on an empty/comment block,
+  matching the editor gutter model.
+
 ## APP_VERSION 1.0.86 — source checks without automatic APK builds
 
 - Android CI now runs dependency, syntax and regression checks only. It no

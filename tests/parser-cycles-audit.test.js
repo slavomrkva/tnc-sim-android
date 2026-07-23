@@ -25,6 +25,31 @@ function seg(num, q201, q200, q203, q204, extra){
 }
 function cuts(segs, surfZ){ return segs.filter(s => !s.rapid && s.to.z < surfZ - 1e-6); }
 
+// A blank/comment/new command ends the Q-row continuation of CYCL DEF. A later
+// standalone Q assignment must not silently rewrite the already defined cycle.
+{
+  const code = H.program(`TOOL CALL 4 Z S2000 F150
+M3
+L X+0 Y+0 Z+30 R0
+CYCL DEF 200
+ Q200=+2
+ Q201=-5
+ Q206=+150
+ Q202=+5
+ Q203=+20
+ Q204=+30
+
+Q201=-20
+CYCL CALL`);
+  const res = H.parse(code);
+  const segs = H.cycleSegments(res, code);
+  const zValues = segs.reduce((all, s) => all.concat([s.from.z, s.to.z]), []);
+  assert.strictEqual(Math.min.apply(null, zValues), 15,
+    'standalone Q201 after an empty block must not overwrite cycle depth Q201=-5 at surface Z+20');
+  assert.ok(!H.validate(code).some(p => p.sev === 'err'),
+    'the separated standalone Q assignment remains valid');
+}
+
 // ───────────────────────── A1 — Q201 = 0 (zero depth) ─────────────────────────
 for(const num of [200,201,208,209]){
   const {segs} = seg(num, '+0', '+2', '+0', '+30');
