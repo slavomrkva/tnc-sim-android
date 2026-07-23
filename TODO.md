@@ -8,6 +8,55 @@
 
 ## Open bugs
 
+## C27 — Guided block editing could lose its insertion and contour context
+**Reported:** 2026-07-23. **Repro:** insert TOOL CALL and then another block;
+edit an L coordinate and press I; press CHF while an L editor is active; or
+compose the reported Q41 / RL / CHF / RND contour one block at a time.
+### Symptom
+Automatic M3/M8 blocks had no descriptions and the next insertion could still
+use the TOOL CALL anchor instead of M8. New L blocks forced visible FAUTO
+instead of leaving F undefined. Whole-block programming keys could interrupt
+an active field editor, and Edit L incremental input used a stale mobile
+textarea selection instead of the current guided field. A just-inserted
+CHF/RND or RL activation also raised an error before its following contour
+block existed, even though the completed reported contour is valid.
+### Attempts
+- Attempt 1 — APP_VERSION 1.0.88 adds the standard M3/M8 comments and carries
+  the TOOL CALL exit anchor through M8; leaves new positioning F undefined in
+  accordance with the TNC 640 modal numeric-feed rule; locks the whole-block
+  keypad for every active FM/BLK/M/Q/TOOL DEF/cycle editor; toggles incremental
+  state on the current Edit L coordinate; and defers only incomplete trailing
+  CHF/RND and RL diagnostics until Run/Step. The complete supplied Q41 contour
+  now has a parser regression proving three CHF elements and the RND remain in
+  the compensated toolpath.
+- Attempt 2 — the APP_VERSION 1.0.87 device screenshot identified the actual
+  generated errors at B1/B2/B3: zero-value/orphan RND and CHF blocks had been
+  inserted at the program start by the editor conflict, so each bad block
+  produced multiple diagnostics. APP_VERSION 1.0.88 also expands Problems to a
+  large scrollable panel when its summary is tapped, instead of limiting nine
+  diagnostics to the previous 140 px strip.
+- Attempt 3 â€” a follow-up audit found keyboard-adjacent regressions beyond the
+  reported contour: decimal F could be silently collapsed, cycle FAUTO was
+  hidden, Q navigation crossed an empty block, and code/delete/Import/Learn
+  transitions could leave stale editor owners. APP_VERSION 1.0.88 blocks
+  decimal feed entry without rewriting a legacy imported value on open, keeps
+  FAUTO visible, stops Q navigation at the logical boundary, centralizes editor
+  cleanup and tracks empty TOOL DEF panels explicitly. Focused runtime and
+  lifecycle regressions cover each case.
+- Attempt 4 — the completed contour additionally ended with `CHF 3`,
+  `L IX+3.02`, then `L IY+10 R0`. The analytic RL/RR engine treated the
+  terminal 180-degree CHF departure as an ordinary inside corner and demanded
+  an impossible intersection between opposite parallel offsets. APP_VERSION
+  1.0.88 now recognizes only this degenerate-CHF departure at the end of a
+  compensated run, preserves the earlier established tool-center lead-out, and
+  adds the exact full-program regression. Genuine inside-corner errors remain
+  blocking. The local TNC 640 manual does not explicitly define this
+  degenerate departure, so it remains a narrow compatibility exception.
+### Status
+Focused editor, keyboard, validation and analytic radius-compensation
+regressions pass. Keep open until APP_VERSION 1.0.88 is accepted on the real
+Android device.
+
 ## C26 — Enter on a cycle can create a misnumbered row outside the program
 **Reported:** 2026-07-23. **Repro:** place the native Android keyboard caret at
 the end of any physical row of a multi-row `CYCL DEF`, then press Enter. Also

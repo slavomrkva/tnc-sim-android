@@ -1,4 +1,4 @@
-// field-editing -- verified byte-for-byte identical between web and android repos.
+// field-editing -- shared-origin editor logic with Android workflow adaptations.
 
 function _qpPanelOpen(){ return !!document.getElementById('qpFbarVal'); }
 
@@ -101,6 +101,19 @@ function buildKeypad(){
 }
 
 function toggleIncrementalToken(){
+  // Guided editing already owns the parsed field model. On Android the code
+  // textarea is intentionally blurred while the custom keyboard is open, so
+  // lastSel can still point at the token that originally opened the editor.
+  // Toggle the CURRENT coordinate field instead of guessing from that stale
+  // textarea selection.
+  if(typeof FM!=='undefined' && FM.active && FM.builderKey==='L'){
+    var currentField=FM.fields&&FM.fields[FM.idx];
+    if(!currentField || currentField.type!=='coord') return;
+    currentField.incr=!currentField.incr;
+    selectField(FM.idx);
+    return;
+  }
+
   _undoPush();
   var val = codeEl.value;
   var selStart = lastSel.start;
@@ -400,13 +413,17 @@ function enterFieldMode(label){
   var pos=lastSel&&lastSel.start!=null?lastSel.start:codeEl.selectionStart;
   var en=lastSel&&lastSel.end!=null?lastSel.end:pos;
   var lp=lineParts();
-  // After inserting a fresh TOOL CALL, auto-add M3 + M8 on the next two lines —
-  // spindle and coolant on is the standard next step and saves a manual insert.
+  // After inserting a fresh TOOL CALL, auto-add the documented M blocks with
+  // the same comments used by manually inserted known M functions. Keep the
+  // suffix on FM so exiting TOOL CALL anchors the next insertion after M8.
   // Only on insertion (here), never on editing an existing TOOL CALL line.
-  var _afterLines = (label==='TOOL CALL') ? '\nM3\nM8' : '';
+  var _afterLines = (label==='TOOL CALL')
+    ? '\nM3 ; Spindle ON \u2014 clockwise\nM8 ; Coolant ON \u2014 flood'
+    : '';
   var plan=insertProgramBlock(lp.text+_afterLines,pos,en,{mode:'command',selectFirstLine:true});
   FM.lineStart=plan.insertStart;
   FM.lineLen=lp.text.length;
+  FM.afterLines=_afterLines;
   // fbar always visible
   // position cursor in new line
   selectField(0);
@@ -439,7 +456,10 @@ function parseExistingLine(lineText, bk){
   if(bk==='TOOL CALL'){
     var tm=lineText.match(/TOOL CALL\s+(\d+)/i);
     var sm=lineText.match(/\bS(\d+)/i);
-    var fm=lineText.match(/\bF(\d+)/i);
+    // Preserve a legacy/imported decimal value when the editor merely opens.
+    // New guided F input is whole-number only on Android, but opening an
+    // existing program must never silently rewrite F420.500 as F420.
+    var fm=lineText.match(/\bF([+-]?(?:\d+(?:[.,]\d+)?|Q\d+))/i);
     var tdl=lineText.match(/\bDL([+-]?[\d.,]+)/i);
     var tdr=lineText.match(/\bDR([+-]?[\d.,]+)/i);
     return [
@@ -550,11 +570,17 @@ function enterFieldModeOnLine(info){
 
 function exitFieldMode(keepCaret){
   if(!FM.active) return;
-  var caret=FM.lineStart+FM.lineLen;
+  var caret=FM.lineStart+FM.lineLen+String(FM.afterLines||'').length;
   FM.active=false;
   if(typeof _liveEditClear==='function') _liveEditClear();
   _cancelMobileFocus(true);
-  if(!keepCaret){ try{ codeEl.setSelectionRange(caret,caret); }catch(e){} }
+  if(!keepCaret){
+    if(typeof syncEditorSelection==='function') syncEditorSelection(caret,caret);
+    else {
+      try{ codeEl.setSelectionRange(caret,caret); }catch(e){}
+      lastSel={start:caret,end:caret};
+    }
+  }
   var cp=document.getElementById('ctxPanel'); if(cp){ cp.innerHTML=''; }
   renderIdlePanel();
   if(typeof runValidation==='function') runValidation();

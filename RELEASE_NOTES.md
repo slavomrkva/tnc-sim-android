@@ -12,6 +12,18 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.88)
+- Feed fields now accept whole numbers only instead of silently turning a
+  decimal entry into another value. Existing imported decimal TOOL CALL feeds
+  remain unchanged when merely opened for editing.
+- Cycle FAUTO remains available above the built-in keyboard, Q-parameter
+  navigation stops at empty blocks, and tapping the program, deleting,
+  importing or opening Learn cleanly closes every active guided editor.
+- TOOL CALL now adds explained M3/M8 blocks and keeps M8 active for the next insertion. New L blocks leave feed inherited unless F is chosen, active editors lock conflicting programming keys, Edit L incremental input works on the current coordinate, and valid CHF/RND contours no longer show premature errors while their next block is still being entered.
+- Fixed the reported compensated contour ending with a 180-degree CHF lead-out
+  being rejected as if the tool were too large for an inside corner.
+- Tapping the Problems summary now opens a much larger scrollable list, so every diagnostic can be read and selected on a phone.
+
 ## Unreleased test build (APP_VERSION 1.0.87)
 - Program rows now follow logical TNC blocks: every row of a cycle selects and inserts after the whole cycle, empty inserted blocks receive the next number, and Enter on END PGM does nothing.
 

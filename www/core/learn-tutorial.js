@@ -1100,6 +1100,10 @@ function _learnEndEditorInput(){
   // A Learn transition may replace the entire program. Never leave a field/Q/
   // BLK editor alive with offsets that point into the previous code, and never
   // leave a pending hidden-input focus able to reopen the keyboard afterwards.
+  if(typeof window!=='undefined' && typeof window._endAllEditorInput==='function'){
+    window._endAllEditorInput();
+    return;
+  }
   if(typeof FM!=='undefined' && FM.active) exitFieldMode(true);
   if(typeof BLK!=='undefined' && BLK.active) closeCtxPanel();
   if(typeof _qPopupLine!=='undefined' && _qPopupLine>=0) closeQPopup();

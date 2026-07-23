@@ -110,14 +110,16 @@ The detailed module-split rationale is in
     never re-add `mode='idle'` there. Note the voxel check is resolution-bound,
     so sub-voxel gouges surface only at finer quality — do not "fix" that by
     stopping the sim.
-19. **Defer only in-progress radius-comp errors:** while editing
+19. **Defer only in-progress contour-completeness errors:** while editing
     (`runValidation` defaults to `liveEdit=true`) suppress the "contour not
     finished yet" compensation diagnostics — the `validateProgram` "RL/RR still
     active … END PGM" completeness checks and the `_rcReport` calls flagged
-    `incomplete` (`rcDefer`). They return at Run/Step, which call
-    `runValidation(false)`. Genuine geometry errors (tool radius too large,
-    non-positive radius, no valid intersection) always stay live — never blanket
-    all radius-comp errors into the deferred set.
+    `incomplete` (`rcDefer`) — plus a trailing CHF/RND that is still waiting for
+    its following contour move (`liveDefer`). They return at Run/Step, which
+    call `runValidation(false)`. Genuine geometry errors (tool radius too large,
+    non-positive radius, no valid intersection, or a modifier that does not fit
+    between two completed moves) always stay live — never blanket all
+    radius-comp or modifier errors into the deferred set.
 20. **Header name is the file identity, not BEGIN PGM:** `#progTitleName`
     shows `_docName`, set on demo pick (friendly name), import (filename),
     export (saved filename) and Clear (`program.H`); `_setDocName` is the only
@@ -178,6 +180,21 @@ The detailed module-split rationale is in
     Enter on `END PGM` must remain a no-op. Every programming-key insertion
     routes through `insertProgramBlock()` so it replaces an adjacent placeholder
     and never writes after `END PGM`.
+
+24. **A guided editor exclusively owns block programming:** while FM, BLK,
+    M, Q, TOOL DEF or cycle selection is active, the whole-block programming
+    keypad is visibly locked and its dispatch is rejected; only the contextual
+    TNC keyboard actions valid for the current field remain enabled. Docked
+    panels retain an explicit owner even when their selectable list is empty.
+    A code-area tap, gutter deletion, Import or Learn transition must close
+    every editor owner before it changes or replaces program context. Edit L's
+    I key toggles the current guided coordinate, never a stale textarea
+    selection. A new positioning block starts with F omitted so the TNC's last
+    numeric feed remains modal; FAUTO and FMAX are explicit choices. Guided F
+    entry accepts whole numbers only and visibly disables decimal input, while
+    merely opening an imported legacy decimal TOOL CALL feed must preserve its
+    text. A newly inserted TOOL CALL adds commented M3/M8 blocks and finishing
+    that editor anchors the next insertion after M8.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

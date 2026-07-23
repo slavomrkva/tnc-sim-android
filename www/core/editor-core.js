@@ -464,7 +464,12 @@ function renderProblems(){
   var list=document.getElementById('problemsList');
   var countEl=document.getElementById('problemsCount');
   var visible = _problemsForDisplay(problemsData);
-  if(visible.length===0){ panel.style.display='none'; updateLineNums(); return; }
+  if(visible.length===0){
+    panel.style.display='none';
+    panel.classList.remove('expanded');
+    updateLineNums();
+    return;
+  }
   var errs=visible.filter(function(p){ return p.sev==='err'; }).length, warns=visible.length-errs;
   panel.style.display='flex';
   var label='';
@@ -482,14 +487,23 @@ function renderProblems(){
     html+='<div class="'+rowCls+'" onclick="gotoLine('+p.line+')"><span class="pl">B'+problemBlockNumber(p.line)+'</span><span class="pi">'+(isFixed?'\u2714':(p.sev==='err'?'\u2716':'\u26A0'))+'</span><span>'+p.msg+'</span>'+fixBtn+explainBtn+'</div>';
   }
   list.style.display = problemsOpen?'block':'none';
+  panel.classList.toggle('expanded',problemsOpen);
+  var head=panel.querySelector('.problems-head');
+  if(head) head.setAttribute('aria-expanded',problemsOpen?'true':'false');
   list.innerHTML=html;
   updateLineNums();
 }
 
 function toggleProblems(){
   problemsOpen = !problemsOpen;
+  var panel = document.getElementById('problems');
   var list = document.getElementById('problemsList');
   if(list) list.style.display = problemsOpen ? 'block' : 'none';
+  if(panel){
+    panel.classList.toggle('expanded',problemsOpen);
+    var head=panel.querySelector('.problems-head');
+    if(head) head.setAttribute('aria-expanded',problemsOpen?'true':'false');
+  }
 }
 
 function gotoLine(n){
@@ -542,10 +556,11 @@ function runValidation(liveEdit){
     var seenProblems={};
     problemsData.forEach(function(p){ seenProblems[p.line+'|'+p.sev+'|'+p.msg]=true; });
     tmpProg.problems.forEach(function(p){
-      // Defer only "contour not finished yet" comp diagnostics while editing;
-      // genuine geometry errors (tool radius too large, etc.) still show live.
-      // The deferred ones return at Run/Step (liveEdit=false).
-      if(liveEdit && p.rcDefer) return;
+      // Defer only "contour not finished yet" diagnostics while editing:
+      // incomplete radius compensation and a trailing CHF/RND waiting for its
+      // following move. Genuine geometry errors still show live. Deferred
+      // diagnostics return at Run/Step (liveEdit=false).
+      if(liveEdit && (p.rcDefer||p.liveDefer)) return;
       var key=p.line+'|'+p.sev+'|'+p.msg;
       if(!seenProblems[key]){ problemsData.push(p); seenProblems[key]=true; }
     });
@@ -637,6 +652,8 @@ function deleteLineN(n,confirmed){
   if(!row||row.blockIndex===null) return;
   var block=model.blocks[row.blockIndex];
   if(block.type==='begin'||block.type==='end') return;
+  if(typeof window!=='undefined' && typeof window._endAllEditorInput==='function')
+    window._endAllEditorInput();
   if(block.type==='cycle'&&!confirmed){
     _editorConfirm('Delete the entire cycle?',function(){ deleteLineN(n,true); });
     return;
@@ -653,6 +670,8 @@ function deleteLineN(n,confirmed){
 }
 
 function importProgram(){
+  if(typeof window!=='undefined' && typeof window._endAllEditorInput==='function')
+    window._endAllEditorInput();
   var inp = document.getElementById('importFileInput');
   if(inp){ inp.value=''; inp.click(); }
 }
@@ -663,6 +682,8 @@ function onImportFile(e){
   var reader = new FileReader();
   reader.onload = function(ev){
     try{
+      if(typeof window!=='undefined' && typeof window._endAllEditorInput==='function')
+        window._endAllEditorInput();
       _undoPush();
       // Real Heidenhain .H exports prefix every block with its block number
       // (e.g. "12 TOOL CALL 5 ..."). Our gutter regenerates that numbering

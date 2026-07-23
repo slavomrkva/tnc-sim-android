@@ -312,6 +312,12 @@ function createHarness() {
   const mobileInput = document.createElement('input');
   mobileInput.id = 'mobileInput';
   editorPanel.appendChild(mobileInput);
+  const keypad = document.createElement('div');
+  keypad.id = 'keypad';
+  const programKey = document.createElement('button');
+  programKey.classList.add('key');
+  keypad.appendChild(programKey);
+  document.body.appendChild(keypad);
 
   const context = {
     console,
@@ -484,6 +490,17 @@ function createHarness() {
   };
   context.openToolDefEdit = function() {
     log.push('openToolDefEdit');
+    clearPanel();
+    makeInput('toolDefPicker', '1', 'none');
+  };
+  context.insertToolDef = function() {
+    log.push('insertToolDef');
+    clearPanel(); // empty Tool Table: panel exists but no #toolDefPicker
+  };
+  context.openCyclePicker = function() {
+    log.push('openCyclePicker');
+    clearPanel();
+    makeInput('cyclePicker', '200', 'none');
   };
   context.closeCtxPanel = function() {
     log.push('closeCtxPanel');
@@ -503,6 +520,8 @@ function createHarness() {
     ctxPanel,
     codeEl,
     mobileInput,
+    keypad,
+    programKey,
     flushTimers() {
       while (timers.length) {
         const timer = timers.shift();
@@ -649,6 +668,23 @@ test('Q ENT and previous navigate adjacent parameter lines after successful comm
   assert.strictEqual(c._qPopupLine, 0, 'previous moves back to the prior Q parameter');
   assert.ok(h.log.includes('qPanelConfirm:0'), 'the current Q line is committed before moving');
   assert.ok(h.log.includes('qPanelConfirm:1'), 'the reverse move also commits first');
+});
+
+test('Q navigation stops at an empty logical block boundary', () => {
+  const h = createHarness();
+  const c = h.context;
+  h.codeEl.value = 'Q200=1\nQ201=2\n\nQ41=0\nL X+0';
+  c.openQPopup(1);
+  const openCallsBefore = h.log.filter(item => item.startsWith('openQPopup:')).length;
+
+  c._ckHandleKey(undefined, 'ent');
+
+  assert.strictEqual(c._qPopupLine, -1, 'the current Q popup commits and closes');
+  assert.strictEqual(
+    h.log.filter(item => item.startsWith('openQPopup:')).length,
+    openCallsBefore,
+    'ENT does not jump across the empty block into Q41'
+  );
 });
 
 test('Q navigation stays on the current line when panel validation keeps the input open', () => {
@@ -802,6 +838,85 @@ test('key availability follows the active editor and QP step', () => {
   assert.strictEqual(!!keyboardKey(h, 'action', 'prev').disabled, false,
     'QP operator enables previous');
   assert.strictEqual(!!keyboardKey(h, 'action', 'ent').disabled, false, 'QP operator enables ENT');
+});
+
+test('feed fields reject both decimal separators while other numeric fields keep them', () => {
+  const h = createHarness();
+  const c = h.context;
+  c.FM.active = true;
+  c.FM.builderKey = 'L';
+  c.FM.fields = [{ p: 'F', type: 'feed', opt: true, val: '4' }];
+  c.selectField(0);
+  c.FM.typing = true;
+
+  assert.strictEqual(!!keyboardKey(h, 'key', ',').disabled, true,
+    'positioning feed visibly disables the decimal key');
+  c._ckHandleKey(',');
+  c._ckHandleKey('.');
+  assert.strictEqual(c.FM.fields[0].val, '4',
+    'direct dispatch cannot change a feed through a decimal separator');
+
+  c.FM.builderKey = 'TOOL CALL';
+  c.FM.fields = [{ p: 'F', type: 'num', opt: true, val: '420.500' }];
+  c.selectField(0);
+  c.FM.typing = true;
+  assert.strictEqual(!!keyboardKey(h, 'key', ',').disabled, true,
+    'TOOL CALL feed is whole-number-only too');
+  c._ckHandleKey('.');
+  assert.strictEqual(c.FM.fields[0].val, '420.500',
+    'rejecting dot does not rewrite an existing legacy decimal feed');
+});
+
+test('the programming keypad stays locked for every active editor owner', () => {
+  const h = createHarness();
+  const c = h.context;
+
+  c.FM.active = true;
+  c.selectField(0);
+  assert.strictEqual(!!h.programKey.disabled, true, 'FM locks whole-block programming keys');
+  c.exitFieldMode();
+  assert.strictEqual(!!h.programKey.disabled, false, 'ending FM unlocks programming keys');
+
+  c.openMPanel();
+  assert.strictEqual(!!h.programKey.disabled, true, 'M editing locks programming keys');
+  c.closeCtxPanel();
+  assert.strictEqual(!!h.programKey.disabled, false, 'closing M editing unlocks programming keys');
+
+  c.openToolDefEdit();
+  assert.strictEqual(!!h.programKey.disabled, true, 'TOOL DEF editing locks programming keys without opening a keyboard');
+  c.closeCtxPanel();
+  assert.strictEqual(!!h.programKey.disabled, false, 'closing TOOL DEF editing unlocks programming keys');
+
+  c.insertToolDef();
+  assert.strictEqual(h.document.getElementById('toolDefPicker'), null,
+    'empty Tool Table reproduces the TOOL DEF panel without a picker');
+  assert.strictEqual(!!h.programKey.disabled, true,
+    'the panel owner marker still locks programming keys without #toolDefPicker');
+  c._endAllEditorInput();
+  assert.strictEqual(!!h.programKey.disabled, false,
+    'central lifecycle cleanup closes the empty TOOL DEF owner');
+});
+
+test('central lifecycle cleanup closes real, virtual and docked editor owners', () => {
+  const h = createHarness();
+  const c = h.context;
+
+  c.openMPanel();
+  assert.ok(h.document.getElementById('mCustomInput'), 'M editor is open');
+  c._endAllEditorInput({ keepCodeFocus: true });
+  assert.strictEqual(h.document.getElementById('mCustomInput'), null, 'M editor closes');
+  assert.strictEqual(h.document.documentElement.classList.contains('ck-open'), false,
+    'custom keyboard closes with the owner');
+
+  c.openQParamPanel();
+  assert.strictEqual(h.ctxPanel.dataset.editorOwner, 'qp', 'Q builder owns the panel');
+  c._endAllEditorInput();
+  assert.strictEqual(h.ctxPanel.dataset.editorOwner, undefined, 'Q builder owner marker clears');
+
+  c.openCyclePicker();
+  assert.strictEqual(h.ctxPanel.dataset.editorOwner, 'cycle', 'cycle picker owns the panel');
+  c._endAllEditorInput();
+  assert.strictEqual(h.document.getElementById('cyclePicker'), null, 'cycle picker closes');
 });
 
 test('P and I expose selected state for the current FM mode', () => {

@@ -21,7 +21,8 @@
    only its docked picker panel in the bottom interaction area.
 
    Behavior (spec v3, layout revised):
-     - "," writes the "." decimal form the editor expects.
+     - "," writes the "." decimal form the editor expects, except for feed
+       fields, which deliberately accept whole numbers only.
      - +/− toggles the sign of the current numeric token (never appends).
      - ◀ steps back to the previous field.
      - ENT ▶ confirms the current field and advances to the next.
@@ -105,12 +106,62 @@
     return !!cp && /QP\.(step|op|fn)\s*=/.test(cp.innerHTML);
   }
 
+  function panelOwner(){
+    var cp=el('ctxPanel');
+    return cp && cp.dataset ? (cp.dataset.editorOwner||'') : '';
+  }
+
+  function markPanelOwner(kind){
+    var cp=el('ctxPanel');
+    if(cp && cp.dataset) cp.dataset.editorOwner=kind;
+  }
+
+  function clearPanelOwner(kind){
+    var cp=el('ctxPanel');
+    if(!cp || !cp.dataset) return;
+    if(!kind || cp.dataset.editorOwner===kind) delete cp.dataset.editorOwner;
+  }
+
   function anEditorActive(){
     return (typeof FM!=='undefined' && FM.active)
       || (typeof BLK!=='undefined' && BLK.active)
       || !!el('mCustomInput')
       || !!el('qPanelInput')
+      || !!el('toolDefPicker')
+      || !!el('cyclePicker')
+      || !!panelOwner()
       || qpBuilderOpen();
+  }
+
+  // The large programming keypad inserts or opens whole blocks. While any
+  // block/parameter editor owns the session, every one of those actions can
+  // interrupt the current edit (for example CHF while editing an L block).
+  // Lock them visually and intercept synthetic/direct dispatch as well. The
+  // custom TNC keyboard remains independently enabled per current field.
+  function updateProgrammingKeyLock(){
+    var pad=el('keypad');
+    if(!pad) return;
+    var locked=anEditorActive();
+    var buttons=pad.querySelectorAll('button.key');
+    for(var i=0;i<buttons.length;i++){
+      var b=buttons[i];
+      if(b.dataset.editBaseDisabled===undefined)
+        b.dataset.editBaseDisabled=b.disabled?'1':'0';
+      var disabled=locked||b.dataset.editBaseDisabled==='1';
+      b.disabled=disabled;
+      b.setAttribute('aria-disabled',disabled?'true':'false');
+      b.classList.toggle('edit-locked',locked);
+    }
+  }
+  var programmingPad=el('keypad');
+  if(programmingPad){
+    programmingPad.addEventListener('click',function(e){
+      if(!anEditorActive()) return;
+      var key=e.target&&e.target.closest?e.target.closest('button.key'):null;
+      if(!key) return;
+      e.preventDefault();
+      if(typeof e.stopImmediatePropagation==='function') e.stopImmediatePropagation();
+    },true);
   }
 
   function suppressNative(){
@@ -147,12 +198,14 @@
     suppressNative();
     blurCodeSoon();
     updateKeyStates();
+    updateProgrammingKeyLock();
   }
   function hide(keepEditing){
     cancelBackspaceHold();
     backspaceHoldConsumed=false;
     document.documentElement.classList.remove('ck-open');
     if(reopenBtn) reopenBtn.classList.toggle('show', !!keepEditing && anEditorActive());
+    updateProgrammingKeyLock();
   }
 
   // ── target abstraction: which editor is currently accepting input ──
@@ -238,9 +291,12 @@
     var lines=codeEl.value.split('\n');
     var i=cur+dir;
     while(i>=0 && i<lines.length){
+      // An empty program row is a logical NC-block boundary. Never jump from
+      // a cycle's Q list into an unrelated standalone Q assignment beyond it.
+      if(lines[i].trim()==='') return;
       if(/^\s*Q\d+\s*=/.test(lines[i])){ if(typeof openQPopup==='function') openQPopup(i); return; }
-      // a non-empty, non-Q line means we've left the cycle's parameter block
-      if(lines[i].trim()!=='' && !/^\s*Q\d+/.test(lines[i])) return;
+      // Any non-Q line means we've left the cycle's parameter block.
+      if(!/^\s*Q\d+/.test(lines[i])) return;
       i+=dir;
     }
   }
@@ -267,17 +323,23 @@
         if(f.p==='F' && (f.val===null||f.val==='')){ f.val='2000'; changed=true; }
       });
     }
-    // A freshly inserted move's feed defaults to FAUTO instead of an empty "—".
-    FM.fields.forEach(function(f){ if(f.type==='feed' && (f.val===null||f.val==='')){ f.val='AUTO'; changed=true; } });
+    // Leave a freshly inserted positioning block's feed undefined. Like the
+    // real control, an omitted F keeps the previously programmed numeric feed
+    // (normally the TOOL CALL feed at the start of a contour).
     if(changed && typeof selectField==='function') selectField(FM.idx);
   }
 
   // ── FM (guided field) input — virtual values on FM.fields[FM.idx] ──
   function fmField(){ return FM.active ? FM.fields[FM.idx] : null; }
+  function wholeFeedField(f){
+    return !!f && (f.type==='feed' ||
+      (typeof FM!=='undefined' && FM.builderKey==='TOOL CALL' && f.p==='F'));
+  }
   function fmType(ch){
     var f=fmField();
     if(!f || f.type==='tool' || f.type==='dr' || f.type==='rc') return;
-    var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9.QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
+    if(wholeFeedField(f) && (ch===','||ch==='.')) return;
+    var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
     if(patterns[f.type] && !patterns[f.type].test(ch)) return;
     if(!FM.typing || f.type==='qval'){ f.val=(f.type==='qval')?'':keepSign(f.val); FM.typing=true; }
     f.val+=ch;
@@ -345,7 +407,9 @@
       if(t.kind==='fm'){
         var f=fmField();
         if(!f || f.type==='tool'||f.type==='dr'||f.type==='rc') return false;
-        if(key===',') return f.type==='coord'||f.type==='num'||f.type==='feed'||f.type==='qval';
+        if(wholeFeedField(f) && (key===','||key==='.')) return false;
+        if(key===',') return f.type==='coord'||f.type==='num'||f.type==='qval';
+        if(key==='.') return f.type==='coord'||f.type==='num'||f.type==='qval';
         return f.type==='coord'||f.type==='num'||f.type==='feed'||f.type==='mfunc'||f.type==='mval'||f.type==='qval';
       }
       if(t.kind==='qp') return QP.step===0 ? /[0-9]/.test(key) : QP.step===2;
@@ -561,16 +625,45 @@
     var competingCtx =
       (kind!=='blk' && typeof BLK!=='undefined' && BLK.active) ||
       (kind!=='m' && !!el('mCustomInput')) ||
-      (kind!=='qp' && qpBuilderOpen());
+      (kind!=='qp' && qpBuilderOpen()) ||
+      (!!panelOwner() && panelOwner()!==kind);
     if(competingCtx && typeof closeCtxPanel==='function') closeCtxPanel();
   }
+
+  // Lifecycle operations that replace or structurally change the program must
+  // never leave a panel holding stale line offsets. This is also used when the
+  // user taps back into the code while another editor owns the session.
+  function endAllEditorInput(options){
+    options=options||{};
+    cancelBackspaceHold();
+    if(typeof FM!=='undefined' && FM.active &&
+       typeof exitFieldMode==='function') exitFieldMode(true);
+    if(typeof _qPopupLine!=='undefined' && _qPopupLine>=0 &&
+       typeof closeQPopup==='function') closeQPopup();
+    var hasCtxOwner =
+      (typeof BLK!=='undefined' && BLK.active) ||
+      !!el('mCustomInput') || !!el('toolDefPicker') || !!el('cyclePicker') ||
+      qpBuilderOpen() || !!panelOwner();
+    if(hasCtxOwner && typeof closeCtxPanel==='function') closeCtxPanel();
+    clearPanelOwner();
+    hide(false);
+    if(typeof _cancelMobileFocus==='function') _cancelMobileFocus(!options.keepCodeFocus);
+    if(!options.keepCodeFocus){
+      try{
+        if(document.activeElement && document.activeElement.blur)
+          document.activeElement.blur();
+      }catch(e){}
+    }
+    updateProgrammingKeyLock();
+  }
+  window._endAllEditorInput=endAllEditorInput;
 
   // FM (path functions / cycle builders)
   wrap('selectField', function(){ if(FM.active) show(); });
   wrap('exitFieldMode', function(){ if(!FM.active) hide(false); });
   // Guided insert (CHF/RND/L/TOOL CALL…): commit any in-progress edit first so
   // no half-filled line is left dangling, fix the anchor when no caret is placed,
-  // and apply per-block defaults (TOOL CALL S/F, feed→FAUTO).
+  // and apply per-block defaults (TOOL CALL S/F only).
   var _efmOrig=window.enterFieldMode;
   if(typeof _efmOrig==='function'){
     window.enterFieldMode=function(label){
@@ -598,6 +691,7 @@
   suppressNativeBeforeFocus('renderBlkPanel');
   wrap('renderBlkPanel', function(){
     if(typeof BLK!=='undefined' && BLK.active){
+      markPanelOwner('blk');
       var i=el('blkFbarVal');
       if(i){ i.inputMode='none'; freshInput=true; }
       show();
@@ -606,6 +700,7 @@
   // Edit M function
   wrapBefore('openMPanel', function(){ prepareOwner('m'); });
   wrap('openMPanel', function(){
+    markPanelOwner('m');
     var i=el('mCustomInput');
     if(i){ i.inputMode='none'; freshInput=true; show(); }
   });
@@ -613,6 +708,7 @@
   wrapBefore('openQPopup', function(){ prepareOwner('q'); });
   suppressNativeBeforeFocus('openQPopup');
   wrap('openQPopup', function(){
+    markPanelOwner('q');
     var i=el('qPanelInput');
     if(i){ i.inputMode='none'; freshInput=true; show(); }
   });
@@ -622,6 +718,7 @@
   wrapBefore('openQParamPanel', function(){ prepareOwner('qp'); });
   wrap('renderQParamPanel', function(){
     if(!qpBuilderOpen()) return;
+    markPanelOwner('qp');
     show();
     if(QP.step===0){
       var val=el('qpFbarVal');
@@ -643,10 +740,16 @@
 
   // TOOL DEF exception — no keyboard at all (custom hidden AND the native one
   // that a codeEl tap would raise is blurred away), only the docked picker.
+  wrapBefore('insertToolDef', function(){ prepareOwner('tool'); });
+  wrap('insertToolDef', function(){ markPanelOwner('tool'); hide(false); blurEditorNow(); });
   wrapBefore('openToolDefEdit', function(){ prepareOwner('tool'); });
-  wrap('openToolDefEdit', function(){ hide(false); blurEditorNow(); });
+  wrap('openToolDefEdit', function(){ markPanelOwner('tool'); hide(false); blurEditorNow(); });
+  // Cycle selection is also an exclusive docked panel. It takes no numeric
+  // keyboard input, but whole-block programming keys stay locked until close.
+  wrapBefore('openCyclePicker', function(){ prepareOwner('cycle'); });
+  wrap('openCyclePicker', function(){ markPanelOwner('cycle'); hide(false); blurEditorNow(); });
 
   // closing any editor hides the keyboard
-  wrap('closeCtxPanel', function(){ hide(false); });
-  wrap('closeQPopup', function(){ hide(false); });
+  wrap('closeCtxPanel', function(){ clearPanelOwner(); hide(false); });
+  wrap('closeQPopup', function(){ clearPanelOwner('q'); hide(false); });
 })();

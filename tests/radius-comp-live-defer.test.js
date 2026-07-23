@@ -17,7 +17,7 @@ function panel(code, liveEdit){
   const seen = {};
   problems.forEach(p => { seen[p.line + '|' + p.sev + '|' + p.msg] = true; });
   (tmp.problems || []).forEach(p => {
-    if (liveEdit && p.rcDefer) return;
+    if (liveEdit && (p.rcDefer || p.liveDefer)) return;
     const k = p.line + '|' + p.sev + '|' + p.msg;
     if (!seen[k]) { problems.push(p); seen[k] = true; }
   });
@@ -57,5 +57,26 @@ ctx.TOOL_R = 5; ctx.probs = [];
 const ucProblems = ctx.parseProgram(unfitCorner).problems || [];
 assert.ok(ucProblems.some(p => /tool radius too large/.test(p.msg) && !p.rcDefer),
   'a genuine geometry error must NOT be tagged rcDefer');
+
+// 4) A just-inserted CHF/RND before END PGM is waiting for its following L
+// block. It is quiet while composing but remains a Run/Step error if left
+// incomplete.
+for(const modifier of ['CHF 3', 'RND R10.5']){
+  const pendingModifier = [
+    'BEGIN PGM MODIFIER MM',
+    'TOOL CALL 1 Z S10000 F2000',
+    'L X+0 Y+0 R0',
+    'L X+15 Y+0 RL',
+    modifier,
+    'END PGM MODIFIER MM'
+  ].join('\n');
+  assert.ok(!panel(pendingModifier, true).some(p => /following contour|between two supported/.test(p.msg)),
+    modifier+' must not nag while its following contour block is still being composed');
+  assert.ok(panel(pendingModifier, false).some(p => /following contour|between two supported/.test(p.msg)),
+    modifier+' must still block Run when no following contour block was added');
+  ctx.TOOL_R = 5; ctx.probs = [];
+  assert.ok((ctx.parseProgram(pendingModifier).problems || []).some(p => p.liveDefer),
+    modifier+' parser diagnostic must carry liveDefer');
+}
 
 console.log('radius-comp-live-defer.test.js: compensation completeness deferral verified');

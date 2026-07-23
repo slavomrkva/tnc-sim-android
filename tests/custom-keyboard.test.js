@@ -9,6 +9,8 @@ const cssSource = fs.readFileSync(path.join(root, 'www', 'android', 'styles.css'
 const htmlSource = fs.readFileSync(path.join(root, 'www', 'index.html'), 'utf8');
 const coreSource = fs.readFileSync(path.join(root, 'www', 'core', 'editor-core.js'), 'utf8');
 const appSource = fs.readFileSync(path.join(root, 'www', 'android', 'app.js'), 'utf8');
+const qparamSource = fs.readFileSync(path.join(root, 'www', 'core', 'qparam-panel.js'), 'utf8');
+const learnSource = fs.readFileSync(path.join(root, 'www', 'core', 'learn-tutorial.js'), 'utf8');
 
 // ── static wiring ──
 assert.match(htmlSource, /android\/app\.js" defer><\/script>\s*<script src="android\/custom-keyboard\.js" defer>/,
@@ -27,8 +29,19 @@ assert.match(ckSource, /ent:function\(\)\{ if\(typeof blkNextStep==='function'\)
 assert.match(ckSource, /function qParamNav\(dir\)/, 'cycle Q-parameter list navigation exists');
 assert.match(ckSource, /function ensureInsertAnchor\(\)/, 'guided inserts get a safe anchor when no caret is placed');
 assert.match(ckSource, /if\(f\.p==='S'[^]*?f\.val='10000'[^]*?if\(f\.p==='F'[^]*?f\.val='2000'/, 'TOOL CALL insert defaults S10000/F2000');
-assert.match(ckSource, /f\.type==='feed'[^]*?f\.val='AUTO'/, 'inserted move feed defaults to FAUTO');
+assert.doesNotMatch(ckSource, /f\.type==='feed'[^]*?f\.val='AUTO'/,
+  'inserted positioning blocks leave F undefined so the modal numeric feed remains active');
 assert.match(ckSource, /window\.enterFieldMode=function\(label\)\{/, 'enterFieldMode is wrapped for exit-first + anchor + defaults');
+assert.match(ckSource, /function updateProgrammingKeyLock\(\)/,
+  'the programming keypad has an editor-session lock');
+assert.match(ckSource, /stopImmediatePropagation/,
+  'the programming keypad lock rejects direct dispatch while an editor is active');
+assert.match(cssSource, /\.key\.dis,\.key\.edit-locked\{opacity:\.25/,
+  'programming keys are visibly dimmed while an editor owns the session');
+assert.match(ckSource, /wrap\('insertToolDef', function\(\)\{ markPanelOwner\('tool'\); hide\(false\); blurEditorNow\(\); \}\)/,
+  'new TOOL DEF selection also locks the programming keypad without opening a keyboard');
+assert.match(ckSource, /wrap\('openCyclePicker', function\(\)\{ markPanelOwner\('cycle'\); hide\(false\); blurEditorNow\(\); \}\)/,
+  'cycle selection is also an exclusive programming panel');
 assert.match(ckSource, /ck-qp-cue/, 'Q-builder first step shows a ▶ continue cue');
 assert.doesNotMatch(appSource, /\{l:'GOTO'/, 'GOTO removed from the keypad');
 
@@ -36,7 +49,7 @@ assert.doesNotMatch(appSource, /\{l:'GOTO'/, 'GOTO removed from the keypad');
 assert.match(ckSource, /wrap\('renderBlkPanel'/, 'keyboard wires into BLK FORM wizard');
 assert.match(ckSource, /wrap\('openMPanel'/, 'keyboard wires into Edit M panel');
 assert.match(ckSource, /wrap\('openQPopup'/, 'keyboard wires into cycle-parameter Q editing');
-assert.match(ckSource, /wrap\('openToolDefEdit', function\(\)\{ hide\(false\); blurEditorNow\(\); \}\)/,
+assert.match(ckSource, /wrap\('openToolDefEdit', function\(\)\{ markPanelOwner\('tool'\); hide\(false\); blurEditorNow\(\); \}\)/,
   'TOOL DEF opens NO keyboard — custom hidden and native blurred away');
 // BLK wizard active on every step (step 0 shape picker also shows the keyboard)
 assert.match(ckSource, /if\(typeof BLK!=='undefined' && BLK\.active\) return \{\s*\n\s*kind:'input', editor:'blk', input:el\('blkFbarVal'\)/,
@@ -56,6 +69,10 @@ assert.match(ckSource, /window\.focusMobileInput=function\(\)\{\s*if\(FM\.active
 // panel changes
 assert.match(cssSource, /html\.ck-open \.ctx-panel \.fbar-done\{display:none;\}/, 'DONE buttons hidden (ENT on keyboard)');
 assert.match(cssSource, /html\.ck-open \.ctx-panel \.fbar-fmax\{display:none;\}/, 'duplicate Q control hidden');
+assert.match(qparamSource, /class="fbar-fauto"[^>]*>FAUTO<\/button>/,
+  'cycle feed FAUTO uses its own visible control');
+assert.doesNotMatch(cssSource, /html\.ck-open \.ctx-panel \.fbar-fauto\{display:none;\}/,
+  'the keyboard never hides the only FAUTO control');
 assert.match(cssSource, /html\.ck-open \.ctx-panel \.fbar-drbtn\[title="Skip this field"\]\{display:none;\}/,
   'skip control hidden (NO ENT on keyboard)');
 assert.doesNotMatch(cssSource, /fbar-nav\[onclick="fieldNext\(\)"\]\{display:none;\}/, 'the ▶ / → next control stays visible');
@@ -70,6 +87,18 @@ assert.match(appSource, /var PI_KEYS=\[\s*\{l:'M'[^]*?\{l:'Q', sub:'Q parameter'
 // keyboard wires the Q-builder numeric steps (operators stay panel buttons)
 assert.match(ckSource, /wrap\('renderQParamPanel'/, 'keyboard drives the Q-assignment builder numeric steps');
 assert.match(ckSource, /window\._qpFocusMobile=function/, 'native keyboard suppressed for the Q-builder');
+assert.match(ckSource, /window\._endAllEditorInput=endAllEditorInput/,
+  'program-changing lifecycle operations share one editor cleanup primitive');
+assert.match(coreSource, /function deleteLineN[^]*?_endAllEditorInput/,
+  'gutter deletion closes every active editor before changing the program');
+assert.match(coreSource, /function importProgram[^]*?_endAllEditorInput/,
+  'Import closes every active editor before opening the file chooser');
+assert.match(learnSource, /function _learnEndEditorInput[^]*?_endAllEditorInput/,
+  'Learn transitions use the same complete editor cleanup');
+assert.match(appSource, /codeEl\.addEventListener\('click', function\(\)\{\s*if\(typeof window\._endAllEditorInput/,
+  'a code-area tap closes the previous editor owner before routing the tap');
+assert.ok((appSource.match(/wholeFeed=f\.type==='feed'\|\|\(FM\.builderKey==='TOOL CALL'&&f\.p==='F'\)/g)||[]).length >= 2,
+  'hardware and hidden native-input fallbacks also reject decimal feed entry');
 
 // ── FM (guided field) behavior via the exposed dispatch ──
 const ctx = {};

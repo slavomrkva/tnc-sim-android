@@ -17,7 +17,10 @@ function openQPopup(lineIdx){
 
   // render into ctx-panel
   var panel = document.getElementById('ctxPanel');
-  var fmaxBtn = isFauto ? '<button class="fbar-fmax" onclick="qPanelSetVal(\'FAUTO\')">FAUTO</button>' : '';
+  // Keep FAUTO visible while the Android custom keyboard is open. The Q
+  // reference button is duplicated by the keyboard and may be hidden, but
+  // FAUTO has no keyboard equivalent.
+  var fmaxBtn = isFauto ? '<button class="fbar-fauto" onclick="qPanelSetVal(\'FAUTO\')">FAUTO</button>' : '';
   var qRefBtn = '<button class="fbar-fmax" onclick="qPanelInsertQ()" title="Insert Q parameter reference">Q</button>';
   panel.innerHTML = '<div class="ctx-row1"><span style="font-family:var(--mono);font-size:11px;color:var(--text3);">'+(label||qkey)+'</span><button style="margin-left:auto;font-family:var(--mono);font-size:11px;background:none;border:none;color:var(--text3);cursor:pointer;padding:2px 8px;" onclick="closeQPopup()">✕</button></div>'
     + '<div class="ctx-row2">'

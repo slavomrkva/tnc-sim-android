@@ -7,6 +7,35 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.88 — exclusive guided editing and contour composition
+
+- TOOL CALL now inserts commented M3/M8 blocks and preserves an exit anchor at
+  the end of M8 so the next logical block follows the complete startup group.
+- New positioning builders leave F undefined, matching the TNC 640 rule that
+  the last numeric feed remains modal; FAUTO/FMAX remain explicit choices.
+- The whole-block programming keypad is visibly and behaviorally locked while
+  any field/panel editor owns the session, while the contextual TNC keyboard
+  keeps its per-field availability.
+- Edit L incremental input now toggles the current guided coordinate instead
+  of a stale blurred-textarea selection.
+- Incomplete RL and trailing CHF/RND diagnostics stay quiet only during live
+  composition and return at Run/Step. Added the complete reported Q41/CHF/RND
+  compensated-contour regression.
+- Restored terminal 180-degree CHF departures before R0 in the analytic
+  compensation engine; the exact reported `CHF 3` / `L IX+3.02` lead-out now
+  retains its established tool-center path as a narrow compatibility exception
+  while genuine inside-corner failures stay blocking.
+- Expanded Problems uses up to half the viewport with an internal scroll area,
+  making larger diagnostic sets readable and selectable on Android.
+- Guided F input is whole-number-only across custom, hardware and hidden-input
+  paths, while a legacy/imported decimal TOOL CALL token is preserved when an
+  editor merely opens.
+- Cycle FAUTO stays visible with the custom keyboard and Q navigation stops at
+  the first empty logical block.
+- Code taps, gutter deletion, Import and Learn share one complete editor
+  cleanup, and docked panels retain an explicit owner even when an empty TOOL
+  DEF library renders no picker.
+
 ## APP_VERSION 1.0.87 — logical NC block numbering and insertion
 
 - Added one logical row/block model for numbering, selection, Problems labels,

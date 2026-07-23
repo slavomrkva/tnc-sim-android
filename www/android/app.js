@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.87';
+var APP_VERSION = '1.0.88';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -1006,7 +1006,9 @@ document.addEventListener('keydown', function(e){
       if(ch==='+'||ch==='-') setFieldVal(ch);
       return;
     }
-    var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9.QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
+    var wholeFeed=f.type==='feed'||(FM.builderKey==='TOOL CALL'&&f.p==='F');
+    if(wholeFeed && (ch===','||ch==='.')) return;
+    var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
     if(patterns[f.type] && !patterns[f.type].test(ch)) return;
     if(f.type==='feed' && /[mMaAxXfFuUtToO]/.test(ch)) ch=ch.toUpperCase();
     // + a - na coord poli len zmenia znamienko, nezahadzujú číslo
@@ -1104,7 +1106,9 @@ if(mobileInput){
       if(ch===MI_SENTINEL) continue;
       if(f.type==='dr'){ if(ch==='+'||ch==='-') setFieldVal(ch); continue; }
       if(f.type==='tool') continue; // handled by select element
-      var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9.QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
+      var wholeFeed=f.type==='feed'||(FM.builderKey==='TOOL CALL'&&f.p==='F');
+      if(wholeFeed && (ch===','||ch==='.')) continue;
+      var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
       if(patterns[f.type] && !patterns[f.type].test(ch)) continue;
       if(_fieldAcceptsSign(f) && (ch==='+'||ch==='-')){
         _setFieldSign(f,ch); continue;
@@ -1119,8 +1123,12 @@ if(mobileInput){
 }
 
 codeEl.addEventListener('click', function(){
-  closeQPopup();
-  if(FM.active) exitFieldMode(true);
+  if(typeof window._endAllEditorInput==='function')
+    window._endAllEditorInput({keepCodeFocus:true});
+  else {
+    closeQPopup();
+    if(FM.active) exitFieldMode(true);
+  }
   if(codeEl.selectionStart !== codeEl.selectionEnd) return;
   var pos=codeEl.selectionStart, val=codeEl.value;
   var ls=val.lastIndexOf('\n',pos-1)+1;
