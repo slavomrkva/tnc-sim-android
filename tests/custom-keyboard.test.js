@@ -39,8 +39,10 @@ assert.match(ckSource, /wrap\('openQPopup'/, 'keyboard wires into cycle-paramete
 assert.match(ckSource, /wrap\('openToolDefEdit', function\(\)\{ hide\(false\); blurEditorNow\(\); \}\)/,
   'TOOL DEF opens NO keyboard — custom hidden and native blurred away');
 // BLK wizard active on every step (step 0 shape picker also shows the keyboard)
-assert.match(ckSource, /if\(typeof BLK!=='undefined' && BLK\.active\) return \{\s*\n\s*kind:'input', input:el\('blkFbarVal'\)/,
+assert.match(ckSource, /if\(typeof BLK!=='undefined' && BLK\.active\) return \{\s*\n\s*kind:'input', editor:'blk', input:el\('blkFbarVal'\)/,
   'BLK target is active on every step, not only when #blkFbarVal exists');
+assert.match(ckSource, /\|\| \(typeof BLK!=='undefined' && BLK\.active\)/,
+  'BLK also counts as active before its first numeric field exists');
 // Cycle-parameter Q bug: inserting Q clears freshInput so the next digit appends
 assert.match(ckSource, /else if\(t\.q\)\{ freshInput=false; t\.q\(\); \}/,
   'Q insertion clears freshInput so the following digit appends to Q');

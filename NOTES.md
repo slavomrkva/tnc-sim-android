@@ -154,8 +154,19 @@ The detailed module-split rationale is in
     functions stay panel buttons, and `_qpFocusMobile` is overridden to keep the
     native keyboard closed. P and I are intentionally absent from the keypad
     `PI_KEYS` row — they live on the keyboard — but Q stays there because it is
-    that builder's entry point. Free-text editing (comments, raw Q-line text)
-    still uses the native keyboard and rule #7's viewport detection.
+    that builder's entry point. Exactly one parameter editor may own the
+    keyboard at a time: opening FM, BLK, M, Q popup, Q builder or TOOL DEF first
+    closes every competing editor. Real inputs must receive `inputmode="none"`
+    before their first focus request, not after rendering returns. Key
+    availability must follow the current editor/field and disabled keys must
+    also be rejected by direct dispatch. P/I expose the current polar/
+    incremental state. Replacing a selected preset preserves its existing
+    leading sign; holding backspace for 550 ms deliberately clears the entire
+    current value (including that sign), while a short press deletes one
+    character. If M or cycle-Q validation leaves the same input mounted after
+    ENT/END, flash invalid feedback instead of failing silently. Free-text
+    editing (comments, raw Q-line text) still uses the native keyboard and rule
+    #7's viewport detection.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

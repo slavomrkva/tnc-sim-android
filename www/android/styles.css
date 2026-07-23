@@ -837,7 +837,7 @@ html[data-theme="light"] .learn-svg [stroke="#5dcaa5"]{stroke:#176b58;}
   .toolbar .speed-val{height:30px;display:inline-flex;align-items:center;justify-content:center;}
 }
 /* ── Custom TNC keyboard (android/custom-keyboard.js) ──────────────
-   Shown only while guided field editing is active (html.ck-open). Compact
+   Shown while any owned parameter editor is active (html.ck-open). Compact
    keys, visually larger symbols, orange P/I. The interactive panel (.ctx-panel)
    is re-ordered to sit directly above the keyboard at the bottom of the
    editor column. */
@@ -874,9 +874,17 @@ html.ck-open .ctx-panel .fbar-drbtn[title="Skip this field"]{display:none;}
   box-shadow:0 1px 0 rgba(255,255,255,.04) inset;
 }
 .ck-key:active{transform:scale(.98);background:var(--surface2);}
+.ck-key:disabled{
+  opacity:.3;filter:saturate(.35);cursor:default;box-shadow:none;
+}
+.ck-key:disabled:active{transform:none;background:var(--surface);}
 .ck-key.ck-action{font-size:15px;}
 .ck-key.ck-pi{background:rgba(232,162,58,.14);border-color:var(--accent-warm);color:var(--accent-warm);}
 .ck-key.ck-pi:active{background:rgba(232,162,58,.28);}
+.ck-key.ck-pi.ck-selected{
+  background:var(--accent-warm);border-color:var(--accent-warm);color:#17191b;
+  box-shadow:0 0 0 2px rgba(255,255,255,.18) inset;
+}
 .ck-key.ck-ent{background:rgba(var(--accent-rgb),.16);border-color:var(--accent);color:var(--accent);}
 .ck-key.ck-end{background:rgba(74,158,255,.14);border-color:var(--accent3);color:var(--accent3);}
 .ck-key.ck-noent{font-size:10px;line-height:1.1;}
@@ -884,6 +892,20 @@ html.ck-open .ctx-panel .fbar-drbtn[title="Skip this field"]{display:none;}
 .ck-key[data-key=","]{font-size:26px;}
 .ck-key[data-action="backspace"]{font-size:22px;}
 .ck-key[data-action="sign"]{font-size:18px;}
+.ck-key.ck-held{
+  background:rgba(var(--accent-rgb),.28);border-color:var(--accent);
+}
+@keyframes ckReject{
+  0%,100%{transform:translateX(0);border-color:var(--border);}
+  25%{transform:translateX(-3px);border-color:#e45b5b;}
+  50%{transform:translateX(3px);border-color:#e45b5b;}
+  75%{transform:translateX(-2px);border-color:#e45b5b;}
+}
+.ck-key.ck-invalid,
+#qPanelInput.ck-invalid,
+#mCustomInput.ck-invalid{
+  animation:ckReject .36s ease;
+}
 /* light theme: keyboard belongs to the dark chrome like .keypad/.ctx-panel */
 html[data-theme="light"] #ckKeyboard{
   color:#edeef0;

@@ -7,6 +7,35 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.84 — contextual keyboard states and editing feedback
+
+- Keyboard keys are enabled from the active FM/BLK/M/Q/QP editor and field
+  type; unavailable actions are dimmed and rejected by direct dispatch too.
+- P and I now expose visual and `aria-pressed` selected states for polar mode
+  and the current incremental coordinate.
+- The first typed replacement keeps an existing leading sign in FM, BLK,
+  cycle-Q and Q-builder values.
+- A rejected M or cycle-Q ENT/END commit flashes the unchanged input and commit
+  key instead of failing silently.
+- Holding backspace for 550 ms clears the current real or virtual field. A
+  short press still removes one character, and the post-hold click is consumed.
+- Expanded the fake-DOM runtime regression from 10 to 16 cases to cover all of
+  these behaviours, including cancelled hold timers and FM/QP virtual values.
+
+## APP_VERSION 1.0.83 — exclusive keyboard ownership + deep runtime regression
+
+- Every FM, BLK, M, Q-popup, Q-builder and TOOL DEF entry path now closes
+  competing editors before taking ownership of the custom keyboard. This fixes
+  BLK/M keys being routed into a stale active FM field and the equivalent
+  peer-panel state collisions.
+- BLK and Q-popup real inputs now receive `inputmode="none"` before their
+  synchronous focus request, rather than only after the wrapped renderer
+  returns.
+- Added a dependency-free fake-DOM/VM runtime regression with 10 cases covering
+  ownership transitions, real-input events, focus ordering, Q navigation and
+  blocked validation, Q-builder steps, lifecycle, delegated clicks and
+  pointerdown focus preservation.
+
 ## APP_VERSION 1.0.81 — keyboard relayout + editor fixes batch
 
 - Keyboard relaid out (right column top→bottom: Q, ◀, ENT▶, NO ENT, END⌄):

@@ -35,17 +35,20 @@
      - The panel slides directly above the keyboard.
      - Its ▶ button is the "→ next value" control.
      - Duplicate DONE / skip / Q controls are hidden (ENT / NO ENT / Q live on
-       the keyboard). P / I / Q are also permanently removed from the keypad
-       (see PI_KEYS in app.js).
+       the keyboard). P and I are permanently removed from the keypad; Q stays
+       there as the Q-assignment builder entry point (see PI_KEYS in app.js).
 
    Native keyboard suppression: FM fields go through the focusMobileInput
    override; the real-input panels get inputmode="none" while the keyboard is
    shown, and this keyboard drives their edits by dispatching input events so
-   each panel's own oninput/commit logic still runs. */
+   each panel's own oninput/commit logic still runs. Keys are enabled per
+   editor/field, P/I expose selection, preset replacement preserves its sign,
+   rejected commits flash, and holding backspace clears the current value. */
 (function(){
   if(typeof isMobile!=='function' || !isMobile()) return;
 
   var kb=null, reopenBtn=null;
+  var backspaceHoldTimer=null, backspaceHoldConsumed=false;
   // When a real-input panel (BLK/M/QPopup) first shows a field, its preset
   // value is selected; the first typed key replaces it, later keys append.
   var freshInput=false;
@@ -78,7 +81,10 @@
     kb.innerHTML=html;
     // pointerdown preventDefault: keys must never steal focus (that would pop
     // the native keyboard or blur the active field); click still fires.
-    kb.addEventListener('pointerdown',function(e){ e.preventDefault(); });
+    kb.addEventListener('pointerdown',onPointerDown);
+    kb.addEventListener('pointerup',cancelBackspaceHold);
+    kb.addEventListener('pointercancel',cancelBackspaceHold);
+    kb.addEventListener('pointerleave',cancelBackspaceHold);
     kb.addEventListener('click',onKey);
     panel.appendChild(kb);
     reopenBtn=document.createElement('button');
@@ -101,7 +107,7 @@
 
   function anEditorActive(){
     return (typeof FM!=='undefined' && FM.active)
-      || (typeof BLK!=='undefined' && BLK.active && el('blkFbarVal'))
+      || (typeof BLK!=='undefined' && BLK.active)
       || !!el('mCustomInput')
       || !!el('qPanelInput')
       || qpBuilderOpen();
@@ -140,19 +146,22 @@
     if(reopenBtn) reopenBtn.classList.remove('show');
     suppressNative();
     blurCodeSoon();
+    updateKeyStates();
   }
   function hide(keepEditing){
+    cancelBackspaceHold();
+    backspaceHoldConsumed=false;
     document.documentElement.classList.remove('ck-open');
     if(reopenBtn) reopenBtn.classList.toggle('show', !!keepEditing && anEditorActive());
   }
 
   // ── target abstraction: which editor is currently accepting input ──
   function currentTarget(){
-    if(typeof FM!=='undefined' && FM.active) return {kind:'fm'};
+    if(typeof FM!=='undefined' && FM.active) return {kind:'fm',editor:'fm'};
     // BLK wizard: active on every step. Step 0 (BOX/CYL shape picker) has no
     // #blkFbarVal — the keyboard still shows so ENT advances to the first field.
     if(typeof BLK!=='undefined' && BLK.active) return {
-      kind:'input', input:el('blkFbarVal'), sign:true, digitsOnly:false,
+      kind:'input', editor:'blk', input:el('blkFbarVal'), sign:true, digitsOnly:false,
       prev:function(){ if(typeof blkStepRel==='function') blkStepRel(-1); },
       // ENT ▶ = advance to the next field (even when editing an existing BLK);
       // on the last field blkNextStep commits. END is the explicit commit.
@@ -162,14 +171,14 @@
     };
     var m=el('mCustomInput');
     if(m) return {
-      kind:'input', input:m, sign:false, digitsOnly:true,
+      kind:'input', editor:'m', input:m, sign:false, digitsOnly:true,
       ent:function(){ if(typeof _mPanelConfirm==='function') _mPanelConfirm(); },
       noent:function(){},
       end:function(){ if(typeof _mPanelConfirm==='function') _mPanelConfirm(); }
     };
     var q=el('qPanelInput');
     if(q) return {
-      kind:'input', input:q, sign:true, digitsOnly:false,
+      kind:'input', editor:'q', input:q, sign:true, digitsOnly:false,
       q:function(){ if(typeof qPanelInsertQ==='function') qPanelInsertQ(); },
       // In a cycle's Q-parameter list, ENT ▶ confirms and jumps to the next
       // Q line (down), ◀ to the previous (up); END just confirms and closes.
@@ -181,8 +190,13 @@
     // Q-parameter assignment builder (openQParamPanel): virtual QP state, its
     // operators/functions are panel buttons, so only the numeric Q-number and
     // value steps take keyboard input.
-    if(qpBuilderOpen()) return {kind:'qp'};
+    if(qpBuilderOpen()) return {kind:'qp',editor:'qp'};
     return null;
+  }
+
+  function keepSign(val){
+    var s=String(val==null?'':val);
+    return (s.charAt(0)==='-'||s.charAt(0)==='+') ? s.charAt(0) : '';
   }
 
   // ── Q builder (QP) — numeric entry on QP.num (step 0) / QP.val (step 2) ──
@@ -193,7 +207,7 @@
     if(ch===',') ch='.';
     var allowed = t==='num' ? /[0-9]/ : /[0-9Qq.+\-*\/()]/;
     if(!allowed.test(ch)) return;
-    if(!QP._typing){ QP[t]=''; QP._typing=true; }
+    if(!QP._typing){ QP[t]=(t==='num')?'':keepSign(QP[t]); QP._typing=true; }
     QP[t]=String(QP[t])+(ch==='q'?'Q':ch);
     qpShow(t);
   }
@@ -265,7 +279,7 @@
     if(!f || f.type==='tool' || f.type==='dr' || f.type==='rc') return;
     var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9.QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
     if(patterns[f.type] && !patterns[f.type].test(ch)) return;
-    if(!FM.typing || f.type==='qval'){ f.val=''; FM.typing=true; }
+    if(!FM.typing || f.type==='qval'){ f.val=(f.type==='qval')?'':keepSign(f.val); FM.typing=true; }
     f.val+=ch;
     if(f.type==='qval') f.val=f.val.replace(/q/g,'Q').replace(/[^0-9.+\-QAUTOauto]/g,'');
     else f.val=sanitizeVal(f.val,f.type);
@@ -307,7 +321,7 @@
     var i=t.input; if(!i) return; // e.g. BLK shape-picker step — nothing to type
     if(ch===',') ch='.';
     if(t.digitsOnly){ if(!/[0-9]/.test(ch)) return; }
-    if(freshInput){ i.value=''; freshInput=false; }
+    if(freshInput){ i.value=keepSign(i.value); freshInput=false; }
     i.value+=ch;
     fireInput(i);
   }
@@ -325,13 +339,144 @@
     fireInput(t.input);
   }
 
+  function keyEnabled(t,key,action){
+    if(!t) return false;
+    if(key!==undefined && key!==null){
+      if(t.kind==='fm'){
+        var f=fmField();
+        if(!f || f.type==='tool'||f.type==='dr'||f.type==='rc') return false;
+        if(key===',') return f.type==='coord'||f.type==='num'||f.type==='feed'||f.type==='qval';
+        return f.type==='coord'||f.type==='num'||f.type==='feed'||f.type==='mfunc'||f.type==='mval'||f.type==='qval';
+      }
+      if(t.kind==='qp') return QP.step===0 ? /[0-9]/.test(key) : QP.step===2;
+      if(!t.input) return false;
+      if(t.editor==='m') return /[0-9]/.test(key);
+      return /[0-9,]/.test(key);
+    }
+    if(t.kind==='fm'){
+      var ff=fmField();
+      if(!ff) return false;
+      if(action==='backspace') return ff.type!=='tool'&&ff.type!=='dr'&&ff.type!=='rc';
+      if(action==='sign') return ff.type==='dr'||(typeof _fieldAcceptsSign==='function'&&_fieldAcceptsSign(ff));
+      if(action==='q') return ff.type==='coord'||ff.type==='num'||ff.type==='feed';
+      if(action==='p') return FM.builderKey==='L'||FM.builderKey==='P';
+      if(action==='i') return FM.builderKey==='L'&&ff.type==='coord';
+      if(action==='prev') return FM.idx>0;
+      if(action==='noent') return !!ff.opt;
+      return action==='ent'||action==='end';
+    }
+    if(t.kind==='qp'){
+      if(action==='backspace') return QP.step===0||QP.step===2;
+      if(action==='sign'||action==='q') return QP.step===2;
+      if(action==='prev') return QP.step>0;
+      return action==='ent'||action==='noent'||action==='end';
+    }
+    if(t.editor==='m'){
+      return action==='backspace'||action==='ent'||action==='end';
+    }
+    if(t.editor==='blk'){
+      if(action==='backspace'||action==='sign') return !!t.input;
+      if(action==='prev') return typeof BLK!=='undefined'&&BLK.step>1;
+      return action==='ent'||action==='noent'||action==='end';
+    }
+    if(t.editor==='q'){
+      if(action==='backspace'||action==='sign'||action==='q') return !!t.input;
+      return action==='prev'||action==='ent'||action==='noent'||action==='end';
+    }
+    return false;
+  }
+
+  function updateKeyStates(){
+    if(!kb) return;
+    var t=currentTarget();
+    var buttons=kb.querySelectorAll('button.ck-key');
+    for(var i=0;i<buttons.length;i++){
+      var b=buttons[i], key=b.dataset.key, action=b.dataset.action;
+      var enabled=keyEnabled(t,key,action);
+      b.disabled=!enabled;
+      b.setAttribute('aria-disabled',enabled?'false':'true');
+      var selected =
+        (action==='p' && t && t.kind==='fm' && FM.builderKey==='P') ||
+        (action==='i' && t && t.kind==='fm' && !!fmField() && !!fmField().incr);
+      b.classList.toggle('ck-selected',!!selected);
+      if(action==='p'||action==='i') b.setAttribute('aria-pressed',selected?'true':'false');
+    }
+  }
+
+  function flashInvalid(input,action){
+    if(!input || !input.classList) return;
+    input.classList.remove('ck-invalid');
+    input.classList.add('ck-invalid');
+    var actionKey=null;
+    if(kb){
+      var buttons=kb.querySelectorAll('button.ck-key');
+      for(var i=0;i<buttons.length;i++){
+        if(buttons[i].dataset.action===action){ actionKey=buttons[i]; break; }
+      }
+    }
+    if(actionKey) actionKey.classList.add('ck-invalid');
+    setTimeout(function(){
+      if(input.classList) input.classList.remove('ck-invalid');
+      if(actionKey && actionKey.classList) actionKey.classList.remove('ck-invalid');
+    },360);
+  }
+
+  function clearCurrentValue(){
+    var t=currentTarget();
+    if(!t || !keyEnabled(t,null,'backspace')) return;
+    if(t.kind==='fm'){
+      var f=fmField();
+      f.val=(f.opt&&(f.type==='coord'||f.type==='feed'))?null:'';
+      FM.typing=true;
+      refreshSelection();
+    } else if(t.kind==='qp'){
+      var qpk=qpKey();
+      if(!qpk) return;
+      QP[qpk]='';
+      QP._typing=true;
+      qpShow(qpk);
+    } else if(t.input){
+      freshInput=false;
+      t.input.value='';
+      fireInput(t.input);
+    }
+  }
+
+  function cancelBackspaceHold(){
+    if(backspaceHoldTimer!==null){
+      clearTimeout(backspaceHoldTimer);
+      backspaceHoldTimer=null;
+    }
+  }
+
+  function onPointerDown(e){
+    e.preventDefault();
+    var b=e.target.closest ? e.target.closest('button.ck-key') : null;
+    if(!b || b.disabled || b.dataset.action!=='backspace') return;
+    cancelBackspaceHold();
+    backspaceHoldConsumed=false;
+    backspaceHoldTimer=setTimeout(function(){
+      backspaceHoldTimer=null;
+      if(b.disabled) return;
+      clearCurrentValue();
+      backspaceHoldConsumed=true;
+      b.classList.add('ck-held');
+      setTimeout(function(){ b.classList.remove('ck-held'); },160);
+      updateKeyStates();
+    },550);
+  }
+
   function handleKey(key, action){
     var t=currentTarget();
     if(!t) return;
+    if(!keyEnabled(t,key,action)){ updateKeyStates(); return; }
+    var commitInput=(action==='ent'||action==='end') && t.kind==='input' &&
+      (t.editor==='m'||t.editor==='q') ? t.input : null;
     if(key!==undefined && key!==null){
       if(t.kind==='fm') fmType(key);
       else if(t.kind==='qp') qpType(key);
       else inputType(t,key);
+      updateKeyStates();
       return;
     }
     switch(action){
@@ -348,12 +493,21 @@
       case 'noent': t.kind==='fm' ? fmNoEnt()   : t.kind==='qp' ? qpEnt() : t.noent(); break;
       case 'end':   t.kind==='fm' ? exitFieldMode() : t.kind==='qp' ? (typeof qpInsert==='function'&&qpInsert()) : t.end(); break; // END ⌄ — the panel's own close wrapper also hides the keyboard
     }
+    if(commitInput){
+      var after=currentTarget();
+      if(after && after.kind==='input' && after.input===commitInput) flashInvalid(commitInput,action);
+    }
+    updateKeyStates();
   }
   window._ckHandleKey=handleKey; // exposed for regression tests
 
   function onKey(e){
     var b=e.target.closest ? e.target.closest('button.ck-key') : null;
-    if(!b) return;
+    if(!b || b.disabled) return;
+    if(b.dataset.action==='backspace' && backspaceHoldConsumed){
+      backspaceHoldConsumed=false;
+      return;
+    }
     handleKey(b.dataset.key, b.dataset.action);
   }
 
@@ -368,6 +522,49 @@
     };
   }
 
+  function wrapBefore(name, before){
+    var orig=window[name];
+    if(typeof orig!=='function') return;
+    window[name]=function(){
+      before.apply(this, arguments);
+      return orig.apply(this, arguments);
+    };
+  }
+
+  // A real-input panel must advertise inputmode=none before its synchronous
+  // focus request. Applying it only after renderBlkPanel/openQPopup returns is
+  // too late on WebViews that decide which IME to show at focus time.
+  function suppressNativeBeforeFocus(name){
+    var orig=window[name];
+    if(typeof orig!=='function') return;
+    window[name]=function(){
+      var focusOrig=window._focusEditorControl;
+      if(typeof focusOrig!=='function') return orig.apply(this, arguments);
+      window._focusEditorControl=function(input){
+        if(input) input.inputMode='none';
+        return focusOrig.apply(this, arguments);
+      };
+      try{ return orig.apply(this, arguments); }
+      finally{ window._focusEditorControl=focusOrig; }
+    };
+  }
+
+  // All parameter editors share one ctx panel and one custom keyboard. Close
+  // every competing owner before a new one opens; currentTarget() must never
+  // have to resolve two simultaneously active editors by priority.
+  function prepareOwner(kind){
+    if(kind!=='fm' && typeof FM!=='undefined' && FM.active &&
+       typeof exitFieldMode==='function') exitFieldMode(true);
+    if(kind!=='q' && el('qPanelInput') && typeof closeQPopup==='function'){
+      closeQPopup();
+    }
+    var competingCtx =
+      (kind!=='blk' && typeof BLK!=='undefined' && BLK.active) ||
+      (kind!=='m' && !!el('mCustomInput')) ||
+      (kind!=='qp' && qpBuilderOpen());
+    if(competingCtx && typeof closeCtxPanel==='function') closeCtxPanel();
+  }
+
   // FM (path functions / cycle builders)
   wrap('selectField', function(){ if(FM.active) show(); });
   wrap('exitFieldMode', function(){ if(!FM.active) hide(false); });
@@ -377,6 +574,7 @@
   var _efmOrig=window.enterFieldMode;
   if(typeof _efmOrig==='function'){
     window.enterFieldMode=function(label){
+      prepareOwner('fm');
       if(typeof FM!=='undefined' && FM.active){ if(typeof exitFieldMode==='function') try{ exitFieldMode(); }catch(e){} }
       else ensureInsertAnchor();
       var r=_efmOrig.apply(this, arguments);
@@ -396,6 +594,8 @@
   // BLK FORM wizard (renderBlkPanel runs on open and every step). Show the
   // keyboard on every step, including step 0's BOX/CYL shape picker, so ENT
   // can advance from there; only the field steps have an input to type into.
+  wrapBefore('openBlkFormPanel', function(){ prepareOwner('blk'); });
+  suppressNativeBeforeFocus('renderBlkPanel');
   wrap('renderBlkPanel', function(){
     if(typeof BLK!=='undefined' && BLK.active){
       var i=el('blkFbarVal');
@@ -404,11 +604,14 @@
     } else hide(false);
   });
   // Edit M function
+  wrapBefore('openMPanel', function(){ prepareOwner('m'); });
   wrap('openMPanel', function(){
     var i=el('mCustomInput');
     if(i){ i.inputMode='none'; freshInput=true; show(); }
   });
   // Cycle parameter Q line
+  wrapBefore('openQPopup', function(){ prepareOwner('q'); });
+  suppressNativeBeforeFocus('openQPopup');
   wrap('openQPopup', function(){
     var i=el('qPanelInput');
     if(i){ i.inputMode='none'; freshInput=true; show(); }
@@ -416,6 +619,7 @@
   // Q-parameter assignment builder — show keyboard on every step (the operator
   // step has no numeric field, but ENT must still advance it). On the first
   // step (parameter number) add a ▶ cue so it's clear entry continues.
+  wrapBefore('openQParamPanel', function(){ prepareOwner('qp'); });
   wrap('renderQParamPanel', function(){
     if(!qpBuilderOpen()) return;
     show();
@@ -439,6 +643,7 @@
 
   // TOOL DEF exception — no keyboard at all (custom hidden AND the native one
   // that a codeEl tap would raise is blurred away), only the docked picker.
+  wrapBefore('openToolDefEdit', function(){ prepareOwner('tool'); });
   wrap('openToolDefEdit', function(){ hide(false); blurEditorNow(); });
 
   // closing any editor hides the keyboard

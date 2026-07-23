@@ -13,6 +13,43 @@ Newest first.
 
 ---
 
+## C25 — Custom keyboard kept and routed to a stale editor owner
+**Repo:** Android `tnc-sim-android`. **Resolved:** APP_VERSION 1.0.84.
+**Accepted on device:** 2026-07-23.
+
+### Symptom
+Starting an FM guided edit and then opening BLK FORM or M directly could leave
+`FM.active` true. The visible editor and the keyboard owner then disagreed, so
+the next custom-keyboard digit could change the stale FM field. BLK and cycle-Q
+inputs were also synchronously focused while still advertising
+`inputmode="decimal"`, allowing a device-dependent native-keyboard flash or
+layout jump.
+
+### Root cause
+The editor entry points shared one context panel but did not explicitly close
+every competing owner before opening. `currentTarget()` therefore had to resolve
+overlapping active states by priority and chose FM first. Native keyboard
+suppression for BLK/Q was applied by an after-render wrapper, which ran only
+after their synchronous focus request.
+
+### Attempts and accepted fix
+- Attempt 1 reproduced the collision in a VM runtime check: with FM and BLK
+  active, pressing `7` changed FM from `0` to `7` while BLK stayed `-50`.
+- Attempt 2 added exclusive ownership preparation for FM, BLK, M, Q popup,
+  Q builder and TOOL DEF entry paths. BLK/Q now receive `inputmode="none"`
+  before their first focus request.
+- Attempt 3 added a dependency-free 10-case fake-DOM runtime regression for
+  ownership transitions, input events, focus ordering, Q navigation and
+  validation, Q-builder steps, lifecycle and delegated pointer events.
+- Attempt 4 added context-aware disabled keys, selected P/I states,
+  sign-preserving first replacement, rejected-commit feedback and a 550 ms
+  hold-to-clear backspace. The deep regression grew to 16 cases, including
+  short/long/cancelled gestures and real/virtual editor values.
+
+All 22 Android JavaScript test files, Capacitor sync, the Gradle debug build and
+APK signature verification passed. The resulting APK was accepted by the user
+after real-device testing.
+
 ## 2026-07-18 — coloured leftover cut surfaces when re-running without Reset
 
 **Cross-repo bug.** Full evidence (symptom, ruled-out causes, root cause,

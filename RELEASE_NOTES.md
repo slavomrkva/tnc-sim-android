@@ -12,6 +12,12 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.84)
+- Improved the built-in TNC keyboard: unavailable keys are visibly disabled, P and I show their active state, replacing a preset keeps its sign, rejected ENT/END input is highlighted, and holding backspace clears the whole current value.
+
+## Unreleased test build (APP_VERSION 1.0.83)
+- Fixed the built-in TNC keyboard sending keys to a previously open editor when switching directly between path, BLK FORM, M and Q editors. BLK and cycle-Q fields now also suppress the Android keyboard before focus, preventing an avoidable keyboard flash or layout jump on affected WebViews.
+
 ## Unreleased test build (APP_VERSION 1.0.81)
 - Rearranged the keyboard again and fixed several editor behaviours: ENT moves to the next field when editing a BLK FORM; in cycle parameters ENT/◀ move down/up between parameters; new TOOL CALL defaults to S10000 F2000; a new move's feed defaults to FAUTO; CHF/RND no longer jump to the top of the program when no line is selected; and the GOTO button was removed.
 
