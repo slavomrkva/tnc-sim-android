@@ -95,7 +95,9 @@ assert.match(coreSource, /function importProgram[^]*?_endAllEditorInput/,
   'Import closes every active editor before opening the file chooser');
 assert.match(learnSource, /function _learnEndEditorInput[^]*?_endAllEditorInput/,
   'Learn transitions use the same complete editor cleanup');
-assert.match(appSource, /codeEl\.addEventListener\('click', function\(\)\{\s*if\(typeof window\._endAllEditorInput/,
+assert.match(ckSource, /wrapBefore\('mtabSwitch', function\(name\)\{\s*if\(name!=='editor'\) endAllEditorInput\(\);/,
+  'leaving Editor for Simulate or Learn closes custom-keyboard ownership first');
+assert.match(appSource, /codeEl\.addEventListener\('click', function\(e\)\{\s*if\(typeof window\._endAllEditorInput/,
   'a code-area tap closes the previous editor owner before routing the tap');
 assert.ok((appSource.match(/wholeFeed=f\.type==='feed'\|\|\(FM\.builderKey==='TOOL CALL'&&f\.p==='F'\)/g)||[]).length >= 2,
   'hardware and hidden native-input fallbacks also reject decimal feed entry');

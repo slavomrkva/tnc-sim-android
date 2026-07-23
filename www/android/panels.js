@@ -62,7 +62,7 @@ function updateLineNums(){
       ? '<button class="ln-del" onclick="deleteLineN('+i+')" tabindex="-1">&#10005;</button>' : '';
     html += '<div class="'+cls+'">'+deleteBtn+numLabel+'</div>';
   }
-  lineNums.innerHTML = '<div style="padding:10px 0 200px;">' + html + '</div>';
+  lineNums.innerHTML = '<div class="line-nums-inner">' + html + '</div>';
   _blockCountText = model.blocks.length + ' blocks';
   var _ib = document.getElementById('_idleBlocks'); if(_ib) _ib.textContent = _blockCountText;
   var _progTitleEl = document.getElementById('progTitleName');

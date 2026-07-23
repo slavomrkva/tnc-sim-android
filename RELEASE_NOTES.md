@@ -12,7 +12,15 @@ user-facing history.
 
 ---
 
-## Unreleased test build (APP_VERSION 1.0.89)
+## Unreleased test build (APP_VERSION 1.0.90)
+- Tapping directly on a final field such as `M99` still edits it, while tapping
+  in the free space after it now leaves a caret for inserting another block.
+- The Simulate tab now uses a larger, rounded outline play icon that matches
+  the visual weight of the other bottom-navigation icons.
+- Editor/Simulate switching now releases any open custom editor input and
+  pauses hidden 3D rendering, avoiding unnecessary WebGL work between tabs.
+- Fixed program block numbers and delete crosses drifting vertically away from
+  the corresponding editor rows after the mobile editor changed height.
 - Added documented incremental polar programming: `LP IPA`, `CP IPA` with
   simultaneous `IZ`, incremental `CC IX/IY`, and modal omitted LP coordinates.
 - Fixed the Android `I` key being disabled while editing the `PA` field of an

@@ -8,6 +8,68 @@
 
 ## Open bugs
 
+## C31 — A final M token captures taps in the free space after a block
+**Reported:** 2026-07-23. **Repro:** place four consecutive LP blocks ending in
+`M99`, then tap directly on `M99` and in the free space to its right.
+### Symptom
+Both taps opened the M editor, so no caret could be placed after the block to
+insert a blank row or another programming function.
+### Attempts
+- Attempt 1 — `textarea.selectionStart` clamps both taps to the same line-end
+  offset. The Android click handler now measures the actual horizontal tap
+  against the rendered monospace text, routes only a real token-cell tap to
+  its guided editor, and keeps a normal caret for free space after any command.
+  The protected BEGIN/END rows retain their existing behavior.
+### Status
+Focused tap-coordinate regressions pass, including the visually ambiguous
+right edge of the final `M99` glyph, and the complete Android suite passes
+(64 JavaScript syntax checks and 29 test files). Keep open until direct-token
+and free-space taps are accepted on the real Android device.
+
+## C30 — Editor/Simulate switching can stutter
+**Reported:** 2026-07-23. The issue was first noticed after the custom TNC
+keyboard was added, but no causal link to the keyboard has been established.
+**Repro:** switch repeatedly between Editor and Simulate on a real Android
+device.
+### Symptom
+The app can become sluggish and the 3D view can lose its WebGL context, showing
+the error panel that offers Compatibility mode. Compatibility itself is not
+enabled automatically; the manual controller has no automatic activation path.
+### Attempts
+- Attempt 1 — code audit found two independent sources of unnecessary work or
+  stale state during a tab switch; neither is yet proven to be the device
+  stutter's root cause. The hidden 3D canvas kept rendering at roughly 20 FPS
+  behind Editor, and switching tabs could leave `html.ck-open` with its editor
+  owner alive behind Simulate. The hidden mobile render loop now performs no
+  WebGL, simulation or mesh work and checks again at a low-cost cadence, while
+  leaving Editor first closes every custom editor/keyboard owner. The
+  simulation clock is kept current so returning to Simulate cannot jump
+  forward.
+### Status
+Focused lifecycle regressions pass, including cleanup order, hidden-render
+suppression, visible resume and manual-only Compatibility mode. The complete
+Android suite passes (64 JavaScript syntax checks and 29 test files). Keep open
+until switching performance and Normal-mode stability are accepted on the real
+device.
+
+## C29 — Editor gutter rows drift vertically from the program text
+**Reported:** 2026-07-23. **Repro:** scroll a short program to the bottom, then
+let the mobile editor viewport change height; a multi-row `CYCL DEF` makes the
+offset easiest to see because every Q row has a delete cross.
+### Symptom
+Block numbers and delete crosses can remain roughly half a row above the
+corresponding program text.
+### Attempts
+- Attempt 1 — removed the gutter's historical 200 px bottom spacer and gave
+  its row wrapper the same 10 px top / 28 px mobile bottom padding as the
+  textarea and syntax-highlight layer. The editor `ResizeObserver` now also
+  re-synchronizes gutter scrolling after flex layout changes clamp the
+  textarea's `scrollTop`.
+### Status
+All 29 Android regressions, 64 JavaScript syntax checks and a mobile headless
+resize reproduction pass. Keep open until the alignment is accepted on the
+real Android device.
+
 ## C27 — Guided block editing could lose its insertion and contour context
 **Reported:** 2026-07-23. **Repro:** insert TOOL CALL and then another block;
 edit an L coordinate and press I; press CHF while an L editor is active; or

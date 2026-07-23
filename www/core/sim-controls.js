@@ -1,4 +1,4 @@
-// sim-controls -- verified byte-for-byte identical between web and android repos.
+// sim-controls -- Android pauses the render loop while its mobile View tab is hidden.
 
 function prepare(){
   prog = parseProgram(codeEl.value);
@@ -82,6 +82,17 @@ function clearSimInfoPanel(){
 }
 
 function loop(){
+  // The mobile Editor/Learn tabs hide the complete canvas panel. Do not keep
+  // touch WebGL while that surface is not visible. This removes unnecessary
+  // background work during tab transitions. Keep the clock warm so returning
+  // to Simulate cannot advance the program by the whole hidden interval.
+  var mobileViewHidden = typeof _isMTab==='function' && _isMTab()
+    && document.body && document.body.getAttribute('data-mtab')!=='view';
+  if(mobileViewHidden){
+    if(typeof clock!=='undefined' && clock && typeof clock.getDelta==='function') clock.getDelta();
+    setTimeout(function(){ requestAnimationFrame(loop); }, 100);
+    return;
+  }
   requestAnimationFrame(loop);
   if(!THREE_OK || !renderer) return;
   if(glContextLost) return;           // skip rendering while the GPU context is gone

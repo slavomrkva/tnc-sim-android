@@ -178,6 +178,7 @@ header{padding:12px 20px;background:var(--surface);border-bottom:1px solid var(-
 .editor-wrap{display:flex;flex:1;overflow:hidden;min-height:0;}
 .line-nums{font-family:var(--mono);font-size:var(--editor-fs);line-height:1.8;color:var(--text3);background:var(--surface2);border-right:1px solid var(--border);min-width:52px;text-align:right;overflow-y:scroll;overflow-x:hidden;user-select:none;flex-shrink:0;scrollbar-width:none;}
 .line-nums::-webkit-scrollbar{display:none;}
+.line-nums-inner{padding:10px 0;}
 .line-nums .ln{height:calc(var(--editor-fs) * 1.8);line-height:calc(var(--editor-fs) * 1.8);display:flex;align-items:center;justify-content:flex-end;gap:2px;white-space:nowrap;padding-right:4px;}
 .ln-del{opacity:0;border:none;background:none;color:var(--text3);cursor:pointer;font-size:10px;padding:0 2px;line-height:1.8;flex-shrink:0;transition:opacity .15s;}
 .line-nums:hover .ln-del{opacity:0.5;}
@@ -693,6 +694,7 @@ html[data-theme="light"] .learn-svg [stroke="#5dcaa5"]{stroke:#176b58;}
   .mtab-bar button{flex:1;background:none;border:none;border-top:3px solid transparent;color:var(--text3);font-family:var(--mono);font-size:9.5px;padding:3px 4px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:background .15s,color .15s;}
   .mtab-bar button .mi{font-size:0;line-height:0;display:flex;}
   .mtab-bar button .mi svg{width:23px;height:23px;display:block;}
+  .mtab-bar #mtabView .mi svg{width:26px;height:26px;}
   .mtab-bar button.on{color:var(--accent);background:rgba(var(--accent-rgb),.14);border-top-color:var(--accent);font-weight:700;}
   .mtab-bar button.on .mi svg{transform:scale(1.08);}
   /* Hide the bottom tab bar whenever a text field is focused (keyboard open).
@@ -755,6 +757,7 @@ html[data-theme="light"] .learn-svg [stroke="#5dcaa5"]{stroke:#176b58;}
   /* Code fills exactly the space left between controls and bottom tabs. */
   body[data-mtab="editor"] .editor-wrap{display:flex;flex:1;height:auto !important;min-height:0;max-height:none !important;overflow:hidden !important;overscroll-behavior:contain !important;}
   body[data-mtab="editor"] .line-nums{min-height:0 !important;}
+  body[data-mtab="editor"] .line-nums-inner{padding-bottom:28px;}
   body[data-mtab="editor"] .code-area-wrap{overflow:hidden;position:relative;}
   body[data-mtab="editor"] #code{position:absolute;inset:0;width:100%;height:100% !important;min-height:0;overflow:auto;resize:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:28px;}
   body[data-mtab="editor"] #hlLayer{position:absolute;inset:0;height:100%;padding-bottom:28px;}

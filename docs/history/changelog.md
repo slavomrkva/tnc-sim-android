@@ -7,6 +7,19 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.90 — precise mobile editor taps and tab rendering
+
+- Matched the gutter's scroll range and resize synchronization to the textarea
+  so block numbers and delete crosses remain aligned with program rows.
+- Measured the actual horizontal tap position in the Android editor: tapping a
+  final token such as `M99` still edits it, while tapping free space after any
+  command leaves a caret for Enter or a new programming function.
+- Released custom editor ownership on tab changes and paused the hidden WebGL
+  loop outside Simulate to remove unnecessary transition work without enabling
+  Compatibility mode automatically.
+- Replaced the solid Simulate triangle with a larger rounded outline matching
+  the other bottom-navigation icons, with focused lifecycle and editor tests.
+
 ## APP_VERSION 1.0.89 — incremental polar editing and mobile footer
 
 - Added documented `CC IX/IY`, modal LP radius/angle, `LP IPA`, and helical

@@ -399,6 +399,7 @@ function createHarness() {
       context.closeCtxPanel();
     },
     renderIdlePanel() { log.push('renderIdlePanel'); },
+    mtabSwitch(name) { log.push('mtabSwitch:' + name); },
     requestAnimationFrame(fn) {
       fn();
       return 1;
@@ -925,6 +926,26 @@ test('central lifecycle cleanup closes real, virtual and docked editor owners', 
   assert.strictEqual(h.ctxPanel.dataset.editorOwner, 'cycle', 'cycle picker owns the panel');
   c._endAllEditorInput();
   assert.strictEqual(h.document.getElementById('cyclePicker'), null, 'cycle picker closes');
+});
+
+test('leaving Editor closes custom keyboard ownership before switching tabs', () => {
+  const h = createHarness();
+  const c = h.context;
+
+  c.openMPanel();
+  assert.ok(h.document.getElementById('mCustomInput'));
+  assert.ok(h.document.documentElement.classList.contains('ck-open'));
+
+  h.clearLog();
+  c.mtabSwitch('view');
+
+  assert.strictEqual(h.document.getElementById('mCustomInput'), null);
+  assert.strictEqual(h.document.documentElement.classList.contains('ck-open'), false);
+  assert.ok(h.log.indexOf('closeCtxPanel') !== -1);
+  assert.ok(
+    h.log.indexOf('closeCtxPanel') < h.log.indexOf('mtabSwitch:view'),
+    'cleanup occurs before tab switch'
+  );
 });
 
 test('P and I expose selected state for the current FM mode', () => {

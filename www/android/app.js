@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.89';
+var APP_VERSION = '1.0.90';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -801,6 +801,10 @@ if(typeof ResizeObserver!=='undefined'){
   new ResizeObserver(function(){
     var hl=document.getElementById('hlLayer');
     if(hl && codeEl){ hl.style.width=codeEl.offsetWidth+'px'; hl.style.height=codeEl.offsetHeight+'px'; }
+    // A flex-layout height change can clamp the textarea's scrollTop without
+    // clamping the separate gutter. Re-sync after every editor resize so the
+    // block numbers/delete crosses stay on the same physical rows as the code.
+    if(typeof syncScrollToLineNums==='function') syncScrollToLineNums();
   }).observe(codeEl);
 }
 
@@ -1123,7 +1127,39 @@ if(mobileInput){
   });
 }
 
-codeEl.addEventListener('click', function(){
+var _editorHitCanvas = null;
+function _editorTapMetrics(event,lineText){
+  if(!event || typeof event.clientX!=='number' || !codeEl
+    || typeof codeEl.getBoundingClientRect!=='function'
+    || !window.getComputedStyle || !document.createElement) return null;
+  var rect=codeEl.getBoundingClientRect();
+  var css=window.getComputedStyle(codeEl);
+  if(!_editorHitCanvas) _editorHitCanvas=document.createElement('canvas');
+  var ctx=_editorHitCanvas.getContext && _editorHitCanvas.getContext('2d');
+  if(!ctx) return null;
+  ctx.font=css.font || ((css.fontSize||'16px')+' '+(css.fontFamily||'monospace'));
+  var paddingLeft=parseFloat(css.paddingLeft)||0;
+  var borderLeft=parseFloat(css.borderLeftWidth)||0;
+  var contentX=event.clientX-rect.left-borderLeft+(codeEl.scrollLeft||0)-paddingLeft;
+  var text=String(lineText||'');
+  var textEnd=text.replace(/\s+$/,'').length;
+  var endWidth=ctx.measureText(text.slice(0,textEnd)).width;
+  if(contentX>endWidth) return {index:textEnd,past:true};
+  if(textEnd===0) return {index:0,past:contentX>0};
+
+  // Find the character cell actually touched. A textarea reports the same
+  // selectionStart for the right side of the last glyph and for empty space
+  // after it, so selectionStart alone cannot distinguish those two actions.
+  var lo=0, hi=textEnd;
+  while(lo<hi){
+    var mid=(lo+hi)>>1;
+    if(ctx.measureText(text.slice(0,mid+1)).width>contentX) hi=mid;
+    else lo=mid+1;
+  }
+  return {index:Math.min(lo,textEnd-1),past:false};
+}
+
+codeEl.addEventListener('click', function(e){
   if(typeof window._endAllEditorInput==='function')
     window._endAllEditorInput({keepCodeFocus:true});
   else {
@@ -1140,11 +1176,14 @@ codeEl.addEventListener('click', function(){
   var posInLine = pos - ls;
   var ci = lineText.indexOf(';');
   var trimmedEnd = lineText.replace(/\s+$/,'').length;
+  var tapMetrics = _editorTapMetrics(e,lineText);
+  var hitPosInLine = tapMetrics ? tapMetrics.index : posInLine;
+  var commandEnd = (ci>=0?lineText.slice(0,ci):lineText).replace(/\s+$/,'').length;
 
   // Q line (cycle parameter)
   if(/^\s*Q\d+/i.test(lineText)){
     // Tap on the comment part (at/after ';') → edit text directly in the textarea.
-    if(ci >= 0 && posInLine >= ci){
+    if(ci >= 0 && hitPosInLine >= ci){
       codeEl.readOnly = false;
       try{ codeEl.focus({preventScroll:true}); }catch(e){ codeEl.focus(); }
       saveLastSel();
@@ -1152,7 +1191,7 @@ codeEl.addEventListener('click', function(){
     }
     // Tap PAST the value (no comment) → blinking caret at end, so Enter inserts
     // a new line below — same behavior every other line type already gets.
-    if(ci < 0 && posInLine >= trimmedEnd){
+    if(ci < 0 && (tapMetrics ? tapMetrics.past : posInLine >= trimmedEnd)){
       try{ codeEl.setSelectionRange(lineEnd, lineEnd); }catch(e){}
       saveLastSel();
       return;
@@ -1186,7 +1225,7 @@ codeEl.addEventListener('click', function(){
 
   // Inline comment: if the line has a ';' and the tap landed AT or AFTER it,
   // edit the comment text directly in the textarea (don't open the command editor).
-  if(ci >= 0 && posInLine >= ci){
+  if(ci >= 0 && hitPosInLine >= ci){
     codeEl.readOnly = false;
     try{ codeEl.focus({preventScroll:true}); }catch(e){ codeEl.focus(); }
     saveLastSel();
@@ -1202,18 +1241,24 @@ codeEl.addEventListener('click', function(){
     return;
   }
 
-  // An embedded M89/M99 is its own editable token inside L/LP. Resolve it
-  // before the generic "past text" and guided-block branches.
-  var _clickedM=(typeof mTokenAt==='function')?mTokenAt(lineText,posInLine):null;
-  if(_clickedM && typeof openMPanelEdit==='function'){
-    openMPanelEdit(lineIdxNow);
+  // A visual tap after the command text is a normal caret placement. Use the
+  // measured character cell because selectionStart is clamped to lineEnd and
+  // cannot distinguish the final glyph from empty space to its right.
+  var _tapPastCommand = ci<0
+    ? (tapMetrics ? tapMetrics.past : posInLine>=trimmedEnd)
+    : (hitPosInLine>=commandEnd && hitPosInLine<ci);
+  if(_tapPastCommand){
+    var _afterCommandCaret=ci<0 ? lineEnd : ls+hitPosInLine;
+    try{ codeEl.setSelectionRange(_afterCommandCaret,_afterCommandCaret); }catch(e){}
+    saveLastSel();
     return;
   }
 
-  // Tap PAST the text → blinking caret at end for Enter (works for every line type).
-  if(posInLine >= trimmedEnd){
-    try{ codeEl.setSelectionRange(lineEnd, lineEnd); }catch(e){}
-    saveLastSel();
+  // An embedded M89/M99 is its own editable token inside L/LP. Resolve it
+  // from the measured character cell, not the textarea's clamped caret.
+  var _clickedM=(typeof mTokenAt==='function')?mTokenAt(lineText,hitPosInLine):null;
+  if(_clickedM && typeof openMPanelEdit==='function'){
+    openMPanelEdit(lineIdxNow);
     return;
   }
 

@@ -659,6 +659,12 @@
   }
   window._endAllEditorInput=endAllEditorInput;
 
+  // Leaving Editor must also release its custom-keyboard/editor ownership so
+  // html.ck-open and a live field do not remain hidden behind another tab.
+  wrapBefore('mtabSwitch', function(name){
+    if(name!=='editor') endAllEditorInput();
+  });
+
   // FM (path functions / cycle builders)
   wrap('selectField', function(){ if(FM.active) show(); });
   wrap('exitFieldMode', function(){ if(!FM.active) hide(false); });
