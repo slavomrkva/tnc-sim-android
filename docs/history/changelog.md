@@ -7,6 +7,11 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.86 — source checks without automatic APK builds
+
+- Android CI now runs dependency, syntax and regression checks only. It no
+  longer performs Capacitor sync, invokes Gradle or uploads a debug APK.
+
 ## APP_VERSION 1.0.85 — repository automation and security hardening
 
 - Made Graphify an optional local tool and removed generated graphs and caches

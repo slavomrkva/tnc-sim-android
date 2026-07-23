@@ -1,7 +1,5 @@
-# Validates pull requests and main, builds an installable debug APK, and
-# publishes it as a workflow artifact for device testing.
-# Debug-signed only — Play releases keep the manual signed flow in NOTES.md.
-name: Android debug APK
+# Validates JavaScript source on pull requests and main without building an APK.
+name: Android checks
 
 on:
   pull_request:
@@ -16,25 +14,18 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-debug-${{ github.event.pull_request.number || github.ref }}
+  group: android-checks-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Android test and debug APK
+  test:
+    name: Android test suite
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     steps:
       - name: Check out event revision
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up Java
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -61,18 +52,3 @@ jobs:
           for test_file in "${test_files[@]}"; do
             node "$test_file"
           done
-
-      - name: Sync web assets into the native project
-        run: npx cap sync android
-
-      - name: Build debug APK
-        working-directory: android
-        run: ./gradlew assembleDebug --console=plain
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: tnc-sim-android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 30
