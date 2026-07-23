@@ -1,0 +1,8 @@
+# Generated output, vendored minified libraries, dependencies, and build state
+# add noise to local architecture graphs.
+graphify-out/
+www/vendor/
+node_modules/
+android/.gradle/
+android/app/build/
+android/build/
