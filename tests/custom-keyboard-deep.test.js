@@ -349,6 +349,14 @@ function createHarness() {
     _qPopupLine: -1,
     refreshSelection() { log.push('refreshSelection'); },
     _fieldAcceptsSign(field) { return !!field && field.type === 'coord'; },
+    fieldAllowsIncremental(builderKey, field) {
+      const p = String(field && field.p || '').toUpperCase();
+      if (builderKey === 'L') return /^[XYZABC]$/.test(p);
+      if (builderKey === 'CC') return /^[XY]$/.test(p);
+      if (builderKey === 'P') return p === 'PA';
+      if (builderKey === 'CP') return p === 'PA' || p === 'Z';
+      return false;
+    },
     _setFieldSign(field, sign) {
       field.val = applyNumericSign(field.val, sign);
       context.FM.typing = true;
@@ -924,17 +932,27 @@ test('P and I expose selected state for the current FM mode', () => {
   const c = h.context;
   c.FM.active = true;
   c.FM.builderKey = 'P';
-  c.FM.fields[0].incr = false;
+  c.FM.fields = [
+    { p: 'PR', type: 'coord', opt: true, val: '+50', incr: false },
+    { p: 'PA', type: 'coord', opt: true, val: '+180', incr: false },
+    { p: 'M', type: 'mval', opt: true, val: '99' }
+  ];
   c.selectField(0);
   const p = keyboardKey(h, 'action', 'p');
   const i = keyboardKey(h, 'action', 'i');
   assert.ok(p.classList.contains('ck-selected'), 'P is selected in P mode');
   assert.strictEqual(p.getAttribute('aria-pressed'), 'true', 'P announces pressed state');
   assert.strictEqual(!!p.disabled, false, 'P remains actionable in P mode');
-  assert.strictEqual(!!i.disabled, true, 'I is not valid in P mode');
+  assert.strictEqual(!!i.disabled, true, 'I remains unavailable for unsupported incremental PR');
+
+  c.selectField(1);
+  assert.strictEqual(!!i.disabled, false, 'I is actionable for PA in an LP block with M99');
+  c._ckHandleKey(undefined, 'i');
+  assert.ok(h.log.includes('toggleIncrementalToken'),
+    'the Android I key routes LP PA through the incremental conversion');
 
   c.FM.builderKey = 'L';
-  c.FM.fields[0].incr = true;
+  c.FM.fields = [{ p: 'X', type: 'coord', opt: true, val: '+10', incr: true }];
   c.selectField(0);
   assert.strictEqual(p.classList.contains('ck-selected'), false, 'P clears outside P mode');
   assert.ok(i.classList.contains('ck-selected'), 'I is selected for an incremental L coordinate');

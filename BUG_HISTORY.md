@@ -13,6 +13,38 @@ Newest first.
 
 ---
 
+## C28 — Mobile editor footer and incremental polar blocks
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.89 and web `tnc-sim`
+v0.900. **Accepted on device:** 2026-07-23.
+
+### Reported symptom
+At the bottom of the editor, the horizontal scrollbar covered the final row
+and a native caret blinked on protected `END PGM`. Tapping `M99` in
+`LP PR+50 PA+45 FMAX M99` opened the LP editor. Incremental polar examples
+were unsupported, and after the first parser fix the Android `I` key still
+could not change an existing LP `PA` field to `IPA`.
+
+### Root cause
+Layout and token dispatch had no special handling for the bottom scrollbar,
+protected rows, or embedded M functions. The parser lacked documented modal
+and incremental polar state. Finally, the custom keyboard enabled `I` only for
+Cartesian `L` fields even though the shared editor correctly supported
+incremental fields in L, CC, LP and CP.
+
+### Attempts and accepted fix
+- Attempt 1 reserved matching bottom space, blurred BEGIN/END rows and added
+  embedded M-token hit testing and in-place replacement.
+- Attempt 2 implemented documented `CC IX/IY`, modal LP coordinates, `LP IPA`,
+  and `CP IPA` with simultaneous `IZ`, full-turn preservation and IPA/DR
+  direction validation. Unsupported `IPR` remains rejected.
+- Attempt 3 routed Android `I` availability through the shared selected-field
+  rule. A regression covers the reported `LP PR+50 PA+180 FMAX M99` shape and
+  verifies that PR stays absolute while PA can become IPA.
+- All Android regressions, syntax checks and the 38-case cross-repository
+  cutting reference passed before merge.
+
+**Cross-reference:** web `BUG_HISTORY.md`, C28.
+
 ## C25 — Custom keyboard kept and routed to a stale editor owner
 **Repo:** Android `tnc-sim-android`. **Resolved:** APP_VERSION 1.0.84.
 **Accepted on device:** 2026-07-23.

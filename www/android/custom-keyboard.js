@@ -424,7 +424,8 @@
       if(action==='sign') return ff.type==='dr'||(typeof _fieldAcceptsSign==='function'&&_fieldAcceptsSign(ff));
       if(action==='q') return ff.type==='coord'||ff.type==='num'||ff.type==='feed';
       if(action==='p') return FM.builderKey==='L'||FM.builderKey==='P';
-      if(action==='i') return FM.builderKey==='L'&&ff.type==='coord';
+      if(action==='i') return typeof fieldAllowsIncremental==='function' &&
+        fieldAllowsIncremental(FM.builderKey,ff);
       if(action==='prev') return FM.idx>0;
       if(action==='noent') return !!ff.opt;
       return action==='ent'||action==='end';

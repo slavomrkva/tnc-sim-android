@@ -7,6 +7,17 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.89 — incremental polar editing and mobile footer
+
+- Added documented `CC IX/IY`, modal LP radius/angle, `LP IPA`, and helical
+  `CP IPA ... IZ` parsing, validation, guided editing, and toolpaths.
+- Embedded `M89`/`M99` tokens in positioning blocks now open and update the M
+  editor without replacing the surrounding block.
+- Reserved editor space above the horizontal scrollbar, removed the native
+  caret from protected BEGIN/END rows, and enabled the Android `I` key for the
+  supported L, CC, LP and CP fields.
+- Added focused editor, keyboard and parser regressions.
+
 ## APP_VERSION 1.0.88 — exclusive guided editing and contour composition
 
 - TOOL CALL now inserts commented M3/M8 blocks and preserves an exit anchor at

@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.88';
+var APP_VERSION = '1.0.89';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -264,17 +264,17 @@ var HELP_MAP = {
   'view-2d':  {title:'XY toolpath', desc:'Top-down 2D view of the tool path. Orange = feed moves, blue = rapid moves. Useful for verifying the tool path geometry before running the full simulation.', ex:''},
   'view-tools':{title:'Tool Table', desc:'Define tools with their geometry: radius R, length L, cutting edge length, tip angle, ball nose radius R2, DL/DR offsets. Tools are referenced by number in TOOL CALL.', ex:'TOOL CALL 1 Z S3000 F800'},
   'path':     {title:'Path — toolpath visibility', desc:'Toggles the 3D toolpath lines on/off. Orange lines = cutting moves (feed), blue lines = rapid traverses (FMAX).', ex:''},
-  'P':        {title:'P — Polar coordinates', desc:'Switches input to polar mode. PR = radius from CC, PA = angle in degrees (0deg = +X axis, CCW positive). Set CC center first.', ex:'CC X+50 Y+50'},
+  'P':        {title:'P — Polar coordinates', desc:'Switches input to polar mode. PR = radius from CC; PA = absolute angle. Use I on PA for incremental IPA. Set CC first.', ex:'LP PR+30 PA+0\nLP IPA+60'},
   'I':        {title:'I — Incremental toggle', desc:'Toggles selected coordinate token between absolute (X+50) and incremental (IX+50). Incremental values are relative to the current position.', ex:'L X+50 F800'},
   'L':        {title:'L — Linear move', desc:'Moves the tool in a straight line to the given coordinates. Omit any axis to keep its current position. F sets feed in mm/min, FMAX is rapid traverse.', ex:'L X+50 Y+20 Z+0 F800'},
   'C':        {title:'C — Circular arc (CC center)', desc:'Arc move around the last CC center point to the endpoint. DR+ = counter-clockwise, DR- = clockwise.', ex:'C X+80 Y+50 DR+ R30 F800'},
-  'CC':       {title:'CC — Circle center', desc:'Defines the center point for the next C arc or polar origin for LP/CP. Does not move the tool.', ex:'CC X+50 Y+50'},
+  'CC':       {title:'CC — Circle center', desc:'Defines the center point for the next C arc or polar origin for LP/CP. IX/IY are relative to the last tool position. CC without coordinates takes the last position.', ex:'CC IX+10 IY+0'},
   'CR':       {title:'CR — Circular arc (radius)', desc:'Arc defined by radius R. DR+ = CCW, DR- = CW. The sign of R selects the minor (-) or major (+) arc.', ex:'CR X+60 Y+30 R+20 DR+ F800'},
   'CT':       {title:'CT — Tangential arc', desc:'Arc that starts tangentially from the previous move direction to the endpoint. No radius needed.', ex:'CT X+60 Y+70 F800'},
   'RND':      {title:'RND — Corner rounding', desc:'Inserts a rounding arc of radius R at the corner between the preceding and following L blocks.', ex:'RND R5'},
   'CHF':      {title:'CHF — Chamfer', desc:'Inserts a straight chamfer of the given length at the corner between two L blocks.', ex:'CHF 2'},
-  'LP':       {title:'LP — Linear polar', desc:'Linear move using polar coordinates. PR = radius from CC, PA = angle in degrees (0° = +X axis, CCW positive).', ex:'LP PR+30 PA+90 FMAX'},
-  'CP':       {title:'CP — Circular polar', desc:'Arc move in polar coordinates. PA = target angle. Uses CC as center.', ex:'CP PA+180 DR+ F800'},
+  'LP':       {title:'LP — Linear polar', desc:'Linear polar move. PR may be omitted to retain the current radius; IPA increments the angle from the current polar position.', ex:'LP PR+30 PA+0\nLP IPA+60'},
+  'CP':       {title:'CP — Circular polar', desc:'Polar arc around CC. Use PA for an absolute target angle or IPA for an incremental sweep. IZ adds a simultaneous tool-axis move for a helix; IPA and DR need the same sign.', ex:'CP IPA+360 IZ+5 DR+ F800'},
   'BLK FORM': {title:'BLK FORM — Workpiece blank', desc:'Defines the raw stock as a rectangular box. 0.1 is the minimum corner, 0.2 is the maximum corner. Z+ is the top surface.', ex:'BLK FORM 0.1 Z X+0 Y+0 Z+0\nBLK FORM 0.2 X+100 Y+100 Z+20'},
   'TOOL CALL':{title:'TOOL CALL — Select tool', desc:'Activates a tool by number. Z = spindle axis. S = spindle speed in RPM. F = feed rate in mm/min.', ex:'TOOL CALL 1 Z S3000 F800'},
   'TOOL DEF': {title:'TOOL DEF — Pre-define tool', desc:'Pre-loads a tool into the magazine so it is ready for the next TOOL CALL without a full ATC cycle.', ex:'TOOL DEF 2'},
@@ -571,13 +571,14 @@ var BUILDERS = {
   ]},
   'CP': {title:'CP — polar circular arc', cmd:'CP', fields:[
     {p:'PA', prompt:'Target angle (degrees)', type:'coord', opt:false},
+    {p:'Z',  prompt:'Helix height / tool-axis coordinate', type:'coord', opt:true},
     {p:'DR', prompt:'Rotation direction', type:'dr', opt:false},
     {p:'F',  prompt:'Feed rate', type:'feed', opt:true},
     {p:'M',  prompt:'Miscellaneous function', type:'mval', opt:true}
   ]},
   'P':  {title:'LP — polar straight line', cmd:'LP', fields:[
-    {p:'PR',prompt:'Polar radius (mm)', type:'coord', opt:false},
-    {p:'PA',prompt:'Polar angle (degrees)', type:'coord', opt:false},
+    {p:'PR',prompt:'Polar radius (mm; omit to keep current radius)', type:'coord', opt:true},
+    {p:'PA',prompt:'Polar angle (degrees; I toggles IPA)', type:'coord', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
     {p:'M', prompt:'Miscellaneous function', type:'mval', opt:true}
   ]},
@@ -1192,6 +1193,23 @@ codeEl.addEventListener('click', function(){
     return;
   }
 
+  // BEGIN/END PGM are protected structural rows. A tap may select the row,
+  // but it must not leave a blinking native caret between the final rows.
+  if(/^(?:BEGIN|END) PGM\b/.test(lt)){
+    try{ codeEl.setSelectionRange(lineEnd,lineEnd); }catch(e){}
+    saveLastSel();
+    try{ codeEl.blur(); }catch(e){}
+    return;
+  }
+
+  // An embedded M89/M99 is its own editable token inside L/LP. Resolve it
+  // before the generic "past text" and guided-block branches.
+  var _clickedM=(typeof mTokenAt==='function')?mTokenAt(lineText,posInLine):null;
+  if(_clickedM && typeof openMPanelEdit==='function'){
+    openMPanelEdit(lineIdxNow);
+    return;
+  }
+
   // Tap PAST the text → blinking caret at end for Enter (works for every line type).
   if(posInLine >= trimmedEnd){
     try{ codeEl.setSelectionRange(lineEnd, lineEnd); }catch(e){}
@@ -1259,7 +1277,7 @@ var atcAnim = null; // {phase, t, fromTool, toTool, toolPos}
 // Replace Q references in a line with their current values
 
 
-var AXIS_TOKENS = /^(I?[XYZABC][+-]?\d+\.?\d*|F[+]?\d+\.?\d*|FMAX|RL|RR|R0|M\d+|DR[+-]|R[+-]?\d+\.?\d*|PR[+-]?\d+\.?\d*|PA[+-]?\d+\.?\d*)$/;
+var AXIS_TOKENS = /^(I?[XYZABC][+-]?\d+\.?\d*|F[+]?\d+\.?\d*|FMAX|RL|RR|R0|M\d+|DR[+-]|R[+-]?\d+\.?\d*|PR[+-]?\d+\.?\d*|I?PA[+-]?\d+\.?\d*)$/;
 
 
 

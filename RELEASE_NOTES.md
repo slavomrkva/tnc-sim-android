@@ -12,6 +12,15 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.89)
+- Added documented incremental polar programming: `LP IPA`, `CP IPA` with
+  simultaneous `IZ`, incremental `CC IX/IY`, and modal omitted LP coordinates.
+- Fixed the Android `I` key being disabled while editing the `PA` field of an
+  existing LP block.
+- The final program row now stays clear of the horizontal scrollbar, protected
+  BEGIN/END rows no longer leave a stray caret, and tapping an embedded
+  `M89`/`M99` edits only that M function.
+
 ## Unreleased test build (APP_VERSION 1.0.88)
 - Feed fields now accept whole numbers only instead of silently turning a
   decimal entry into another value. Existing imported decimal TOOL CALL feeds
