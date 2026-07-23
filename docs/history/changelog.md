@@ -7,6 +7,14 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.85 — repository automation and security hardening
+
+- Made Graphify an optional local tool and removed generated graphs and caches
+  from version control.
+- Consolidated CI around pull requests and `main`, added JavaScript regressions
+  before the debug APK build, pinned Actions to immutable commits, and enabled
+  grouped Dependabot updates for Actions and Capacitor dependencies.
+
 ## APP_VERSION 1.0.84 — contextual keyboard states and editing feedback
 
 - Keyboard keys are enabled from the active FM/BLK/M/Q/QP editor and field
