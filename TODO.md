@@ -8,6 +8,32 @@
 
 ## Open bugs
 
+## C32 — Valid BLK FORM dimensions above 500 mm were rejected
+**Reported:** 2026-07-24. **Repro:** use a valid elongated box such as
+`800 × 100 × 50 mm`, or a cylinder with diameter above 500 mm, then press Run.
+### Symptom
+The validator blocked every box side, cylinder diameter and cylinder height
+above 500 mm even when the actual voxel grid fit Android's memory budget. At
+the same time, an allowed 500 mm cube was already automatically coarsened by
+the separate voxel guard, so the fixed dimension limit did not describe the
+real resource cost.
+### Attempts
+- Attempt 1 — APP_VERSION 1.0.91 replaces the fixed limit with one adaptive,
+  isotropic planner shared by live cutting and Refine. It preserves each
+  quality profile when it fits, deterministically coarsens only when required,
+  and guarantees the rounded grid stays within the 12M/32M Android budgets.
+  Default-quality coarsening is a visible warning rather than a Run blocker.
+  Non-finite, non-positive and reversed dimensions remain errors. The camera
+  far plane now follows the framed blank and the visual table grid is capped
+  independently of voxel/collision detail.
+### Status
+All 65 JavaScript syntax checks and 30 Android test files pass, including
+focused coverage for elongated boxes, large cubes, cylinders, invalid
+dimensions, all quality budgets, camera range and table-grid bounds. Keep open
+until a large box and cylinder are accepted in Normal mode on a real Android
+device, including the displayed warning and expected coarse small-feature
+fidelity.
+
 ## C31 — A final M token captures taps in the free space after a block
 **Reported:** 2026-07-23. **Repro:** place four consecutive LP blocks ending in
 `M99`, then tap directly on `M99` and in the free space to its right.

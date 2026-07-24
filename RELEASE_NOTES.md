@@ -12,6 +12,14 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.91)
+- BLK FORM is no longer rejected merely because one box side, cylinder
+  diameter or cylinder height exceeds 500 mm. Large valid blanks now adapt 3D
+  detail to the Android memory budget and warn when Default quality becomes
+  coarser; invalid or reversed dimensions are still blocked.
+- Larger workpieces are framed with an adaptive 3D viewing range instead of
+  disappearing beyond the old fixed camera limit.
+
 ## Unreleased test build (APP_VERSION 1.0.90)
 - Tapping directly on a final field such as `M99` still edits it, while tapping
   in the free space after it now leaves a caret for inserting another block.

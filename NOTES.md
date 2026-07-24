@@ -90,9 +90,14 @@ The detailed module-split rationale is in
 14. **Bug lifecycle:** new/open bugs live in `TODO.md`; log every attempt there.
     On acceptance, move symptom, cause, attempts, and device evidence to
     `BUG_HISTORY.md` in the same change. Mirror cross-repo bugs.
-15. **Chunked voxel limits:** keep the one-cell dirty halo, recursive Measure
+15. **Adaptive voxel limits:** keep the one-cell dirty halo, recursive Measure
     raycasting, group-safe disposal, and Android's lower 12M live / 32M Refine
-    guards during shared-core ports.
+    guards during shared-core ports. `planVoxelGrid()` is the shared source of
+    truth for live and Refine dimensions and must keep the final rounded grid
+    inside its budget. Do not restore a fixed per-axis BLK FORM limit: accept
+    valid finite dimensions, warn when the Default profile must exceed its
+    0.7 mm cell target, and keep the 3D camera/table helpers bounded for the
+    resulting larger scene.
 16. **Zero is a valid Q value:** use `Q !== undefined ? Q : default`, never
     `Q || default` for cycle parameters.
 17. **Manual Android WebGL compatibility:** always start in the user's selected
