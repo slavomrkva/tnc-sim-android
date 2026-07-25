@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.92 — repository cleanup
+
+- Preserved the former open-work list in a dated historical snapshot and reset
+  the current `TODO.md` to no open items after `main` was confirmed as the
+  accepted source of truth.
+- Updated the Compatibility-mode regression's build-marker expectation.
+
 ## APP_VERSION 1.0.91 — adaptive BLK FORM dimensions
 
 - Replaced the arbitrary 500 mm box/cylinder rejection with one shared,
