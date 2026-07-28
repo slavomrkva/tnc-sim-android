@@ -7,6 +7,22 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.97 — 2026-07-28 — pre-production robustness audit
+
+- Made repeated spaces and tabs insignificant across validation, parsing,
+  BLK FORM pre-scan and LBL expansion; normalized Unicode BOM and mixed line
+  endings during import.
+- Added deterministic parser metamorphic/fuzz coverage, native export failure
+  tests and an Android WebView instrumentation smoke/cutting/upgrade test.
+- Treat closing the native share sheet as cancellation rather than a false
+  export failure while retaining actionable storage/plugin errors.
+- Updated Capacitor Android/core/CLI to 8.4.2, patched two vulnerable
+  build-time transitive dependencies, and verified a zero-vulnerability npm
+  audit.
+- Consumed Capacitor's native safe-area CSS variables with browser fallbacks,
+  fixed manifest element order, and added package-identity, Activity recreate,
+  localStorage upgrade and real voxel-cutting device assertions.
+
 ## APP_VERSION 1.0.96 — official-program compatibility audit
 
 - Accepted documented `F AUTO`, Cycle 200/201/208 `Q206=AUTO`, and compact

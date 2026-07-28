@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.96';
+var APP_VERSION = '1.0.97';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -29,9 +29,15 @@ function _downloadTextFile(text, filename){
   }
   plugins.Filesystem.writeFile({ path: filename, data: text, directory: 'CACHE', encoding: 'utf8' })
     .then(function(res){
-      if(plugins.Share) return plugins.Share.share({ title: filename, url: res.uri, dialogTitle: 'Save ' + filename });
+      if(!plugins.Share) throw new Error('Share plugin missing — run npx cap sync android.');
+      return plugins.Share.share({ title: filename, url: res.uri, dialogTitle: 'Save ' + filename });
     })
-    .catch(function(err){ _toast('Export failed: ' + (err && err.message || 'unknown error'), true); });
+    .catch(function(err){
+      var message=err&&err.message||'unknown error';
+      // Closing the OS share sheet is a normal user action, not a failed save.
+      if(/cancel(?:led|ed)?/i.test(message)) return;
+      _toast('Export failed: ' + message, true);
+    });
 }
 
 // ===== constants.js =====

@@ -12,6 +12,14 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.97)
+- Imported programs tolerate repeated spaces/tabs, Unicode BOMs and mixed line
+  endings without changing validation, blank geometry or the simulated path.
+- Closing the Android share sheet is no longer reported as an export failure;
+  real storage and missing-plugin errors remain visible.
+- System-bar spacing now uses Capacitor's native safe-area values on older
+  Android WebViews instead of relying only on inaccurate browser values.
+
 ## Unreleased test build (APP_VERSION 1.0.96)
 - Imported HEIDENHAIN programs now accept the official `F AUTO`, cycle
   `Q206=AUTO` and compact `REP6` spellings without false validator errors.

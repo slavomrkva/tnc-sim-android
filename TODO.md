@@ -6,6 +6,69 @@
 
 ## Open bugs
 
+## C50 — Android CSS ignored Capacitor's native safe-area correction
+**Reported:** 2026-07-28. **Repro:** launch the app on an Android WebView older
+than 140 and inspect system-bar spacing and the injected
+`--safe-area-inset-*` properties.
+
+### Symptom
+Capacitor injects corrected native inset values because older Android WebViews
+can return inaccurate `env(safe-area-inset-*)` values, but the app CSS read
+only the browser `env()` properties and ignored the correction.
+
+### Attempts
+- Attempt 1 — API 30 instrumentation/logcat confirmed early transient upstream
+  injection warnings during document creation but also proved the native
+  property is populated after load.
+- Attempt 2 — changed Android layout spacing to prefer Capacitor's
+  `--safe-area-inset-*` properties with `env(..., 0px)` fallbacks. The device
+  test now asserts the native property after startup and Activity recreation.
+
+### Status
+Implemented in APP_VERSION 1.0.97; keep open until visual device acceptance.
+
+## C49 — Closing the Android share sheet is reported as export failure
+**Reported:** 2026-07-28. **Repro:** export a program and close a native share
+sheet implementation that rejects its promise with a cancellation error.
+
+### Symptom
+The common promise catch treated cancellation exactly like a storage/plugin
+failure and displayed a false red export error.
+
+### Attempts
+- Attempt 1 — added a native-plugin contract test for missing plugins,
+  successful write/share, full storage and cancelled sharing. It reproduced
+  the false error.
+- Attempt 2 — ignore only cancellation-shaped share errors; preserve actionable
+  errors for write failures and missing Filesystem/Share plugins.
+
+### Status
+Implemented in APP_VERSION 1.0.97; keep open until device acceptance.
+
+## C47-C48 — Imported whitespace, BOM and line endings change program meaning
+**Reported:** 2026-07-28. **Repro:** add repeated spaces to every inter-word
+separator, or import a program beginning with a Unicode BOM and mixed CRLF/CR
+line endings.
+
+### Symptom
+Validation accepted the whitespace variant after its command normalization,
+but the parser's separate BLK FORM pre-scan ignored the blank and started the
+simulation from its fallback home position. BOM/mixed-ending files retained
+transport characters that could prevent structural commands from matching.
+
+### Attempts
+- Attempt 1 — a deterministic metamorphic test compared the complete canonical
+  path for case, commas, line endings, block numbers, comments and whitespace;
+  the whitespace case exposed the BLK FORM start-position divergence.
+- Attempt 2 — applied one whitespace normalizer to validator, LBL expansion,
+  BLK FORM pre-scan and motion parsing; stripped BOMs in direct parser input
+  and normalized BOM/CRLF/CR during file import.
+- Attempt 3 — verified nine equivalent spellings, 200 deterministic valid
+  random programs and six invalid guards on web and Android.
+
+### Status
+Implemented in APP_VERSION 1.0.97; keep open until device acceptance.
+
 ## C46 — Radius compensation collapses complete and multi-turn CP paths
 **Reported:** 2026-07-28. **Repro:** use the supported path from official
 NC11101: activate RL on LP, run `CP IPA+9000 Z-30 DR+`, then `CP DR+`.

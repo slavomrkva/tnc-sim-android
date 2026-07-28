@@ -221,6 +221,20 @@ The detailed module-split rationale is in
     the 32-level recursion guard and the 200000-block expansion budget. Polar
     straight line LP may activate RL/RR; angle-less `CP DR+`/`CP DR-` is a full
     circle, and compensated CP joins must preserve every programmed full turn.
+27. **NC transport formatting is not program semantics:** repeated spaces and
+    tabs outside comments, a leading Unicode BOM, and CRLF/CR versus LF line
+    endings must not change validation, BLK FORM geometry, LBL expansion or
+    the generated toolpath. Import normalizes these before editing while direct
+    pasted/parser input remains tolerant. Closing the Android share sheet is a
+    cancellation, not an export error; real storage or plugin failures remain
+    visible.
+28. **Android safe-area source:** Capacitor's SystemBars support corrects older
+    WebViews by injecting `--safe-area-inset-*`. Android CSS must prefer those
+    native variables and fall back to `env(safe-area-inset-*, 0px)`; do not
+    regress to raw `env()` values alone. A transient injection attempt can
+    happen before `documentElement` exists, so device acceptance is based on
+    the final populated property and visible spacing, not that early upstream
+    console line alone.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and
