@@ -13,6 +13,41 @@ Newest first.
 
 ---
 
+## C38 — Supported validator and positioning-feed audit
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.94 and web `tnc-sim`
+v0.919. **Fixed and accepted:** 2026-07-28.
+
+### Reported symptoms
+The validator rejected `FAUTO` in a valid `C` block and treated block-local
+feeds inconsistently across the implemented positioning families. The repair
+had to cover only functions already exposed by the simulator.
+
+### Root causes
+Circular and polar validator branches accepted only numeric feeds, while each
+parser branch managed feed state separately. Numeric label expansion preceded
+complete bounds checks. Supported cycles accepted incomplete or unknown Q
+parameters, Q336 incorrectly excluded negative values, duplicate positioning
+fields were resolved by regex order, and coordinate-sign diagnostics could
+miss one unsigned coordinate when another coordinate had an explicit sign.
+
+### Attempts and accepted fix
+- A full offline-manual audit initially exposed additional constructs, but the
+  user deliberately limited the product scope. Named labels, cylinder blanks,
+  FU/FZ, CHF/RND feed extensions, extended TOOL DEF/TOOL CALL, STOP and new
+  cycles were not ported.
+- Two attempted Claude CLI reviews timed out or exhausted their turn limit and
+  produced no evidence or code changes.
+- The accepted web shared-core repair was ported deliberately rather than
+  copying files wholesale. L/C/CR/CT/LP/CP now share numeric, `FAUTO` and
+  `FMAX` semantics; numeric labels, repeats, supported cycles, duplicate
+  fields and coordinate-sign diagnostics are validated consistently.
+
+### Verification
+Focused regressions cover the repaired scope. All 33 Android test files passed
+and Capacitor assets were synchronized without building an APK.
+
+**Cross-reference:** web `BUG_HISTORY.md`, C38.
+
 ## C37 — Programming-block editing and audited M-function handling
 **Repos:** Android `tnc-sim-android` APP_VERSION 1.0.93 and web `tnc-sim`
 v0.918. **Resolved:** 2026-07-28.

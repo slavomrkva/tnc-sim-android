@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.94 — supported validator and feed audit
+
+- Mirrored the accepted shared-core fix for numeric/FAUTO/FMAX positioning
+  feeds across L/C/CR/CT/LP/CP while preserving Android-specific behavior.
+- Enforced strict numeric LBL bounds and bounded repeats, duplicate/conflicting
+  fields, per-coordinate sign diagnostics and implemented parameter rules for
+  cycles 200/201/208/209, including negative Q336.
+- Added focused regressions and deliberately left unsupported manual features
+  outside the Android product scope.
+
 ## APP_VERSION 1.0.93 — web programming-control and M-audit port
 
 - Ported the accepted web M grammar to all Android positioning families with a

@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.94)
+- Fixed false `FAUTO` and `FMAX` errors in supported circular and polar
+  positioning blocks.
+- Tightened validation for supported numeric labels and cycles
+  200/201/208/209, including negative Q336, duplicate fields and coordinate
+  sign diagnostics.
+
 ## Unreleased test build (APP_VERSION 1.0.93)
 - Positioning blocks now accept up to two M functions at the end of `L`, `C`,
   `CR`, `CT`, `LP` and `CP`, including documented M parameters.
