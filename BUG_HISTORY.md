@@ -13,6 +13,46 @@ Newest first.
 
 ---
 
+## C51-C53 — Custom-keyboard viewport, M30 playback and omitted RC field
+**Repo:** Android `tnc-sim-android` APP_VERSION 1.0.98.
+**Fixed and accepted:** 2026-07-28.
+
+### Reported symptoms
+- On a long manually entered program, the lower custom-keyboard rows extended
+  behind Android's navigation area.
+- A standalone M30 displayed the M0 stop message and required a second Run.
+- Pressing `NO ENT` on optional radius compensation produced a literal `null`
+  token and a validator error.
+
+### Root causes
+- The affected Android WebView resolved CSS `100svh` to 975.5 px even though
+  `visualViewport.height` and `innerHeight` were 843 px.
+- Parser playback collapsed M0, M2, M6 and M30 into one boolean `stop` marker,
+  so playback could not distinguish a pause from a program end.
+- The common guided-editor serializer returned JavaScript `null` directly for
+  an omitted `rc` field, unlike other optional field types.
+
+### Attempts and accepted fixes
+- A live body-height override first proved that the actual visible viewport
+  was the correct keyboard constraint. The accepted implementation publishes
+  the current visual-viewport height as `--ck-vvh` when the custom keyboard
+  opens or its viewport resizes; CSS constrains the editor body to that value.
+- M-control segments now retain their exact stop code. M0 and M6 pause with
+  distinct messages; M2 and M30 proceed directly to program completion.
+- The RC serializer now converts both `null` and `undefined` to an omitted
+  token. The manually damaged line was reopened through the guided editor and
+  immediately normalized back to valid code.
+
+### Verification
+All 36 automated test files passed. On emulator-5554, the keyboard bottom was
+842 px inside an 843.05 px visual viewport, while the context panel remained
+directly above it. The original M30 program and a second complete program
+entered block by block with the custom keyboard both reached `done` after one
+Run. The second program validated and parsed with zero diagnostics and covered
+`CC IX/IY`, `LP PR/PA`, `LP IPA`, `L IX` and `CR`; its retained endpoints were
+checked and playback completed 58 subsegments / 10 simulation steps. Logcat
+contained no matching crash, ANR or out-of-memory event.
+
 ## C38 — Supported validator and positioning-feed audit
 **Repos:** Android `tnc-sim-android` APP_VERSION 1.0.95 and web `tnc-sim`
 v0.920. **Fixed and accepted:** 2026-07-28.

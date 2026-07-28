@@ -81,7 +81,11 @@ class FakeElement {
     this.children = [];
     this.classList = new FakeClassList();
     this.dataset = {};
-    this.style = {};
+    this.style = {
+      setProperty(name, value) {
+        this[name] = String(value);
+      }
+    };
     this.attributes = {};
     this.listeners = {};
     this.value = '';
@@ -295,6 +299,8 @@ function applyNumericSign(value, sign) {
 
 function createHarness() {
   const log = [];
+  const windowListeners = {};
+  const viewportListeners = {};
   const timers = [];
   const cancelledTimers = new Set();
   let nextTimerId = 1;
@@ -403,6 +409,16 @@ function createHarness() {
     requestAnimationFrame(fn) {
       fn();
       return 1;
+    },
+    innerHeight: 900,
+    visualViewport: {
+      height: 843.4,
+      addEventListener(type, listener) {
+        (viewportListeners[type] || (viewportListeners[type] = [])).push(listener);
+      }
+    },
+    addEventListener(type, listener) {
+      (windowListeners[type] || (windowListeners[type] = [])).push(listener);
     }
   };
   context.window = context;
@@ -531,6 +547,12 @@ function createHarness() {
     mobileInput,
     keypad,
     programKey,
+    dispatchWindow(type) {
+      (windowListeners[type] || []).forEach(listener => listener());
+    },
+    dispatchViewport(type) {
+      (viewportListeners[type] || []).forEach(listener => listener());
+    },
     flushTimers() {
       while (timers.length) {
         const timer = timers.shift();
@@ -754,9 +776,19 @@ test('show/hide lifecycle and TOOL DEF exception keep keyboard state consistent'
   c.openMPanel();
   assert.strictEqual(h.document.documentElement.classList.contains('ck-open'), true,
     'opening an owned editor shows the keyboard');
+  assert.strictEqual(h.document.documentElement.style['--ck-vvh'], '843px',
+    'opening the keyboard captures the real visible viewport height');
+  c.visualViewport.height = 700.6;
+  h.dispatchViewport('resize');
+  assert.strictEqual(h.document.documentElement.style['--ck-vvh'], '701px',
+    'an open keyboard follows visual-viewport changes');
   c.closeCtxPanel();
   assert.strictEqual(h.document.documentElement.classList.contains('ck-open'), false,
     'closing the panel hides the keyboard');
+  c.visualViewport.height = 650;
+  h.dispatchWindow('resize');
+  assert.strictEqual(h.document.documentElement.style['--ck-vvh'], '701px',
+    'viewport events do not mutate editor height while the keyboard is closed');
 
   c.openMPanel();
   c.openToolDefEdit(3);

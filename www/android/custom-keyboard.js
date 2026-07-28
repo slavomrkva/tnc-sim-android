@@ -54,6 +54,22 @@
   // value is selected; the first typed key replaces it, later keys append.
   var freshInput=false;
 
+  function syncCustomViewportHeight(){
+    var vv=window.visualViewport;
+    var h=vv && vv.height ? vv.height : window.innerHeight;
+    if(!h || !isFinite(h)) return;
+    var root=document.documentElement;
+    if(root && root.style && typeof root.style.setProperty==='function'){
+      root.style.setProperty('--ck-vvh', Math.round(h)+'px');
+    }
+  }
+
+  function syncOpenCustomViewportHeight(){
+    if(document.documentElement.classList.contains('ck-open')){
+      syncCustomViewportHeight();
+    }
+  }
+
   var KEYS=[
     {k:'7'},{k:'8'},{k:'9'},{a:'q',t:'Q'},
     {k:'4'},{k:'5'},{k:'6'},{a:'prev',t:'◀'},
@@ -193,6 +209,7 @@
   function show(){
     ensureBuilt();
     if(!kb) return;
+    syncCustomViewportHeight();
     document.documentElement.classList.add('ck-open');
     if(reopenBtn) reopenBtn.classList.remove('show');
     suppressNative();
@@ -759,4 +776,14 @@
   // closing any editor hides the keyboard
   wrap('closeCtxPanel', function(){ clearPanelOwner(); hide(false); });
   wrap('closeQPopup', function(){ clearPanelOwner('q'); hide(false); });
+
+  // Some Android WebViews resolve 100svh against the full window including
+  // system bars. Keep the custom keyboard inside the actually visible viewport
+  // and update it when rotation or system-bar geometry changes.
+  if(typeof window.addEventListener==='function'){
+    window.addEventListener('resize', syncOpenCustomViewportHeight);
+  }
+  if(window.visualViewport && typeof window.visualViewport.addEventListener==='function'){
+    window.visualViewport.addEventListener('resize', syncOpenCustomViewportHeight);
+  }
 })();

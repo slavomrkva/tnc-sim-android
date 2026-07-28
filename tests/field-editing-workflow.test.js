@@ -98,6 +98,9 @@ assert.strictEqual(parsedCompactRepeat[0].val,'2',
 assert.strictEqual(parsedCompactRepeat[1].val,'6',
   'CALL LBL editor recognizes the documented compact REP6 count');
 
+assert.strictEqual(context.tokenFor({p:'',type:'rc',opt:true,val:null}),'',
+  'NO ENT on optional radius compensation serializes as omission, never literal null');
+
 // TOOL CALL inserts documented M comments and finishing the guided edit leaves
 // the logical insertion anchor at the end of M8.
 context.lastSel={start:lineOffset(codeEl.value,1),end:lineOffset(codeEl.value,1)};

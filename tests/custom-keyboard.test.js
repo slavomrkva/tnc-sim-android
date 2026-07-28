@@ -78,6 +78,10 @@ assert.match(cssSource, /html\.ck-open \.ctx-panel \.fbar-drbtn\[title="Skip thi
 assert.doesNotMatch(cssSource, /fbar-nav\[onclick="fieldNext\(\)"\]\{display:none;\}/, 'the ▶ / → next control stays visible');
 assert.match(cssSource, /html\.ck-open body\[data-mtab="editor"\] \.ctx-panel\{order:98/,
   'interactive panel re-orders to sit directly above the keyboard');
+assert.match(cssSource, /height:var\(--ck-vvh,100vh\) !important;/,
+  'custom-keyboard editor height uses the actual visible WebView height');
+assert.match(ckSource, /var h=vv && vv\.height \? vv\.height : window\.innerHeight;/,
+  'custom keyboard prefers visualViewport height and falls back to innerHeight');
 
 // P and I removed from the keypad; Q stays (it opens the Q-assignment builder)
 assert.doesNotMatch(appSource, /var PI_KEYS=\[[^]*?\{l:'P'/, 'P removed from the keypad PI_KEYS row');

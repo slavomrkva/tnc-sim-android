@@ -170,10 +170,14 @@ The detailed module-split rationale is in
     incremental state. Replacing a selected preset preserves its existing
     leading sign; holding backspace for 550 ms deliberately clears the entire
     current value (including that sign), while a short press deletes one
-    character. If M or cycle-Q validation leaves the same input mounted after
-    ENT/END, flash invalid feedback instead of failing silently. Free-text
-    editing (comments, raw Q-line text) still uses the native keyboard and rule
-    #7's viewport detection.
+    character. `NO ENT` on every optional field serializes an omitted token,
+    never JavaScript `null`. If M or cycle-Q validation leaves the same input
+    mounted after ENT/END, flash invalid feedback instead of failing silently.
+    While `ck-open`, constrain the editor to a `--ck-vvh` height captured from
+    the actual `visualViewport` (with `innerHeight` fallback), because older
+    Android WebViews can include system bars in `100svh`. Free-text editing
+    (comments, raw Q-line text) still uses the native keyboard and rule #7's
+    viewport detection.
 
 23. **Program operations use logical NC blocks, not textarea rows:**
     `analyzeProgramRows()` is the source of truth for gutter numbering,

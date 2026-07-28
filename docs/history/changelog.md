@@ -7,6 +7,17 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.98 — 2026-07-28 — manual-entry playback fixes
+
+- Constrained the custom TNC keyboard to the actual Android visual viewport so
+  all rows remain above system navigation on older WebViews.
+- Preserved M0/M2/M6/M30 identity through parser playback; only M0 and M6
+  pause, while M2 and M30 complete in one Run.
+- Serialized an omitted guided radius-compensation field as empty instead of
+  the invalid literal `null`, with focused regression coverage.
+- Repeated a complete block-by-block custom-keyboard program covering
+  incremental CC/L, polar LP/IPA and CR, and verified its retained endpoints.
+
 ## APP_VERSION 1.0.97 — 2026-07-28 — pre-production robustness audit
 
 - Made repeated spaces and tabs insignificant across validation, parsing,

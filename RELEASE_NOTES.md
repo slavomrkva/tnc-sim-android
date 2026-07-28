@@ -12,6 +12,14 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.98)
+- The custom TNC keyboard now remains fully above Android's system navigation
+  area on WebViews that report an oversized CSS viewport.
+- M30 and M2 now finish the program in one Run instead of displaying a false
+  M0 pause; M0 and M6 retain their intended pause behavior.
+- Skipping optional radius compensation with `NO ENT` no longer inserts an
+  invalid `null` token.
+
 ## Unreleased test build (APP_VERSION 1.0.97)
 - Imported programs tolerate repeated spaces/tabs, Unicode BOMs and mixed line
   endings without changing validation, blank geometry or the simulated path.
