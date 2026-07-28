@@ -14,8 +14,8 @@ Newest first.
 ---
 
 ## C38 — Supported validator and positioning-feed audit
-**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.94 and web `tnc-sim`
-v0.919. **Fixed and accepted:** 2026-07-28.
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.95 and web `tnc-sim`
+v0.920. **Fixed and accepted:** 2026-07-28.
 
 ### Reported symptoms
 The validator rejected `FAUTO` in a valid `C` block and treated block-local
@@ -26,9 +26,9 @@ had to cover only functions already exposed by the simulator.
 Circular and polar validator branches accepted only numeric feeds, while each
 parser branch managed feed state separately. Numeric label expansion preceded
 complete bounds checks. Supported cycles accepted incomplete or unknown Q
-parameters, Q336 incorrectly excluded negative values, duplicate positioning
-fields were resolved by regex order, and coordinate-sign diagnostics could
-miss one unsigned coordinate when another coordinate had an explicit sign.
+parameters, duplicate positioning fields were resolved by regex order, and
+coordinate-sign diagnostics could miss one unsigned coordinate when another
+coordinate had an explicit sign.
 
 ### Attempts and accepted fix
 - A full offline-manual audit initially exposed additional constructs, but the
@@ -37,14 +37,19 @@ miss one unsigned coordinate when another coordinate had an explicit sign.
   cycles were not ported.
 - Two attempted Claude CLI reviews timed out or exhausted their turn limit and
   produced no evidence or code changes.
+- The first Q336 change followed the older 01/2021 manual, which permits
+  `-360...360`. The post-merge reference check correctly exposed that the
+  simulator targets software 34059x-18 and its 10/2023 manual, where Cycle 209
+  uses `0...360`; APP_VERSION 1.0.95 restored the target-version range.
 - The accepted web shared-core repair was ported deliberately rather than
   copying files wholesale. L/C/CR/CT/LP/CP now share numeric, `FAUTO` and
   `FMAX` semantics; numeric labels, repeats, supported cycles, duplicate
   fields and coordinate-sign diagnostics are validated consistently.
 
 ### Verification
-Focused regressions cover the repaired scope. All 33 Android test files passed
-and Capacitor assets were synchronized without building an APK.
+Focused regressions cover the repaired scope. All 33 Android test files and
+the follow-up offline cutting reference passed. Capacitor assets were
+synchronized without building an APK.
 
 **Cross-reference:** web `BUG_HISTORY.md`, C38.
 

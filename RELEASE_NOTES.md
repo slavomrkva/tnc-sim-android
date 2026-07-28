@@ -12,12 +12,15 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.95)
+- Cycle 209 now validates Q336 against the `0...360` range documented for the
+  simulator's target TNC 640 software version.
+
 ## Unreleased test build (APP_VERSION 1.0.94)
 - Fixed false `FAUTO` and `FMAX` errors in supported circular and polar
   positioning blocks.
 - Tightened validation for supported numeric labels and cycles
-  200/201/208/209, including negative Q336, duplicate fields and coordinate
-  sign diagnostics.
+  200/201/208/209, duplicate fields and coordinate sign diagnostics.
 
 ## Unreleased test build (APP_VERSION 1.0.93)
 - Positioning blocks now accept up to two M functions at the end of `L`, `C`,

@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.95 — target-version Q336 correction
+
+- Restored Cycle 209 Q336 to `0...360` for the simulator's target TNC 640
+  software 34059x-18 and its 10/2023 machining-cycles manual.
+- Recorded that the brief APP_VERSION 1.0.94 `-360...360` change came from the
+  older 01/2021 manual and updated matching parser regressions.
+
 ## APP_VERSION 1.0.94 — supported validator and feed audit
 
 - Mirrored the accepted shared-core fix for numeric/FAUTO/FMAX positioning
