@@ -7,6 +7,19 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.93 — web programming-control and M-audit port
+
+- Ported the accepted web M grammar to all Android positioning families with a
+  two-M product limit, documented parameter grouping, modal-cycle semantics,
+  known start/end state timing and explicit warnings for unsimulated effects.
+- Added two guided M fields, full-block routing for embedded M taps and
+  parameter-preserving reopen/edit behavior.
+- Added the persistent Problems-row validator switch, structural gutter
+  deletion, Clear-to-BEGIN Enter anchoring and fresh TOOL CALL S10000/F2000
+  defaults while retaining Android's automatic commented M3/M8 suffix.
+- Preserved Android-only voxel budgets, live contour deferral, keyboard
+  ownership and value-preserving sign toggle; added focused regressions.
+
 ## APP_VERSION 1.0.92 — repository cleanup
 
 - Preserved the former open-work list in a dated historical snapshot and reset

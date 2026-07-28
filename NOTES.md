@@ -201,6 +201,17 @@ The detailed module-split rationale is in
     text. A newly inserted TOOL CALL adds commented M3/M8 blocks and finishing
     that editor anchors the next insertion after M8.
 
+25. **Positioning M tails and validator control mirror the accepted web
+    contract:** `L`, `C`, `CR`, `CT`, `LP` and `CP` expose at most two M
+    functions at the block end. Any M number is syntactically accepted;
+    documented M parameters stay attached to their M instead of being parsed
+    as coordinates or feed. Known spindle, coolant, stop and modal-cycle
+    effects are simulated, while unsupported machine effects remain explicit
+    warnings. Tapping either embedded M opens the complete guided positioning
+    block. The persistent validator switch is available only in the bottom
+    Problems row when an error exists, or while validation is OFF; OFF removes
+    diagnostics and Run/Step blocking but never disables parsing.
+
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and
 the technical log belong in `docs/history/`.

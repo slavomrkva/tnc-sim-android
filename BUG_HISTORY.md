@@ -13,6 +13,41 @@ Newest first.
 
 ---
 
+## C37 — Programming-block editing and audited M-function handling
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.93 and web `tnc-sim`
+v0.918. **Resolved:** 2026-07-28.
+
+### Reported symptom
+Valid M functions at the end of `L` and `C` blocks were rejected, clicking an
+embedded M opened it as a standalone block, and only one M could be entered.
+After Clear, Enter could not create the first row after `BEGIN PGM`. Structural
+gutter crosses were missing, TOOL CALL started with empty/zero speed and feed,
+and the validator could not be disabled when it produced a false error.
+
+### Root cause
+The guided builders and validator used separate, incomplete M grammars. Feed
+and coordinate scans continued through the M tail, so documented parameters
+such as `M103 F20` were mistaken for positioning values. Android also retained
+older structural-row and Problems-panel policies after the accepted web fix.
+
+### Attempts and accepted fix
+- The first web audit established the deliberate simulator limit of two M
+  functions although the TNC 640 permits four, then replaced the L-only
+  allowlist with one shared M-tail grammar for every implemented positioning
+  family.
+- The Android port preserved its lower voxel budgets, custom keyboard and
+  automatic commented M3/M8 blocks instead of copying web files wholesale.
+- Guided editing now preserves M parameters until the M number is deliberately
+  changed, routes either embedded M back into its complete block, and gives
+  fresh TOOL CALL blocks `S10000 F2000`.
+- Validator OFF is persistent and visible only in the bottom Problems row when
+  relevant. BEGIN/END retain native text protection but both have gutter
+  delete controls; Clear anchors Enter after BEGIN.
+- Android sign-toggle behavior was not reimplemented: its existing
+  value-preserving keyboard path was retained and covered by regression tests.
+
+**Cross-reference:** web `BUG_HISTORY.md`, C37.
+
 ## C28 — Mobile editor footer and incremental polar blocks
 **Repos:** Android `tnc-sim-android` APP_VERSION 1.0.89 and web `tnc-sim`
 v0.900. **Accepted on device:** 2026-07-23.

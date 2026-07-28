@@ -20,6 +20,26 @@ function highlightActiveLine(lineIdx){
 
 function hasErrors(){ for(var i=0;i<problemsData.length;i++){ if(problemsData[i].sev==='err') return true; } return false; }
 
+var _VALIDATOR_STORAGE_KEY='tncsim.validator.enabled';
+var _validatorEnabled=true;
+try{
+  if(typeof localStorage!=='undefined' && localStorage.getItem(_VALIDATOR_STORAGE_KEY)==='false')
+    _validatorEnabled=false;
+}catch(e){}
+
+function isValidatorEnabled(){ return _validatorEnabled; }
+
+function setValidatorEnabled(enabled){
+  _validatorEnabled=enabled!==false;
+  try{
+    if(typeof localStorage!=='undefined')
+      localStorage.setItem(_VALIDATOR_STORAGE_KEY,_validatorEnabled?'true':'false');
+  }catch(e){}
+  runValidation();
+}
+
+function toggleValidator(){ setValidatorEnabled(!_validatorEnabled); }
+
 function pFloat(val){ return parseFloat((val+'').replace(',', '.')); }
 
 function pInt(val){ return parseInt((val+'').replace(',', '')); }
@@ -194,7 +214,9 @@ function editorClear(){
   var begin = m ? m[1] : 'BEGIN PGM PROGRAM MM';
   var end   = m2 ? m2[1] : 'END PGM PROGRAM MM';
   codeEl.value = begin + '\n' + end;
-  syncEditorSelection(0,0);
+  // Put the caret at the end of BEGIN so Enter can immediately create the
+  // first program block. BEGIN itself remains protected by beforeinput.
+  syncEditorSelection(begin.length,begin.length);
   _currentDemoIdx = -1;
   _setDocName('program.H'); // new unsaved program uses the default name
   dirty=true; updateLineNums(); runValidation();
@@ -463,15 +485,42 @@ function renderProblems(){
   var panel=document.getElementById('problems');
   var list=document.getElementById('problemsList');
   var countEl=document.getElementById('problemsCount');
+  var validatorToggle=document.getElementById('problemsValidatorToggle');
+  var validatorOn=isValidatorEnabled();
   var visible = _problemsForDisplay(problemsData);
+  if(!validatorOn){
+    problemsOpen=false;
+    panel.style.display='flex';
+    panel.classList.remove('expanded');
+    countEl.innerHTML='<span style="color:#e8a23a">\u25CF Validator OFF</span>';
+    if(validatorToggle){
+      validatorToggle.style.display='inline-block';
+      validatorToggle.classList.add('off');
+      validatorToggle.textContent='Validator OFF \u2014 turn ON';
+      validatorToggle.title='Enable validation diagnostics and Run/Step blocking';
+      validatorToggle.setAttribute('aria-pressed','false');
+    }
+    list.style.display='none';
+    list.innerHTML='';
+    updateLineNums();
+    return;
+  }
   if(visible.length===0){
     panel.style.display='none';
     panel.classList.remove('expanded');
+    if(validatorToggle) validatorToggle.style.display='none';
     updateLineNums();
     return;
   }
   var errs=visible.filter(function(p){ return p.sev==='err'; }).length, warns=visible.length-errs;
   panel.style.display='flex';
+  if(validatorToggle){
+    validatorToggle.style.display=errs?'inline-block':'none';
+    validatorToggle.classList.remove('off');
+    validatorToggle.textContent='Validator ON \u2014 turn OFF';
+    validatorToggle.title='Disable validation diagnostics and Run/Step blocking';
+    validatorToggle.setAttribute('aria-pressed','true');
+  }
   var label='';
   if(errs) label+='<span class="pc-err">\u25CF '+errs+(errs>1?' errors':' error')+'</span>';
   if(warns) label+=(errs?' \u00B7 ':'')+'<span style="color:#e8a23a">\u25CF '+warns+(warns>1?' warnings':' warning')+'</span>';
@@ -543,7 +592,9 @@ function runValidation(liveEdit){
   // below — surface only at simulation start, not while a contour is still
   // being typed.
   if(liveEdit===undefined) liveEdit=true;
-  problemsData = validateProgram(codeEl.value, liveEdit);
+  var learnOpen=typeof LEARN!=='undefined' && LEARN.open;
+  var validationActive=_validatorEnabled && !learnOpen;
+  problemsData = validationActive ? validateProgram(codeEl.value, liveEdit) : [];
   // Some errors can only be known after constructing the actual compensated
   // toolpath (for example an inner corner that the effective tool radius cannot
   // enter). Surface those parser diagnostics in the same Problems panel so Run
@@ -551,7 +602,7 @@ function runValidation(liveEdit){
   var tmpProg = parseProgram(codeEl.value);
   // Learn mode: validator is fully OFF — the lesson's own Check (with hints)
   // is the feedback channel; error nags would just intimidate a beginner.
-  if(typeof LEARN!=='undefined' && LEARN.open){ problemsData = []; }
+  if(!validationActive){ problemsData = []; }
   else if(tmpProg && tmpProg.problems && tmpProg.problems.length){
     var seenProblems={};
     problemsData.forEach(function(p){ seenProblems[p.line+'|'+p.sev+'|'+p.msg]=true; });
@@ -578,7 +629,10 @@ function tokenFor(f){
   if(f.type==='tool') return String(f.val||1);
   if(f.type==='feed'){ if(f.val===null || f.val==='') return ''; var fv=f.val.toUpperCase(); return (fv==='MAX'||fv==='FMAX'||fv==='9999')?'FMAX':'F'+f.val; }
   if(f.p==='REP'){ if(f.val===null || f.val==='') return ''; return 'REP '+f.val; }
-  if(f.type==='mval'){ if(f.val===null || f.val==='') return ''; return 'M'+f.val; }
+  if(f.type==='mval'){
+    if(f.val===null || f.val==='') return '';
+    return 'M'+f.val+(f.mParams?' '+f.mParams:'');
+  }
   if(f.type==='rc') return f.val; // 'RL','RR','R0' or '' (omit)
   if(f.type==='coord'){ if(f.val===null || f.val==='') return ''; var _cv=(f.val==='+'||f.val==='-')?f.val+'0':f.val; return (f.incr?'I':'')+f.p+signFmt(_cv); }
   if(f.type==='num'){ if(f.val===null || f.val==='') return ''; return f.p+f.val; }
@@ -651,7 +705,6 @@ function deleteLineN(n,confirmed){
   var row=model.rows[n];
   if(!row||row.blockIndex===null) return;
   var block=model.blocks[row.blockIndex];
-  if(block.type==='begin'||block.type==='end') return;
   if(typeof window!=='undefined' && typeof window._endAllEditorInput==='function')
     window._endAllEditorInput();
   if(block.type==='cycle'&&!confirmed){

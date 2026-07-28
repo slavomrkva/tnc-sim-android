@@ -12,6 +12,17 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.93)
+- Positioning blocks now accept up to two M functions at the end of `L`, `C`,
+  `CR`, `CT`, `LP` and `CP`, including documented M parameters.
+- Tapping an M inside a positioning block edits the complete block and keeps
+  both M fields separate.
+- The bottom Problems row can temporarily disable an erroring validator; the
+  switch remains available there while validation is off.
+- Clear now leaves Enter ready after BEGIN PGM, BEGIN/END have gutter delete
+  crosses, and a new TOOL CALL starts with S10000 and F2000 before the existing
+  automatic M3/M8 blocks.
+
 ## Unreleased test build (APP_VERSION 1.0.91)
 - BLK FORM is no longer rejected merely because one box side, cylinder
   diameter or cylinder height exceeds 500 mm. Large valid blanks now adapt 3D

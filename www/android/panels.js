@@ -58,7 +58,7 @@ function updateLineNums(){
     if(selectedBlock!==null && model.rows[i] && model.rows[i].blockIndex===selectedBlock) cls+=' selected';
     var numLabel = blockNums[i]===null ? '' : blockNums[i];
     var rowBlock=model.rows[i]&&model.rows[i].blockIndex!==null ? model.blocks[model.rows[i].blockIndex] : null;
-    var deleteBtn=rowBlock&&rowBlock.type!=='begin'&&rowBlock.type!=='end'
+    var deleteBtn=rowBlock
       ? '<button class="ln-del" onclick="deleteLineN('+i+')" tabindex="-1">&#10005;</button>' : '';
     html += '<div class="'+cls+'">'+deleteBtn+numLabel+'</div>';
   }

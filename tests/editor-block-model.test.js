@@ -157,8 +157,19 @@ for(const column of [0, 'END PGM TEST MM'.length]){
   assert.strictEqual(context.codeEl.value, 'BEGIN PGM TEST MM\nL X+0 Y+0\nEND PGM TEST MM',
     'deleting any cycle row deletes the entire logical cycle');
   assert.strictEqual(undoCount, 1);
+
+  context.codeEl.value='BEGIN PGM TEST MM\nL X+0\nEND PGM TEST MM';
+  context.deleteLineN(0,true);
+  assert.strictEqual(context.codeEl.value,'L X+0\nEND PGM TEST MM',
+    'gutter deletion can remove the complete BEGIN PGM block');
+  context.codeEl.value='BEGIN PGM TEST MM\nL X+0\nEND PGM TEST MM';
+  context.deleteLineN(2,true);
+  assert.strictEqual(context.codeEl.value,'BEGIN PGM TEST MM\nL X+0',
+    'gutter deletion can remove the complete END PGM block');
 }
 
+assert.match(editorSource,/codeEl\.value = begin \+ '\\n' \+ end;[\s\S]{0,180}syncEditorSelection\(begin\.length,begin\.length\)/,
+  'Clear anchors Enter immediately after BEGIN PGM');
 assert.match(appSource, /_editorBeforeInput[\s\S]*actualInserted[\s\S]*editorInsertBlankAfterActiveBlock\(\)/,
   'Android has an input-event fallback for IMEs that report Enter as insertText');
 for(const [name, source] of [
@@ -170,5 +181,7 @@ for(const [name, source] of [
 }
 assert.match(panelsSource, /analyzeProgramRows\(lines\)/);
 assert.match(panelsSource, /model\.blocks\.length \+ ' blocks'/);
+assert.match(panelsSource,/var deleteBtn=rowBlock\s*\?/,
+  'BEGIN and END receive the same gutter delete control as other logical blocks');
 
 console.log('editor-block-model.test.js: logical numbering, selection, Enter, delete and export verified');

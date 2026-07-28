@@ -96,7 +96,7 @@ assert.strictEqual(parsedToolCall[2].val,'420.500',
 // the logical insertion anchor at the end of M8.
 context.lastSel={start:lineOffset(codeEl.value,1),end:lineOffset(codeEl.value,1)};
 context.enterFieldMode('TOOL CALL');
-assert.match(codeEl.value, /TOOL CALL 1 S0\nM3 ; Spindle ON — clockwise\nM8 ; Coolant ON — flood/);
+assert.match(codeEl.value, /TOOL CALL 1 S10000 F2000\nM3 ; Spindle ON — clockwise\nM8 ; Coolant ON — flood/);
 context.exitFieldMode();
 assert.strictEqual(context.lastSel.start, codeEl.value.indexOf('M8 ;')+'M8 ; Coolant ON — flood'.length,
   'TOOL CALL completion anchors the next command at the end of M8');

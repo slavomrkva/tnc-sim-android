@@ -49,14 +49,16 @@ const context = {
       {p:'PR',type:'coord',prompt:'PR',opt:true},
       {p:'PA',type:'coord',prompt:'PA',opt:true},
       {p:'F',type:'feed',prompt:'F',opt:true},
-      {p:'M',type:'mval',prompt:'M',opt:true}
+      {p:'M',type:'mval',prompt:'M',opt:true},
+      {p:'M',type:'mval',prompt:'M2',opt:true}
     ]},
     CP:{cmd:'CP',fields:[
       {p:'PA',type:'coord',prompt:'PA',opt:false},
       {p:'Z',type:'coord',prompt:'Z',opt:true},
       {p:'DR',type:'dr',prompt:'DR',opt:false},
       {p:'F',type:'feed',prompt:'F',opt:true},
-      {p:'M',type:'mval',prompt:'M',opt:true}
+      {p:'M',type:'mval',prompt:'M',opt:true},
+      {p:'M',type:'mval',prompt:'M2',opt:true}
     ]}
   },
   M_DEFS:[{m:'M89',desc:'Modal cycle call'},{m:'M99',desc:'Cycle call'}],
@@ -90,6 +92,14 @@ assert.strictEqual(parsed[0].incr,false);
 assert.strictEqual(parsed[1].val,'+45');
 assert.strictEqual(parsed[1].incr,false);
 assert.strictEqual(parsed[3].val,'99');
+
+codeEl.value='LP PR+50 PA+45 F500 M103 F20 M8';
+parsed=context.parseExistingLine(codeEl.value,'P');
+assert.strictEqual(parsed[3].val,'103');
+assert.strictEqual(parsed[3].mParams,'F20',
+  'guided positioning editor preserves documented parameters of the first M');
+assert.strictEqual(parsed[4].val,'8',
+  'guided positioning editor reopens the second M in its own field');
 
 codeEl.setSelectionRange(codeEl.value.indexOf('PA')+1,codeEl.value.indexOf('PA')+1);
 context.enterFieldModeOnLine(context.getCaretLine());
@@ -154,8 +164,14 @@ assert.strictEqual(codeEl.value,'LP PR+50 PA+45 FMAX M89 ; drill here',
 
 assert.ok(appSource.indexOf('if(_tapPastCommand)') < appSource.indexOf("mTokenAt(lineText,hitPosInLine)"),
   'a measured free-space tap must place the caret before M-token routing runs');
-assert.match(appSource, /\^\(\?:BEGIN\|END\) PGM\\b[\s\S]{0,220}codeEl\.blur/,
-  'protected BEGIN/END rows must blur the native caret');
+assert.match(appSource, /\^BEGIN PGM\\b[\s\S]{0,300}codeEl\.focus/,
+  'protected BEGIN keeps focus so Enter can insert the first program block');
+assert.match(appSource, /\^END PGM\\b[\s\S]{0,220}codeEl\.blur/,
+  'protected END keeps the native caret blurred');
+assert.ok(
+  appSource.indexOf("if(_clickedM && /^(?:L|C|CR|CT|LP|CP)\\b/.test(lt))") <
+    appSource.indexOf("if(_clickedM && typeof openMPanelEdit==='function')"),
+  'embedded positioning M opens the full guided block before standalone M routing');
 assert.match(styles, /body\[data-mtab="editor"\] #code\{[^}]*padding-bottom:28px/,
   'mobile editor must reserve space above its horizontal scrollbar');
 assert.match(styles, /body\[data-mtab="editor"\] #hlLayer\{[^}]*padding-bottom:28px/,

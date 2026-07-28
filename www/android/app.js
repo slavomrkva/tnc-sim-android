@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.92';
+var APP_VERSION = '1.0.93';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -123,14 +123,14 @@ document.addEventListener('keydown', function(e){
 
 
 var M_DEFS = [
-  {m:'M0',   desc:'Program stop (press Run to continue)'},
-  {m:'M1',   desc:'Optional program stop (only if Single Block / opt. stop is active)'},
-  {m:'M2',   desc:'Program end — same as M30 (legacy)'},
+  {m:'M0',   desc:'Program stop; spindle and coolant OFF'},
+  {m:'M1',   desc:'Optional program stop (machine configuration dependent)'},
+  {m:'M2',   desc:'Program end; spindle and coolant OFF — same as M30'},
   {m:'M3',   desc:'Spindle ON — clockwise'},
   {m:'M4',   desc:'Spindle ON — counter-clockwise'},
   {m:'M5',   desc:'Spindle OFF'},
-  {m:'M6',   desc:'Tool change'},
-  {m:'M7',   desc:'Coolant ON — mist'},
+  {m:'M6',   desc:'Tool change / program stop / spindle OFF (machine-dependent)'},
+  {m:'M7',   desc:'Coolant ON — mist (machine-specific; not a standard TNC 640 M function)'},
   {m:'M8',   desc:'Coolant ON — flood'},
   {m:'M9',   desc:'Coolant OFF'},
   {m:'M13',  desc:'Spindle ON clockwise + Coolant ON'},
@@ -146,23 +146,15 @@ var M_DEFS = [
   {m:'M101', desc:'Auto tool change with replacement tool when tool life expires'},
   {m:'M102', desc:'Reset M101'},
   {m:'M103', desc:'Reduce feed rate during plunging, by factor F (%)'},
-  {m:'M104', desc:'Reactivate the last-defined datum'},
-  {m:'M105', desc:'Machining with the 2nd kv (servo gain) factor'},
-  {m:'M106', desc:'Machining with the 1st kv (servo gain) factor'},
   {m:'M107', desc:'Suppress error message for oversized replacement tools'},
   {m:'M108', desc:'Reset M107'},
   {m:'M109', desc:'Constant contouring speed at tool cutting edge — increase & decrease feed'},
   {m:'M110', desc:'Constant contouring speed at tool cutting edge — decrease feed only'},
   {m:'M111', desc:'Reset M109/M110'},
-  {m:'M112', desc:'Round contour transitions within tolerance'},
-  {m:'M113', desc:'Reset M112'},
-  {m:'M114', desc:'Auto-compensate machine geometry when working with tilted axes'},
-  {m:'M115', desc:'Reset M114'},
   {m:'M116', desc:'Rotary axis feed rate in mm/min instead of °/min'},
   {m:'M117', desc:'Reset M116'},
   {m:'M118', desc:'Superimpose handwheel positioning during program run'},
   {m:'M120', desc:'Look-ahead — precalculate radius-compensated contour'},
-  {m:'M124', desc:'Contour filter — smooth small irregularities'},
   {m:'M126', desc:'Shortest-path traverse of rotary axes'},
   {m:'M127', desc:'Reset M126'},
   {m:'M128', desc:'TCPM — keep tool-tip position when positioning tilted axes'},
@@ -175,18 +167,12 @@ var M_DEFS = [
   {m:'M138', desc:'Select which axes M128/M114 act on'},
   {m:'M140', desc:'Retract from contour along the tool axis'},
   {m:'M141', desc:'Suppress touch-probe monitoring'},
-  {m:'M142', desc:'Delete modal program information'},
   {m:'M143', desc:'Delete basic rotation'},
   {m:'M144', desc:'Compensate machine kinematics in ACTUAL/NOMINAL position at block end'},
   {m:'M145', desc:'Reset M144'},
   {m:'M148', desc:'Auto-retract tool from contour at an NC stop'},
   {m:'M149', desc:'Reset M148'},
-  {m:'M150', desc:'Suppress limit-switch message'},
-  {m:'M200', desc:'Laser cutting — output programmed voltage directly'},
-  {m:'M201', desc:'Laser cutting — output voltage as a function of distance'},
-  {m:'M202', desc:'Laser cutting — output voltage as a function of speed'},
-  {m:'M203', desc:'Laser cutting — output voltage as a function of time (ramp)'},
-  {m:'M204', desc:'Laser cutting — output voltage as a function of time (pulse)'},
+  {m:'M197', desc:'Reduce corner rounding with a blockwise DL extension'},
 ];
 
 // Popup listing every M function we have defined (the full M_DEFS table above) —
@@ -479,7 +465,8 @@ var BUILDERS = {
     {p:'Z', prompt:'Z coordinate', type:'coord', opt:true},
       {p:'', prompt:'Radius compensation', type:'rc', opt:true},
       {p:'F', prompt:'Feed rate', type:'feed', opt:true},
-      {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true}
+      {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true},
+      {p:'M', prompt:'Second miscellaneous function M', type:'mval', opt:true}
   ]},
   'C':  {title:'C — circular arc', fields:[
     {p:'X', prompt:'End point X', type:'coord', opt:true},
@@ -487,7 +474,8 @@ var BUILDERS = {
     {p:'DR',prompt:'Rotation direction', type:'dr', opt:false},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
     {p:'', prompt:'Radius compensation', type:'rc', opt:true},
-    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true}
+    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function M', type:'mval', opt:true}
   ]},
   'CC': {title:'CC — circle center', fields:[
     {p:'X', prompt:'Center X', type:'coord', opt:true},
@@ -499,13 +487,15 @@ var BUILDERS = {
     {p:'R', prompt:'Radius', type:'num', opt:false},
     {p:'DR',prompt:'Rotation direction', type:'dr', opt:false},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
-    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true}
+    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function M', type:'mval', opt:true}
   ]},
   'CT': {title:'CT — tangential arc', fields:[
     {p:'X', prompt:'End point X', type:'coord', opt:true},
     {p:'Y', prompt:'End point Y', type:'coord', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
-    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true}
+    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function M', type:'mval', opt:true}
   ]},
   'CYCL DEF 201':{title:'CYCL DEF 201 — Reaming', cmd:'CYCL DEF 201', fields:[
     {p:'Q200', prompt:'Safety clearance (mm)', type:'num', opt:false},
@@ -574,20 +564,23 @@ var BUILDERS = {
     {p:'Z',  prompt:'Helix height / tool-axis coordinate', type:'coord', opt:true},
     {p:'DR', prompt:'Rotation direction', type:'dr', opt:false},
     {p:'F',  prompt:'Feed rate', type:'feed', opt:true},
-    {p:'M',  prompt:'Miscellaneous function', type:'mval', opt:true}
+    {p:'M',  prompt:'Miscellaneous function', type:'mval', opt:true},
+    {p:'M',  prompt:'Second miscellaneous function', type:'mval', opt:true}
   ]},
   'P':  {title:'LP — polar straight line', cmd:'LP', fields:[
     {p:'PR',prompt:'Polar radius (mm; omit to keep current radius)', type:'coord', opt:true},
     {p:'PA',prompt:'Polar angle (degrees; I toggles IPA)', type:'coord', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
-    {p:'M', prompt:'Miscellaneous function', type:'mval', opt:true}
+    {p:'M', prompt:'Miscellaneous function', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function', type:'mval', opt:true}
   ]},
   'I':  {title:'L — incremental move', cmd:'L', fields:[
     {p:'IX',prompt:'Incremental X', type:'coord', opt:true},
     {p:'IY',prompt:'Incremental Y', type:'coord', opt:true},
     {p:'IZ',prompt:'Incremental Z', type:'coord', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
-    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true}
+    {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function M', type:'mval', opt:true}
   ]}
 };
 
@@ -992,6 +985,7 @@ document.addEventListener('keydown', function(e){
   if(e.key==='ArrowDown'){ e.preventDefault(); fieldNext(); return; }
   if(e.key==='Backspace'||e.key==='Delete'){
     e.preventDefault();
+    if(f.type==='mval') f.mParams='';
     if(e.key==='Delete'){
     // if all fields are null/empty, delete the entire line
     var allEmpty=FM.fields.every(function(ff){ return ff.val===null||ff.val===''||ff.val==='0'; });
@@ -1015,6 +1009,7 @@ document.addEventListener('keydown', function(e){
     if(wholeFeed && (ch===','||ch==='.')) return;
     var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
     if(patterns[f.type] && !patterns[f.type].test(ch)) return;
+    if(f.type==='mval') f.mParams='';
     if(f.type==='feed' && /[mMaAxXfFuUtToO]/.test(ch)) ch=ch.toUpperCase();
     // + a - na coord poli len zmenia znamienko, nezahadzujú číslo
     if(_fieldAcceptsSign(f) && (ch==='+'||ch==='-')){
@@ -1093,6 +1088,7 @@ if(mobileInput){
     if(newVal.length < lastMobileVal.length){
       // backspace detected
       if(f.val!==null && f.val!==''){
+        if(f.type==='mval') f.mParams='';
         f.val=String(f.val).slice(0,-1);
         if(f.val===''&&f.opt&&(f.type==='coord'||f.type==='feed')) f.val=null;
         FM.typing=true;
@@ -1115,6 +1111,7 @@ if(mobileInput){
       if(wholeFeed && (ch===','||ch==='.')) continue;
       var patterns={coord:/[0-9.,+\-QqAaBbCc]/,num:/[0-9.,Qq]/,feed:/[0-9QqFfAaXxUuTtOoMm]/,mfunc:/[0-9]/,mval:/[0-9]/};
       if(patterns[f.type] && !patterns[f.type].test(ch)) continue;
+      if(f.type==='mval') f.mParams='';
       if(_fieldAcceptsSign(f) && (ch==='+'||ch==='-')){
         _setFieldSign(f,ch); continue;
       }
@@ -1232,9 +1229,16 @@ codeEl.addEventListener('click', function(e){
     return;
   }
 
-  // BEGIN/END PGM are protected structural rows. A tap may select the row,
-  // but it must not leave a blinking native caret between the final rows.
-  if(/^(?:BEGIN|END) PGM\b/.test(lt)){
+  // BEGIN stays text-protected, but its end is a valid insertion anchor:
+  // after Clear, tapping it and pressing Enter creates the first program row.
+  if(/^BEGIN PGM\b/.test(lt)){
+    codeEl.readOnly=false;
+    try{ codeEl.setSelectionRange(lineEnd,lineEnd); }catch(e){}
+    try{ codeEl.focus({preventScroll:true}); }catch(e){ try{ codeEl.focus(); }catch(e2){} }
+    saveLastSel();
+    return;
+  }
+  if(/^END PGM\b/.test(lt)){
     try{ codeEl.setSelectionRange(lineEnd,lineEnd); }catch(e){}
     saveLastSel();
     try{ codeEl.blur(); }catch(e){}
@@ -1254,11 +1258,15 @@ codeEl.addEventListener('click', function(e){
     return;
   }
 
-  // An embedded M89/M99 is its own editable token inside L/LP. Resolve it
-  // from the measured character cell, not the textarea's clamped caret.
+  // Embedded M tokens belong to their positioning block. Open the full guided
+  // block editor so either of the two M fields can be edited in context.
   var _clickedM=(typeof mTokenAt==='function')?mTokenAt(lineText,hitPosInLine):null;
+  if(_clickedM && /^(?:L|C|CR|CT|LP|CP)\b/.test(lt)){
+    var _mInfo=getCaretLine();
+    if(_mInfo){ enterFieldModeOnLine(_mInfo); return; }
+  }
   if(_clickedM && typeof openMPanelEdit==='function'){
-    openMPanelEdit(lineIdxNow);
+    openMPanelEdit(lineIdxNow,_clickedM);
     return;
   }
 
