@@ -7,6 +7,20 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.96 — official-program compatibility audit
+
+- Accepted documented `F AUTO`, Cycle 200/201/208 `Q206=AUTO`, and compact
+  `REPn` spellings while preserving strict rejection outside their valid
+  positioning or cycle-feed fields.
+- Reworked numeric label expansion to distinguish LBL 0 subprograms from
+  CALL LBL REP program sections, support nested section repeats, and stop
+  recursive or oversized expansion before it can freeze the Android WebView.
+- Accepted radius-compensation activation on polar LP, angle-less CP full
+  circles, and preserved complete revolutions while joining compensated
+  multi-turn CP helices.
+- Added focused parser, validator and guided-editor regressions derived from
+  official HEIDENHAIN HIT 3-axis solutions.
+
 ## APP_VERSION 1.0.95 — target-version Q336 correction
 
 - Restored Cycle 209 Q336 to `0...360` for the simulator's target TNC 640

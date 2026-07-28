@@ -212,6 +212,16 @@ The detailed module-split rationale is in
     Problems row when an error exists, or while validation is OFF; OFF removes
     diagnostics and Run/Step blocking but never disables parsing.
 
+26. **Imported HEIDENHAIN feed and numeric-label spellings stay equivalent:**
+    supported positioning blocks accept both `FAUTO` and the control-generated
+    `F AUTO`; Q206 in Cycles 200/201/208 accepts `AUTO` and maps it to the
+    current TOOL CALL feed. Numeric repeats accept `REP6` and `REP 6`.
+    `LBL n ... LBL 0` is a subprogram, while `LBL n ... CALL LBL n REPn` is a
+    program-section repeat ending at that call. Preserve nested section repeats,
+    the 32-level recursion guard and the 200000-block expansion budget. Polar
+    straight line LP may activate RL/RR; angle-less `CP DR+`/`CP DR-` is a full
+    circle, and compensated CP joins must preserve every programmed full turn.
+
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and
 the technical log belong in `docs/history/`.

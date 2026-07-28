@@ -12,6 +12,15 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.96)
+- Imported HEIDENHAIN programs now accept the official `F AUTO`, cycle
+  `Q206=AUTO` and compact `REP6` spellings without false validator errors.
+- Program-section repeats and nested numeric LBL calls now execute the intended
+  section instead of skipping motion or repeating through the program end.
+- Polar LP blocks can now activate tool-radius compensation, and official
+  angle-less CP full circles and multi-turn compensated helices retain their
+  complete paths.
+
 ## Unreleased test build (APP_VERSION 1.0.95)
 - Cycle 209 now validates Q336 against the `0...360` range documented for the
   simulator's target TNC 640 software version.

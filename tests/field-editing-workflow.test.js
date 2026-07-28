@@ -92,6 +92,12 @@ const parsedToolCall=context.parseExistingLine(
 assert.strictEqual(parsedToolCall[2].val,'420.500',
   'TOOL CALL parser preserves all decimal feed digits on editor open');
 
+const parsedCompactRepeat=context.parseExistingLine('CALL LBL 2 REP6','LBL CALL');
+assert.strictEqual(parsedCompactRepeat[0].val,'2',
+  'CALL LBL editor preserves the label number from compact REP syntax');
+assert.strictEqual(parsedCompactRepeat[1].val,'6',
+  'CALL LBL editor recognizes the documented compact REP6 count');
+
 // TOOL CALL inserts documented M comments and finishing the guided edit leaves
 // the logical insertion anchor at the end of M8.
 context.lastSel={start:lineOffset(codeEl.value,1),end:lineOffset(codeEl.value,1)};
