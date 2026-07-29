@@ -7,6 +7,17 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.100 — 2026-07-29 — Learn clarity and clean Reset
+
+- Moved Lesson 15's datum label inside its SVG boundary and added semantic
+  accessibility labels to every Learn diagram, with an annotation-derived
+  fallback for future diagrams.
+- Corrected the remaining Cycle 209 UI, demo and task text so Q256 is described
+  as a multiplier of Q239 thread pitch rather than a distance in millimetres.
+- Routed the main editor Reset through the shared complete editor-input cleanup
+  before replacing code, preventing stale wizard offsets and keyboard owners.
+- Added focused Learn, custom-keyboard and Reset regressions.
+
 ## APP_VERSION 1.0.99 — 2026-07-29 — clearer Learn diagrams
 
 - Reworked the Lesson 5 arc diagrams with complete program blocks, explicit

@@ -195,6 +195,15 @@ function _editorConfirm(msg, onYes){
 function editorReset(){
   if(!codeEl) return;
   _editorConfirm('Reset to default program?', function(){
+    // Reset replaces the complete program. Release every guided editor first
+    // so no wizard keeps offsets or keyboard ownership from the old code.
+    if(typeof window!=='undefined' && typeof window._endAllEditorInput==='function')
+      window._endAllEditorInput();
+    else {
+      if(typeof FM!=='undefined' && FM.active && typeof exitFieldMode==='function') exitFieldMode(true);
+      if(typeof _qPopupLine!=='undefined' && _qPopupLine>=0 && typeof closeQPopup==='function') closeQPopup();
+      if(typeof closeCtxPanel==='function') closeCtxPanel();
+    }
     _undoPush();
     codeEl.value = DEFAULT_CODE;
     syncEditorSelection(0,0);

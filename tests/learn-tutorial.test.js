@@ -5,6 +5,9 @@ const vm = require('vm');
 
 const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const learnSource = read('www/core/learn-tutorial.js');
+const appSource = read('www/android/app.js');
+const demoSource = read('www/core/demo-programs.js');
 const context = {
   console, Math, JSON, RegExp, Date, parseFloat, parseInt, isFinite,
   TOOL_R: 5, DEFAULT_FEED: 500, lastDefinedFeed: 500,
@@ -22,7 +25,7 @@ context.window = context;
 vm.createContext(context);
 vm.runInContext(read('www/core/data-tables.js'), context, {filename:'data-tables.js'});
 vm.runInContext(read('www/core/parser-engine.js'), context, {filename:'parser-engine.js'});
-vm.runInContext(read('www/core/learn-tutorial.js'), context, {filename:'learn-tutorial.js'});
+vm.runInContext(learnSource, context, {filename:'learn-tutorial.js'});
 
 function solutionFor(task){
   if(task.solRepl) return task.starter.replace(task.solRepl[0], task.solRepl[1]);
@@ -40,6 +43,25 @@ assert.strictEqual(intro.tasks[0].prompt, 'Your challenge appears here. Complete
 assert.strictEqual(intro.tasks[0].checks.length, 0, 'Start here is not a graded task');
 assert.strictEqual(solutionFor(intro.tasks[0]), null, 'Start here has no solution');
 assert.match(read('www/core/data-tables.js'), /Switch between the Editor and 3D view at any time/);
+
+const svgOpenings = learnSource.match(/return '<svg class="learn-svg"[^\r\n]*/g) || [];
+assert.strictEqual(svgOpenings.length, 31, 'all Learn diagram factories are covered by the accessibility check');
+for(const opening of svgOpenings){
+  assert.match(opening, /aria-label="[^"]{20,}"/,
+    `Learn diagram needs a meaningful source-level aria-label: ${opening}`);
+}
+const profileSvg = context.learnSvgPartProfile();
+assert.match(profileSvg, /x="63"[^>]*text-anchor="start"[^>]*>datum 0,0</,
+  'Lesson 15 datum label sits inside the SVG instead of extending past its left edge');
+const tappingSvg = context.learnSvgThreadCycle();
+assert.match(tappingSvg, /Q256[\s\S]*0\.5 x pitch back/,
+  'Cycle 209 diagram explains that Q256 is a factor of pitch');
+assert.match(appSource, /Q256 × Q239/,
+  'Q256 help explains the pitch-factor calculation');
+assert.doesNotMatch(appSource, /Q256[^]*?Chip break retract distance \(mm\)/,
+  'Cycle 209 guided input must not describe Q256 as millimetres');
+assert.doesNotMatch(demoSource, /Q256[^\r\n]*\[mm\]/,
+  'demo code must not label Q256 with millimetre units');
 
 for(const lesson of context.LESSONS){
   for(let i=0; i<lesson.tasks.length; i++){

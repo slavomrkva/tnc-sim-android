@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.99';
+var APP_VERSION = '1.0.100';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -293,7 +293,7 @@ var HELP_MAP = {
   'Q208':     {title:'Q208 — Retraction feed', desc:'Feed rate for retracting from the hole. Set to 0 to use the same feed as Q206.', ex:'Q208=+0'},
   'Q239':     {title:'Q239 — Thread pitch', desc:'Thread pitch in mm. Positive = right-hand thread, negative = left-hand thread. Feed = pitch × RPM.', ex:'Q239=+1.25'},
   'Q257':     {title:'Q257 — Depth per chip break', desc:'How deep the tap goes before retracting slightly to break chips. 0 = no chip breaking.', ex:'Q257=+5'},
-  'Q256':     {title:'Q256 — Chip break retract', desc:'Distance to retract for chip breaking (stays inside the hole). Typically 0.2–0.5mm.', ex:'Q256=+0.2'},
+  'Q256':     {title:'Q256 — Chip break retract factor', desc:'Multiplier of thread pitch Q239 used for a short chip-breaking retract (retract = Q256 × Q239). Set 0 for a full retract out of the hole.', ex:'Q256=+0.5'},
   'measure':  {title:'◎ Measure', desc:'Click to enter measure mode. Click any point on the workpiece surface to record its X/Y/Z coordinates. Click two points to measure the distance between them. Click again to exit measure mode.', ex:''},
   'bug-report':{title:'🐛 Bug report', desc:'Opens the bug report dialog. Describe what went wrong; your program is included automatically. Use "Copy image to clipboard" to grab a screenshot of the 3D view, then paste it (Ctrl+V) into the GitHub issue or email.', ex:''},
   'editor':   {title:'NC Program editor', desc:'Write your Heidenhain Klartext NC program here. Click any line to activate the inline field editor. Use the keypad buttons above to insert commands. Lines starting with ; are comments.', ex:'; This is a comment'},
@@ -519,7 +519,7 @@ var BUILDERS = {
     {p:'Q203', prompt:'Surface coordinate (mm)', type:'num', opt:false},
     {p:'Q204', prompt:'2nd safety clearance (mm)', type:'num', opt:false},
     {p:'Q257', prompt:'Depth per chip break (mm)', type:'num', opt:false},
-    {p:'Q256', prompt:'Chip break retract distance (mm)', type:'num', opt:false},
+    {p:'Q256', prompt:'Chip break retract factor (× thread pitch Q239; 0 = full retract)', type:'num', opt:false},
     {p:'Q336', prompt:'Spindle orientation angle (deg)', type:'num', opt:false},
   ]},
   'CYCL DEF 200':{title:'CYCL DEF 200 — Drilling', cmd:'CYCL DEF 200', fields:[

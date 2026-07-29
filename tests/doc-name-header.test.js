@@ -14,6 +14,7 @@ const core = path.join(__dirname, '..', 'www', 'core');
 const titleEl = { textContent: '(init)' };
 const codeEl = { value: 'BEGIN PGM PROGRAM MM\nEND PGM PROGRAM MM', selectionStart: 0 };
 let lastDownloadName = null;
+let endedEditorInput = 0;
 const ctx = {
   console,
   document: { getElementById: id => id === 'progTitleName' ? titleEl
@@ -32,7 +33,7 @@ const ctx = {
   formatBlockNum: n => n + ' ',
   _downloadTextFile(text, name) { lastDownloadName = name; },
   getComputedStyle() { return { lineHeight: '20' }; },
-  window: {},
+  window: { _endAllEditorInput() { endedEditorInput++; } },
 };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(core, 'editor-core.js'), 'utf8'), ctx);
@@ -51,6 +52,7 @@ assert.strictEqual(ctx._docName, 'program.H', 'Clear resets to the default name'
 
 vm.runInContext('editorReset();', ctx);
 assert.strictEqual(ctx._docName, 'Complete Part', 'Reset restores the starter demo name');
+assert.strictEqual(endedEditorInput, 1, 'Reset releases active editor/keyboard ownership before replacing code');
 
 // Import a file named mypart.H whose body still says BEGIN PGM PROGRAM.
 ctx.FileReader = function () {

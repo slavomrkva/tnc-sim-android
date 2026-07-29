@@ -97,6 +97,8 @@ assert.match(coreSource, /function deleteLineN[^]*?_endAllEditorInput/,
   'gutter deletion closes every active editor before changing the program');
 assert.match(coreSource, /function importProgram[^]*?_endAllEditorInput/,
   'Import closes every active editor before opening the file chooser');
+assert.match(coreSource, /function editorReset[^]*?_endAllEditorInput/,
+  'Reset closes every active editor before replacing the complete program');
 assert.match(learnSource, /function _learnEndEditorInput[^]*?_endAllEditorInput/,
   'Learn transitions use the same complete editor cleanup');
 assert.match(ckSource, /wrapBefore\('mtabSwitch', function\(name\)\{\s*if\(name!=='editor'\) endAllEditorInput\(\);/,

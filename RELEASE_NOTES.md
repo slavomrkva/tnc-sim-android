@@ -12,6 +12,14 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.100)
+- Learn diagrams now have meaningful screen-reader descriptions, and the datum
+  label in Lesson 15 stays fully visible.
+- Cycle 209 help now consistently explains Q256 as a factor of thread pitch,
+  rather than a distance in millimetres.
+- Reset now closes any active guided editor and TNC keyboard before restoring
+  the default program.
+
 ## Unreleased test build (APP_VERSION 1.0.99)
 - Lesson 5's arc diagrams now show complete program blocks and clearer
   `DR-`/`DR+` semicircle examples. The Lesson 9 LBL diagram now matches real
