@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.99 — 2026-07-29 — clearer Learn diagrams
+
+- Reworked the Lesson 5 arc diagrams with complete program blocks, explicit
+  direction arrows and paired `DR-`/`DR+` semicircle examples.
+- Put Lesson 9's positioning blocks inside the displayed LBL body and clarified
+  Lesson 10's bolt-circle diagram with numbered points and a separate CC label.
+
 ## APP_VERSION 1.0.98 — 2026-07-28 — manual-entry playback fixes
 
 - Constrained the custom TNC keyboard to the actual Android visual viewport so

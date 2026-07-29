@@ -12,6 +12,12 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.99)
+- Lesson 5's arc diagrams now show complete program blocks and clearer
+  `DR-`/`DR+` semicircle examples. The Lesson 9 LBL diagram now matches real
+  program order, while Lesson 10's bolt-circle diagram moves the CC coordinates
+  clear of the circle and numbers its three points.
+
 ## Unreleased test build (APP_VERSION 1.0.98)
 - The custom TNC keyboard now remains fully above Android's system navigation
   area on WebViews that report an oversized CSS viewport.
