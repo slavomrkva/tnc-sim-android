@@ -46,6 +46,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="android/styles.css">
+<script src="android/i18n.js"></script>
 <script>
   // Apply saved theme before the page paints, to avoid a flash of the wrong theme.
   try{
@@ -68,16 +69,17 @@
         <span class="ph-title"><span class="dot"></span> <span id="progTitleName">program.H</span></span>
         <span id="programAutosaveStatus" class="program-autosave-status" role="status" aria-live="polite" hidden></span>
         <span class="ph-tools">
-          <button id="learnBtn" class="ph-btn learn-cta" onclick="openLearn()" title="Interactive lessons for beginners">Learn</button>
-          <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help">Help</button>
-          <button id="mCodesBtn" class="ph-btn" onclick="openMCodesList()" title="List all defined M functions">M list</button>
-          <button class="ph-btn" onclick="exportProgram()" data-help="export" title="Download program.H">Export</button>
-          <button class="ph-btn" onclick="importProgram()" title="Load .H program file">Import</button>
+          <button id="learnBtn" class="ph-btn learn-cta" onclick="openLearn()" title="Interactive lessons for beginners" data-i18n-title="panel.learnTitle" data-i18n="panel.learn">Learn</button>
+          <button id="kpHelpBtn" class="ph-btn" onclick="toggleKpHelp()" title="Context help" data-i18n-title="panel.helpTitle" data-i18n="panel.help">Help</button>
+          <button id="mCodesBtn" class="ph-btn" onclick="openMCodesList()" title="List all defined M functions" data-i18n-title="panel.mlistTitle" data-i18n="panel.mlist">M list</button>
+          <button class="ph-btn" onclick="exportProgram()" data-help="export" title="Download program.H" data-i18n-title="panel.exportTitle" data-i18n="panel.export">Export</button>
+          <button class="ph-btn" onclick="importProgram()" title="Load .H program file" data-i18n-title="panel.importTitle" data-i18n="panel.import">Import</button>
           <input type="file" id="importFileInput" accept="text/plain,.h,.H,.nc,.txt,.tap,.cnc" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;" onchange="onImportFile(event)">
         </span>
         <span class="ph-hdr-actions">
-          <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span></button>
-          <button id="aboutBtn" class="ph-btn" onclick="openAboutPopup()" title="About TNC Sim" style="display:inline-flex;align-items:center;gap:4px;"><span>&#9432;</span><span>About</span></button>
+          <button id="langToggle" class="ph-btn" onclick="I18N.cycleLang()" title="Language / Sprache"><span id="langLabel">EN</span></button>
+          <button id="themeToggle" class="ph-btn" onclick="toggleTheme()" title="Toggle dark / light mode" data-i18n-title="theme.title" style="display:inline-flex;align-items:center;gap:4px;"><span id="themeIcon">&#9789;</span><span id="themeLabel">Dark</span></button>
+          <button id="aboutBtn" class="ph-btn" onclick="openAboutPopup()" title="About TNC Sim" data-i18n-title="about.title" style="display:inline-flex;align-items:center;gap:4px;"><span>&#9432;</span><span data-i18n="about.text">About</span></button>
         </span>
       </div>
 
@@ -316,29 +318,29 @@ END PGM PROGRAM MM</textarea>
 
     <div class="canvas-panel">
       <div class="toolbar">
-        <span id="staleSimWarning" style="display:none;font-family:var(--mono);font-size:10px;color:#f0a500;padding:0 8px;white-space:nowrap;align-self:center;">⚠ re-run</span>
-        <button class="btn btn-run" id="runBtn" onclick="onRun()" title="Run" data-help="run"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6,4 20,12 6,20"/></svg><span class="btn-label">Run</span></button>
-        <button class="btn btn-step" onclick="onStep()" title="Step" data-help="step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="3,4 13,12 3,20"/><polygon points="12,4 22,12 12,20"/></svg><span class="btn-label">Step</span></button>
-        <button class="btn btn-stop" onclick="onStop()" title="Stop" data-help="stop"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="16" rx="1"/><rect x="13" y="4" width="7" height="16" rx="1"/></svg><span class="btn-label">Stop</span></button>
-        <button class="btn btn-reset" onclick="onReset()" title="Reset" data-help="reset"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span class="btn-label">Reset</span></button>
+        <span id="staleSimWarning" style="display:none;font-family:var(--mono);font-size:10px;color:#f0a500;padding:0 8px;white-space:nowrap;align-self:center;" data-i18n-html="toolbar.stale">⚠ re-run</span>
+        <button class="btn btn-run" id="runBtn" onclick="onRun()" title="Run" data-i18n-title="toolbar.run" data-help="run"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6,4 20,12 6,20"/></svg><span class="btn-label" data-i18n="toolbar.run">Run</span></button>
+        <button class="btn btn-step" onclick="onStep()" title="Step" data-i18n-title="toolbar.step" data-help="step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="3,4 13,12 3,20"/><polygon points="12,4 22,12 12,20"/></svg><span class="btn-label" data-i18n="toolbar.step">Step</span></button>
+        <button class="btn btn-stop" onclick="onStop()" title="Stop" data-i18n-title="toolbar.stop" data-help="stop"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="16" rx="1"/><rect x="13" y="4" width="7" height="16" rx="1"/></svg><span class="btn-label" data-i18n="toolbar.stop">Stop</span></button>
+        <button class="btn btn-reset" onclick="onReset()" title="Reset" data-i18n-title="toolbar.reset" data-help="reset"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span class="btn-label" data-i18n="toolbar.reset">Reset</span></button>
       </div>
       <div class="view-tabs">
-        <div class="tab active" id="tab3d" onclick="switchView('3d')" data-help="view-3d">3D view</div>
-        <div class="tab" id="tab2d" onclick="switchView('2d')" data-help="view-2d">XY toolpath</div>
-        <div class="tab" id="tabTools" onclick="switchView('tools')" data-help="view-tools">Tool Table</div>
+        <div class="tab active" id="tab3d" onclick="switchView('3d')" data-help="view-3d" data-i18n="view.3d">3D view</div>
+        <div class="tab" id="tab2d" onclick="switchView('2d')" data-help="view-2d" data-i18n="view.2d">XY toolpath</div>
+        <div class="tab" id="tabTools" onclick="switchView('tools')" data-help="view-tools" data-i18n="view.tools">Tool Table</div>
       </div>
       <div class="simulation-settings-drawer">
         <button id="simulationSettingsToggle" class="simulation-settings-toggle" type="button" onclick="toggleSimulationSettings()" aria-expanded="false" aria-controls="simulationSettingsPanel">
-          <span>Simulation controls</span><span id="simulationSettingsChevron" aria-hidden="true">&#9662;</span>
+          <span data-i18n="android.simControls">Simulation controls</span><span id="simulationSettingsChevron" aria-hidden="true">&#9662;</span>
         </button>
         <div id="simulationSettingsPanel" class="simulation-settings-panel" hidden>
           <div class="simulation-setting">
-            <span class="simulation-setting-label">QUALITY</span>
-            <div class="btn-group" id="qualityGroup"><button class="btn btn-tog" onclick="setQuality(0)" data-help="q-low">Low</button><button class="btn btn-tog active" onclick="setQuality(1)" data-help="q-med">Def</button><button class="btn btn-tog" onclick="setQuality(2)" data-help="q-high">High</button></div>
+            <span class="simulation-setting-label" data-i18n="toolbar.quality">QUALITY</span>
+            <div class="btn-group" id="qualityGroup"><button class="btn btn-tog" onclick="setQuality(0)" data-help="q-low" data-i18n="toolbar.qLow">Low</button><button class="btn btn-tog active" onclick="setQuality(1)" data-help="q-med" data-i18n="toolbar.qDef">Def</button><button class="btn btn-tog" onclick="setQuality(2)" data-help="q-high" data-i18n="toolbar.qHigh">High</button></div>
           </div>
           <div class="simulation-setting simulation-mode-setting" id="simulationModeSetting">
-            <span class="simulation-setting-label">MODE</span>
-            <button id="compatModeToggle" type="button" onclick="AndroidWebGLCompat.toggleMode()" title="Restart 3D with the low-memory WebGL1 renderer" aria-pressed="false">Compatibility</button>
+            <span class="simulation-setting-label" data-i18n="android.mode">MODE</span>
+            <button id="compatModeToggle" type="button" onclick="AndroidWebGLCompat.toggleMode()" title="Restart 3D with the low-memory WebGL1 renderer" data-i18n-title="android.compatTitle" data-i18n="android.compat">Compatibility</button>
           </div>
         </div>
       </div>
@@ -350,17 +352,17 @@ END PGM PROGRAM MM</textarea>
         <div class="view-hint" id="viewHint"></div>
 
         <div id="canvasTopButtons" style="position:absolute;top:10px;left:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;z-index:5;">
-          <button id="measureBtn" onclick="toggleMeasure()" data-help="measure" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">&#x25CE; Measure</button>
-          <button id="pathToggle" onclick="togglePaths()" title="Show/hide toolpath" data-help="path" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">⛶ Path</button>
-          <button id="stockToggle" onclick="toggleStockVisibility()" title="Hide workpiece and show only the toolpath" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">BLKFORM OFF</button>
+          <button id="measureBtn" onclick="toggleMeasure()" data-help="measure" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);" data-i18n-html="canvas.measure">&#x25CE; Measure</button>
+          <button id="pathToggle" onclick="togglePaths()" title="Show/hide toolpath" data-i18n-title="path.title" data-help="path" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);" data-i18n-html="canvas.path">⛶ Path</button>
+          <button id="stockToggle" onclick="toggleStockVisibility()" title="Hide workpiece and show only the toolpath" data-i18n-title="blkform.title" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(14,16,20,.7);color:var(--text3);cursor:pointer;backdrop-filter:blur(4px);">BLKFORM OFF</button>
           <div id="canvasSpeedControl" class="speed-ctrl canvas-speed" data-help="speed" aria-label="Simulation speed"><button class="speed-btn" onclick="changeSpeed(-1)">&#8722;</button><span class="speed-val" id="speedVal">1.0&#215;</span><button class="speed-btn" onclick="changeSpeed(1)">+</button></div>
-          <div class="refine-control-row"><button id="refineBtnCanvas" onclick="triggerRefine()" title="Compute high-precision mesh" style="display:none;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(74,158,255,.4);border-radius:5px;background:rgba(14,16,20,.7);color:rgba(74,158,255,.8);cursor:pointer;backdrop-filter:blur(4px);">&#x25C6; Refine</button></div>
+          <div class="refine-control-row"><button id="refineBtnCanvas" onclick="triggerRefine()" title="Compute high-precision mesh" data-i18n-title="refine.title" style="display:none;font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(74,158,255,.4);border-radius:5px;background:rgba(14,16,20,.7);color:rgba(74,158,255,.8);cursor:pointer;backdrop-filter:blur(4px);" data-i18n-html="canvas.refine">&#x25C6; Refine</button></div>
         </div>
         <div id="simInfoPanel" style="position:absolute;top:38px;left:10px;font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.9;display:none;pointer-events:none;"></div>
         <div id="toolLegend" style="position:absolute;bottom:36px;left:10px;font-family:var(--mono);font-size:10px;background:rgba(14,16,20,.75);border:1px solid var(--border);border-radius:6px;padding:8px 12px;display:none;pointer-events:none;backdrop-filter:blur(4px);max-width:200px;"></div>
         <div id="refineIndicator" style="display:none;position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;padding:6px 16px;border:1px solid rgba(74,158,255,.5);border-radius:20px;background:rgba(14,16,20,.85);color:rgba(74,158,255,.95);backdrop-filter:blur(4px);align-items:center;gap:8px;z-index:30;box-shadow:0 2px 12px rgba(0,0,0,.3);">
           <span id="refineSpinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(74,158,255,.3);border-top-color:rgba(74,158,255,1);border-radius:50%;animation:refine-spin 0.7s linear infinite;"></span>
-          <span id="refineIndicatorText">Refining mesh&hellip;</span>
+          <span id="refineIndicatorText" data-i18n="refine.indicator">Refining mesh&hellip;</span>
         </div>
         <div id="measureOverlay" style="position:absolute;top:48px;right:10px;z-index:6;background:rgba(14,16,20,.85);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--text2);display:none;min-width:180px;max-width:calc(100% - 20px);"></div>
       </div>
@@ -376,15 +378,15 @@ END PGM PROGRAM MM</textarea>
 
 <div id="editScrollRail" aria-hidden="true"><span class="er-ico">&#8645;</span></div>
 <nav class="mtab-bar" aria-label="Mobile sections">
-  <button id="mtabEditor" class="on" onclick="mtabSwitch('editor')"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 12h9M4 17h6"/><path d="M15.5 15.5l4-4a1.4 1.4 0 0 0-2-2l-4 4-.5 2.5 2.5-.5z"/></svg></span>Editor</button>
-  <button id="mtabView" onclick="mtabSwitch('view')" aria-label="Simulate in 3D"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M6 7.2 19 10.9a1.2 1.2 0 0 1 0 2.2L6 16.8a1.25 1.25 0 0 1-1.6-1.2V8.4A1.25 1.25 0 0 1 6 7.2Z"/></svg></span>Simulate</button>
-  <button id="mtabLearn" onclick="mtabTapLearn()"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4L2 9l10 5 10-5-10-5z"/><path d="M6 11v4.5c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V11"/><path d="M22 9v5"/></svg></span>Learn</button>
+  <button id="mtabEditor" class="on" onclick="mtabSwitch('editor')"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 12h9M4 17h6"/><path d="M15.5 15.5l4-4a1.4 1.4 0 0 0-2-2l-4 4-.5 2.5 2.5-.5z"/></svg></span><span data-i18n="mobile.editor">Editor</span></button>
+  <button id="mtabView" onclick="mtabSwitch('view')" aria-label="Simulate in 3D" data-i18n-aria="android.simulateAria"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M6 7.2 19 10.9a1.2 1.2 0 0 1 0 2.2L6 16.8a1.25 1.25 0 0 1-1.6-1.2V8.4A1.25 1.25 0 0 1 6 7.2Z"/></svg></span><span data-i18n="android.simulate">Simulate</span></button>
+  <button id="mtabLearn" onclick="mtabTapLearn()"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4L2 9l10 5 10-5-10-5z"/><path d="M6 11v4.5c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V11"/><path d="M22 9v5"/></svg></span><span data-i18n="mobile.learn">Learn</span></button>
 </nav>
 
 <footer>
   <p class="ft-full">TNC Sim &nbsp;·&nbsp; <a href="https://github.com/slavomrkva/tnc-sim">GitHub</a> &nbsp;&middot;&nbsp; <a href="mailto:info@tncsim.org">info@tncsim.org</a></p>
-  <span class="ft-full" style="display:inline-flex;align-items:center;gap:7px;white-space:nowrap;"><span style="font-size:10px;font-family:var(--mono);color:var(--text3);">Support this project and</span><button onclick="openBugReport()" data-help="bug-report" class="ph-btn" style="white-space:nowrap;background:rgba(245,137,58,.14);border-color:rgba(245,137,58,.4);color:var(--accent-warm);">🐛 One-click bug report / Suggest an improvement</button></span>
-  <a class="ft-full ph-btn" href="https://buymeacoffee.com/slavozett" target="_blank" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;" title="Buy me a coffee">&#9749; Buy me a coffee</a>
+  <span class="ft-full" style="display:inline-flex;align-items:center;gap:7px;white-space:nowrap;"><span style="font-size:10px;font-family:var(--mono);color:var(--text3);" data-i18n="android.support">Support this project and</span><button onclick="openBugReport()" data-help="bug-report" class="ph-btn" style="white-space:nowrap;background:rgba(245,137,58,.14);border-color:rgba(245,137,58,.4);color:var(--accent-warm);" data-i18n-html="footer.bug">🐛 One-click bug report / Suggest an improvement</button></span>
+  <a class="ft-full ph-btn" href="https://buymeacoffee.com/slavozett" target="_blank" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;" title="Buy me a coffee" data-i18n-title="android.coffee" data-i18n-html="android.coffeeLabel">&#9749; Buy me a coffee</a>
   <div class="ft-mini">
     <a href="https://github.com/slavomrkva/tnc-sim" title="GitHub" aria-label="GitHub"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
     <button onclick="openBugReport()" title="One-click bug report / Suggest an improvement" aria-label="Report a bug or suggest an improvement">🐛</button>
@@ -392,31 +394,31 @@ END PGM PROGRAM MM</textarea>
   </div>
 </footer>
 
-<div class="onboard-overlay" id="onboardOverlay" role="dialog" aria-label="Welcome tour">
+<div class="onboard-overlay" id="onboardOverlay" role="dialog" aria-label="Welcome tour" data-i18n-aria="android.welcomeTour">
   <div class="onboard-card">
     <div class="onboard-view">
       <div class="onboard-track" id="onboardTrack">
         <div class="onboard-slide">
-          <img src="onboarding/1.png" alt="Editor screen">
-          <div class="ob-cap"><h3>Editor</h3><p class="ob-sub">Write TNC code</p><p class="ob-desc">Compose and edit Heidenhain CNC programs</p></div>
+          <img src="onboarding/1.png" alt="Editor screen" data-i18n-alt="android.editorScreen">
+          <div class="ob-cap"><h3 data-i18n="mobile.editor">Editor</h3><p class="ob-sub" data-i18n="android.writeCode">Write TNC code</p><p class="ob-desc" data-i18n="android.editorDesc">Compose and edit Heidenhain CNC programs</p></div>
         </div>
         <div class="onboard-slide">
-          <img src="onboarding/2.png" alt="3D simulation screen">
-          <div class="ob-cap"><h3>3D Simulation</h3><p class="ob-sub">Simulate toolpaths</p><p class="ob-desc">Visualize and inspect the machining process in 3D</p></div>
+          <img src="onboarding/2.png" alt="3D simulation screen" data-i18n-alt="android.simScreen">
+          <div class="ob-cap"><h3 data-i18n="android.simulation3d">3D Simulation</h3><p class="ob-sub" data-i18n="android.simulatePaths">Simulate toolpaths</p><p class="ob-desc" data-i18n="android.simDesc">Visualize and inspect the machining process in 3D</p></div>
         </div>
         <div class="onboard-slide">
-          <img src="onboarding/3.png" alt="Learn screen">
-          <div class="ob-cap"><h3>Learn</h3><p class="ob-sub">Learn &amp; practice</p><p class="ob-desc">Interactive lessons and hands-on exercises</p></div>
+          <img src="onboarding/3.png" alt="Learn screen" data-i18n-alt="android.learnScreen">
+          <div class="ob-cap"><h3 data-i18n="mobile.learn">Learn</h3><p class="ob-sub" data-i18n="android.learnPractice">Learn &amp; practice</p><p class="ob-desc" data-i18n="android.learnDesc">Interactive lessons and hands-on exercises</p></div>
         </div>
       </div>
     </div>
     <div class="onboard-ctrl">
       <div class="onboard-dots" id="onboardDots"></div>
       <div class="onboard-btns">
-        <button class="onboard-skip" id="onboardSkip" onclick="obClose()">Skip</button>
-        <button class="onboard-next" id="onboardNext" onclick="obNext()">Next</button>
+        <button class="onboard-skip" id="onboardSkip" onclick="obClose()" data-i18n="android.skip">Skip</button>
+        <button class="onboard-next" id="onboardNext" onclick="obNext()" data-i18n="learn.next">Next</button>
       </div>
-      <label class="onboard-dont"><input type="checkbox" id="onboardDont" checked> Don't show this again</label>
+      <label class="onboard-dont"><input type="checkbox" id="onboardDont" checked> <span data-i18n="android.dontShow">Don't show this again</span></label>
     </div>
   </div>
 </div>
@@ -424,7 +426,7 @@ END PGM PROGRAM MM</textarea>
 <div class="cycle-overlay" id="cycleOverlay" onclick="if(event.target===this)closeCyclePicker()">
   <div class="cycle-modal">
     <div class="cycle-modal-head">
-      <h3 id="cycleModalTitle">Select Cycle</h3>
+      <h3 id="cycleModalTitle" data-i18n="cycle.select">Select Cycle</h3>
       <button class="cycle-close" onclick="closeCyclePicker()">&#10005;</button>
     </div>
     <div class="cycle-modal-body" id="cycleModalBody"></div>
@@ -432,21 +434,21 @@ END PGM PROGRAM MM</textarea>
 </div>
 <div class="help-overlay" id="bugOverlay" onclick="if(event.target===this)closeBugReport()">
   <div class="help-modal" style="max-width:520px;">
-    <h2 style="font-family:var(--mono);">🐛 Report a bug or suggest an improvement <button class="help-close" onclick="closeBugReport()">&times;</button></h2>
+    <h2 style="font-family:var(--mono);"><span data-i18n-html="bug.title">🐛 Report a bug or suggest an improvement</span> <button class="help-close" onclick="closeBugReport()">&times;</button></h2>
     <div class="help-body" style="display:flex;flex-direction:column;gap:14px;">
       <div class="bug-choice">
-        <button type="button" id="bugChoiceProblem" class="bug-choice-btn on" onclick="bugSetKind('bug')">🐛 Report a problem</button>
-        <button type="button" id="bugChoiceSuggest" class="bug-choice-btn" onclick="bugSetKind('suggest')">💡 Suggest an improvement</button>
+        <button type="button" id="bugChoiceProblem" class="bug-choice-btn on" onclick="bugSetKind('bug')" data-i18n-html="bug.choiceProblem">🐛 Report a problem</button>
+        <button type="button" id="bugChoiceSuggest" class="bug-choice-btn" onclick="bugSetKind('suggest')" data-i18n-html="bug.choiceSuggest">💡 Suggest an improvement</button>
       </div>
       <div>
-        <textarea id="bugDesc" rows="5" oninput="_bugUpdateSendState()" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+        <textarea id="bugDesc" rows="5" oninput="_bugUpdateSendState()" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;resize:vertical;outline:none;box-sizing:border-box;" data-i18n-ph="bug.bugPh"></textarea>
       </div>
-      <div id="bugWarn" style="font-family:var(--mono);font-size:10px;line-height:1.5;color:var(--text2);background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.28);border-radius:6px;padding:8px 10px;">This report is anonymous. TNC Sim does not collect personal data. Your description, current NC program, and basic technical diagnostics are sent to our public GitHub tracker. Please don't include any confidential information.</div>
+      <div id="bugWarn" data-i18n="bug.warnBug" style="font-family:var(--mono);font-size:10px;line-height:1.5;color:var(--text2);background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.28);border-radius:6px;padding:8px 10px;">This report is anonymous. TNC Sim does not collect personal data. Your description, current NC program, and basic technical diagnostics are sent to our public GitHub tracker. Please don't include any confidential information.</div>
       <div id="bugTurnstile"></div>
       <div id="bugStatus" style="display:none;font-family:var(--mono);font-size:11px;line-height:1.5;word-break:break-word;"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-        <button onclick="closeBugReport()" style="font-family:var(--mono);font-size:12px;padding:6px 16px;border:1px solid var(--border);border-radius:5px;background:none;color:var(--text3);cursor:pointer;">Cancel</button>
-        <button id="bugSendBtn" onclick="sendReport()" style="font-family:var(--mono);font-size:12px;padding:6px 20px;border:1px solid var(--accent);border-radius:5px;background:var(--accent);color:#fff;cursor:pointer;">Send report</button>
+        <button onclick="closeBugReport()" style="font-family:var(--mono);font-size:12px;padding:6px 16px;border:1px solid var(--border);border-radius:5px;background:none;color:var(--text3);cursor:pointer;" data-i18n="bug.cancel">Cancel</button>
+        <button id="bugSendBtn" onclick="sendReport()" style="font-family:var(--mono);font-size:12px;padding:6px 20px;border:1px solid var(--accent);border-radius:5px;background:var(--accent);color:#fff;cursor:pointer;" data-i18n="bug.sendBug">Send report</button>
       </div>
     </div>
   </div>
@@ -454,7 +456,7 @@ END PGM PROGRAM MM</textarea>
 
 <div class="help-overlay" id="helpOverlay" onclick="if(event.target===this)closeHelp()">
   <div class="help-modal">
-    <h2>TNC Sim — Help <button class="help-close" onclick="closeHelp()">&times;</button></h2>
+    <h2><span data-i18n="help.title">TNC Sim — Help</span> <button class="help-close" onclick="closeHelp()">&times;</button></h2>
     <div class="help-body" id="helpBody"></div>
   </div>
 </div>
@@ -465,12 +467,16 @@ END PGM PROGRAM MM</textarea>
 <script src="vendor/OrbitControls.js"></script>
 
 <script src="core/data-tables.js" defer></script>
+<script src="android/i18n-lessons-de.js" defer></script>
+<script src="android/i18n-cycles-de.js" defer></script>
 <script src="core/block-form-panel.js" defer></script>
 <script src="android/turnstile-config.js" defer></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="core/bug-report.js" defer></script>
 <script src="core/cycle-picker.js" defer></script>
 <script src="core/demo-programs.js" defer></script>
+<script src="android/i18n-demos-de.js" defer></script>
+<script src="android/i18n-runtime-de.js" defer></script>
 <script src="core/editor-core.js" defer></script>
 <script src="core/program-autosave.js" defer></script>
 <script src="core/field-editing.js" defer></script>
@@ -486,6 +492,7 @@ END PGM PROGRAM MM</textarea>
 <script src="core/render3d.js" defer></script>
 <script src="core/sim-controls.js" defer></script>
 <script src="core/theme-toast.js" defer></script>
+<script src="android/i18n-about-de.js" defer></script>
 <script src="core/tool-table.js" defer></script>
 <script src="core/view2d.js" defer></script>
 <script src="core/voxel-cutting.js" defer></script>

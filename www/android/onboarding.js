@@ -12,7 +12,9 @@
     var dots = document.getElementById('onboardDots');
     if(dots){ var h=''; for(var k=0;k<N;k++){ h += '<i class="'+(k===idx?'on':'')+'"></i>'; } dots.innerHTML = h; }
     var nx = document.getElementById('onboardNext');
-    if(nx) nx.textContent = (idx===N-1) ? 'Get started' : 'Next';
+    if(nx) nx.textContent = (idx===N-1)
+      ? (typeof t==='function' ? t('android.getStarted','Get started') : 'Get started')
+      : (typeof t==='function' ? t('learn.next','Next') : 'Next');
   };
   window.obNext = function(){ if(idx < N-1) window.obGo(idx+1); else window.obClose(); };
   window.obClose = function(){

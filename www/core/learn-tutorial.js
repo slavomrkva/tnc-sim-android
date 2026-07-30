@@ -782,8 +782,142 @@ function learnSvgDrill(){
     + '</svg>';
 }
 
+/* Optional UI string lookup. English remains the source fallback when no
+   localization layer is active. */
+function _lt(key, fallback){
+  try { return (typeof t === 'function') ? t(key, fallback) : fallback; }
+  catch(e){ return fallback; }
+}
+
 /* Text checks grade executable Klartext only.  A student may explain an answer
    in a comment, but a commented-out TOOL CALL/CYCL DEF must never earn a tick. */
+/* Marked starters get a concise Klartext answer cue at the intended insertion
+   point. `; >>>` is reserved and stripped before grading so the cue can never
+   satisfy a check by itself. */
+var LEARN_TASK_MARK = '; >>> ';
+var _LEARN_MARK_RE  = /^[ \t]*;[ \t]*>>>.*$/gm;
+
+function _learnStripTaskMarks(code){
+  return String(code || '').replace(_LEARN_MARK_RE, '');
+}
+
+function _learnTaskComment(L, ti){
+  return LEARN_TASK_MARK + _lt('learn.answerMarker', 'YOUR ANSWER \u2014 TASK') + ' '
+    + (ti + 1) + '/' + L.tasks.length;
+}
+
+function _learnAnswerLineCount(T){
+  if(T.sol !== undefined) return Math.max(1, String(T.sol).split('\n').length);
+  if(T.solRepl){
+    var oldN = String(T.solRepl[0]).split('\n').length;
+    var newN = String(T.solRepl[1]).split('\n').length;
+    return Math.max(1, newN > oldN ? newN - oldN : oldN);
+  }
+  return 1;
+}
+
+function _learnLineIndexAt(code, offset){
+  return String(code || '').slice(0, Math.max(0, offset)).split('\n').length - 1;
+}
+
+function _learnLineOffset(code, line){
+  var rows = String(code || '').split('\n');
+  var offset = 0;
+  for(var i = 0; i < line && i < rows.length; i++) offset += rows[i].length + 1;
+  return Math.min(offset, String(code || '').length);
+}
+
+/* Build both the starter and its visual answer range. Existing `; >>>` cues
+   become a short marker followed by enough blank blocks for the official
+   solution. A task that inserts at the first blank gap gets the same treatment.
+   Direct replacement tasks keep their source intact and highlight the blocks
+   that should be edited. */
+function _learnStarterPlan(L, ti){
+  var T = L.tasks[ti];
+  var starter = T.starter || '';
+  var count = _learnAnswerLineCount(T);
+  var cue = _learnTaskComment(L, ti);
+  var code = starter;
+  var start = -1;
+  var mode = 'edit';
+  var caretColumn = 0;
+
+  if(/^[ \t]*;[ \t]*>>>/m.test(starter)){
+    code = starter.replace(/^[ \t]*;[ \t]*>>>.*$(?:\n[ \t]*)*/m,
+      cue + '\n'.repeat(count + 1));
+    start = _learnLineIndexAt(code, code.indexOf(cue)) + 1;
+    mode = 'insert';
+  } else if(T.sol !== undefined && /\n(?:[ \t]*\n)+/.test(starter)){
+    code = starter.replace(/\n(?:[ \t]*\n)+/,
+      '\n' + cue + '\n'.repeat(count + 1));
+    start = _learnLineIndexAt(code, code.indexOf(cue)) + 1;
+    mode = 'insert';
+  } else if(T.solRepl){
+    var oldText = String(T.solRepl[0]);
+    var replacement = String(T.solRepl[1]);
+    var at = starter.indexOf(oldText);
+    if(at >= 0){
+      var oldLines = oldText.split('\n').length;
+      var newLines = replacement.split('\n').length;
+      if(newLines > oldLines && replacement.slice(-oldText.length) === oldText){
+        var lineAt = starter.lastIndexOf('\n', at - 1) + 1;
+        if(T.answerPrefix !== undefined){
+          var prefix = String(T.answerPrefix);
+          code = starter.slice(0, lineAt) + prefix + '\n'.repeat(count)
+            + starter.slice(lineAt);
+          start = _learnLineIndexAt(code, lineAt);
+          caretColumn = prefix.length;
+        } else {
+          code = starter.slice(0, lineAt) + cue + '\n'.repeat(count + 1)
+            + starter.slice(lineAt);
+          start = _learnLineIndexAt(code, code.indexOf(cue)) + 1;
+        }
+        mode = 'insert';
+      } else {
+        start = _learnLineIndexAt(starter, at);
+        count = oldLines;
+      }
+    }
+  }
+
+  return {code:code, start:start, count:count, mode:mode, caretColumn:caretColumn};
+}
+
+function learnAnswerLineRange(){
+  if(typeof LEARN === 'undefined' || !LEARN || !LEARN.open
+    || LEARN.lesson < 0 || LEARN.task < 0 || LEARN.answerStartLine < 0) return null;
+  return {
+    start: LEARN.answerStartLine,
+    end: LEARN.answerStartLine + Math.max(1, LEARN.answerLineCount || 1) - 1
+  };
+}
+
+function _learnSolvedCode(L, ti){
+  var T = L.tasks[ti];
+  var plan = _learnStarterPlan(L, ti);
+  var code = plan.code;
+  if(T.sol !== undefined && plan.start >= 0){
+    var lines = code.split('\n');
+    lines.splice.apply(lines, [plan.start, plan.count].concat(String(T.sol).split('\n')));
+    return lines.join('\n');
+  }
+  if(T.solRepl && plan.start >= 0 && plan.mode === 'insert'){
+    var oldText = String(T.solRepl[0]);
+    var replacement = String(T.solRepl[1]);
+    if(replacement.slice(-oldText.length) === oldText){
+      var inserted = replacement.slice(0, replacement.length - oldText.length);
+      if(inserted.slice(-1) === '\n') inserted = inserted.slice(0, -1);
+      var plannedLines = code.split('\n');
+      plannedLines.splice.apply(plannedLines,
+        [plan.start, plan.count].concat(inserted.split('\n')));
+      return plannedLines.join('\n');
+    }
+  }
+  if(T.solRepl) return code.replace(T.solRepl[0], T.solRepl[1]);
+  if(T.sol !== undefined) return code.replace('\n\n', '\n' + T.sol + '\n');
+  return code;
+}
+
 function _learnExecutableCode(code){
   return String(code || '').split('\n').map(function(line){
     var semi = line.indexOf(';');
@@ -929,8 +1063,10 @@ function learnEvalChecks(code, task){
         }
       }
       else if(ch.t === 'has_comment'){
-        // any line containing ';' followed by some real text
-        ok = /;\s*\S/.test(code);
+        // The injected answer marker is not the student's own comment.
+        // Horizontal whitespace only: an empty `; ` line must not borrow text
+        // from the next NC block across a newline.
+        ok = /;[ \t]*\S/.test(_learnStripTaskMarks(code));
       }
       else if(ch.t === 'blk_axis'){
         ok = /BLK\s+FORM\s+0\.1\s+Z\b/i.test(code);
@@ -1024,10 +1160,7 @@ function learnBackToList(){ LEARN.view = 'list'; LEARN.lesson = -1; learnRender(
 function learnSolve(){
   var pw = prompt('Password:');
   if(pw !== '1234') return;
-  var T = LESSONS[LEARN.lesson].tasks[LEARN.task];
-  var code = T.starter;
-  if(T.solRepl) code = code.replace(T.solRepl[0], T.solRepl[1]);
-  else if(T.sol !== undefined) code = code.replace('\n\n', '\n' + T.sol + '\n');
+  var code = _learnSolvedCode(LESSONS[LEARN.lesson], LEARN.task);
   codeEl.value = code;
   if(typeof syncEditorSelection==='function') syncEditorSelection(0,0);
   dirty = true; updateLineNums();
@@ -1056,8 +1189,15 @@ function learnStartTask(ti){
   if(LEARN.savedCode === null) LEARN.savedCode = codeEl.value; // stash user's work once
   LEARN.task = ti; LEARN.lastResults = null; LEARN.view = 'lesson';
   LEARN.hint = 0;                        // progressive hints start closed
-  codeEl.value = L.tasks[ti].starter;
-  if(typeof syncEditorSelection==='function') syncEditorSelection(0,0);
+  var plan = _learnStarterPlan(L, ti);
+  codeEl.value = plan.code;
+  LEARN.answerStartLine = plan.start;
+  LEARN.answerLineCount = plan.count;
+  var caretAt = plan.start >= 0
+    ? _learnLineOffset(codeEl.value, plan.start) + (plan.caretColumn || 0)
+    : 0;
+  if(typeof syncEditorSelection==='function') syncEditorSelection(caretAt,caretAt);
+  else if(codeEl.setSelectionRange) codeEl.setSelectionRange(caretAt,caretAt);
   dirty = true; if(typeof _undoPush==='function') _undoPush();
   updateLineNums(); runValidation();
   if(typeof renderIdlePanel==='function') renderIdlePanel();
@@ -1145,10 +1285,12 @@ function learnRender(){
   var p = _lpEl();
   if(!p) return;
   var L = LEARN.lesson >= 0 ? LESSONS[LEARN.lesson] : null;
-  var title = L ? (L.intro ? L.title : ('Lesson ' + _learnNo(LEARN.lesson) + ' \u00b7 ' + L.title)) : 'Learn \u2014 Heidenhain basics';
+  var title = L ? (L.intro ? L.title : (_lt('learn.lesson', 'Lesson') + ' ' + _learnNo(LEARN.lesson) + ' \u00b7 ' + L.title))
+                : _lt('learn.title', 'Learn \u2014 Heidenhain basics');
   var head = '<div class="lp-head"><span style="font-size:15px;">&#127891;</span>'
     + '<span class="lp-title">' + title + '</span>'
-    + '<button class="lp-x" onclick="closeLearn()" title="Close Learn" aria-label="Close Learn">&#10005;</button></div>';
+    + '<button class="lp-x" onclick="closeLearn()" title="' + _lt('learn.close', 'Close Learn')
+    + '" aria-label="' + _lt('learn.close', 'Close Learn') + '">&#10005;</button></div>';
   var body = '';
 
   if(LEARN.view === 'list' || !L){
@@ -1159,14 +1301,14 @@ function learnRender(){
       var started = (prog[Ls.id]||0) > 0;
       var assisted = !!prog[Ls.id + '#solved'];   // finished with the password button
       var tickCol = assisted ? '#f0a94a' : '#5dcaa5';
-      var st = done ? '<span class="li-st" style="color:'+tickCol+';"'+(assisted?' title="Solved with assistance"':'')+'>&#10003;</span>'
+      var st = done ? '<span class="li-st" style="color:'+tickCol+';"'+(assisted?' title="'+_lt('learn.solvedAssistance', 'Solved with assistance')+'"':'')+'>&#10003;</span>'
              : started ? '<span class="li-st" style="color:'+(assisted?'#f0a94a':'var(--accent)')+';">'+prog[Ls.id]+'/'+Ls.tasks.length+'</span>'
              : '<span class="li-st" style="color:var(--text3);">&#9675;</span>';
       if(Ls.intro){
         // highlighted, un-numbered "Start here" card that sits apart from the course
         return '<button type="button" class="learn-li intro" onclick="learnOpenLesson('+i+')">'
           + '<span class="li-num intro">&#9658;</span>'
-          + '<span class="li-t"><span class="li-eyebrow">START HERE</span>'+Ls.title+'</span>'+st+'</button>';
+          + '<span class="li-t"><span class="li-eyebrow">'+_lt('learn.startHere', 'START HERE')+'</span>'+Ls.title+'</span>'+st+'</button>';
       }
       num++;
       return '<button type="button" class="learn-li" onclick="learnOpenLesson('+i+')">'
@@ -1174,11 +1316,15 @@ function learnRender(){
     }).join('');
     var realLessons = LESSONS.filter(function(x){ return !x.intro; });
     var completeLessons = realLessons.filter(function(x){ return (prog[x.id]||0) >= x.tasks.length; }).length;
-    var more = '<div class="learn-li lock"><span class="li-num">&#127942;</span><span class="li-t">Finish the final integrated project to complete the course. Then try changing dimensions or repairing a deliberate mistake without opening the answer.</span><span class="li-st"></span></div>';
-    body = '<p>Short lessons with small practice exercises solved in the <b>real editor</b> \u2014 the simulator checks your code. Progress is saved.</p>'
-      + '<div class="learn-summary" aria-live="polite"><b>'+completeLessons+'/'+realLessons.length+'</b> lessons complete</div>'
+    var more = '<div class="learn-li lock"><span class="li-num">&#127942;</span><span class="li-t">'
+      + _lt('learn.finalNote', 'Finish the final integrated project to complete the course. Then try changing dimensions or repairing a deliberate mistake without opening the answer.')
+      + '</span><span class="li-st"></span></div>';
+    body = '<p>' + _lt('learn.intro', 'Short lessons with small practice exercises solved in the <b>real editor</b> \u2014 the simulator checks your code. Progress is saved.') + '</p>'
+      + '<div class="learn-summary" aria-live="polite"><b>'+completeLessons+'/'+realLessons.length+'</b> '
+      + _lt('learn.complete', 'lessons complete') + '</div>'
       + '<div class="learn-list">' + rows + more + '</div>'
-      + '<div style="text-align:center;margin-top:14px;"><button class="lp-btn" style="font-size:11px;color:var(--text3);" onclick="learnResetProgress()">&#8634; Reset progress</button></div>';
+      + '<div style="text-align:center;margin-top:14px;"><button class="lp-btn" style="font-size:11px;color:var(--text3);" onclick="learnResetProgress()">&#8634; '
+      + _lt('learn.resetProgress', 'Reset progress') + '</button></div>';
     p.innerHTML = head + '<div class="lp-body">'+body+'</div>';
     var _mb0 = document.getElementById('learnMobileBar');
     if(_mb0){ _mb0.classList.remove('on'); _mb0.innerHTML=''; document.body.classList.remove('practice-on'); }
@@ -1187,29 +1333,34 @@ function learnRender(){
 
   /* \u2500\u2500 combined lesson view: slides pinned on top, practice below \u2500\u2500 */
   var dots = L.slides.map(function(_, i){
-    return '<button type="button" class="'+(i===LEARN.slide?'on':'')+'" onclick="LEARN.slide='+i+';learnRender();" aria-label="Theory slide '+(i+1)+' of '+L.slides.length+'" aria-current="'+(i===LEARN.slide?'step':'false')+'"></button>';
+    return '<button type="button" class="'+(i===LEARN.slide?'on':'')+'" onclick="LEARN.slide='+i+';learnRender();" aria-label="'
+      + _lt('learn.theorySlide', 'Theory slide') + ' '+(i+1)+'/'+L.slides.length+'" aria-current="'+(i===LEARN.slide?'step':'false')+'"></button>';
   }).join('');
   var slides = '<div class="lp-slides">'
-    + '<div class="lp-sec-cap">&#128214; THEORY</div>'
+    + '<div class="lp-sec-cap">&#128214; ' + _lt('learn.theory', 'THEORY') + '</div>'
     + '<div class="lp-slides-nav">'
-    + '<button class="lp-btn lp-hamburger" onclick="learnBackToList()" title="All lessons" aria-label="All lessons">&#9776;</button>'
-    + '<button class="lp-btn" onclick="learnNav(-1)" aria-label="Previous theory slide"'+(LEARN.slide===0?' disabled':'')+'>&#8249;</button>'
+    + '<button class="lp-btn lp-hamburger" onclick="learnBackToList()" title="' + _lt('learn.allLessons', 'All lessons')
+    + '" aria-label="' + _lt('learn.allLessons', 'All lessons') + '">&#9776;</button>'
+    + '<button class="lp-btn" onclick="learnNav(-1)" aria-label="' + _lt('learn.prevTheory', 'Previous theory slide') + '"'+(LEARN.slide===0?' disabled':'')+'>&#8249;</button>'
     + '<div class="learn-prog" style="flex:1;margin:0;">'+dots+'</div>'
-    + '<button class="lp-btn" onclick="learnNav(1)" aria-label="Next theory slide"'+(LEARN.slide===L.slides.length-1?' disabled':'')+'>&#8250;</button>'
+    + '<button class="lp-btn" onclick="learnNav(1)" aria-label="' + _lt('learn.nextTheory', 'Next theory slide') + '"'+(LEARN.slide===L.slides.length-1?' disabled':'')+'>&#8250;</button>'
     + '<span style="font-family:var(--mono);font-size:11px;color:var(--text3);">'+(LEARN.slide+1)+'/'+L.slides.length+'</span>'
     + '</div>'
     + '<div class="lp-slide-view">' + L.slides[LEARN.slide].html() + '</div>'
     + '</div>';
 
-  var practice = '<div class="lp-divider"><span>PRACTICE</span></div>';
+  var practice = '<div class="lp-divider"><span>' + _lt('learn.practice', 'PRACTICE') + '</span></div>';
   if(LEARN.task < 0){
     if(LEARN.slide === L.slides.length - 1){
       var prog2 = learnProgress();
       var doneN = prog2[L.id]||0;
       practice += '<button class="lp-btn chk" style="width:100%;text-align:center;padding:11px;font-size:13.5px;" onclick="learnStartTask('+(doneN < L.tasks.length ? doneN : 0)+')">'
-        + (doneN>0 && doneN<L.tasks.length ? 'Continue practice ('+doneN+'/'+L.tasks.length+' done) \u2192' : 'Start practice \u2192') + '</button>';
+        + (doneN>0 && doneN<L.tasks.length
+          ? _lt('learn.continuePractice', 'Continue practice') + ' ('+doneN+'/'+L.tasks.length+') \u2192'
+          : _lt('learn.startPractice', 'Start practice') + ' \u2192') + '</button>';
     } else {
-      practice += '<div style="font-family:var(--mono);font-size:11.5px;color:var(--text3);text-align:center;padding:4px 0 2px;">&#128274; Read through the slides \u2014 practice unlocks on the last one</div>';
+      practice += '<div style="font-family:var(--mono);font-size:11.5px;color:var(--text3);text-align:center;padding:4px 0 2px;">&#128274; '
+        + _lt('learn.readSlides', 'Read through the slides \u2014 practice unlocks on the last one') + '</div>';
     }
   } else {
     var T = L.tasks[LEARN.task];
@@ -1218,12 +1369,12 @@ function learnRender(){
     var lastTask = LEARN.task === L.tasks.length - 1;
     var nHints = (T.hints && T.hints.length) || 0;
     var shown  = Math.min(LEARN.hint||0, nHints);
-    practice += '<span class="lp-task-badge">PRACTICE '+(LEARN.task+1)+' / '+L.tasks.length+'</span>'
+    practice += '<span class="lp-task-badge">'+_lt('learn.practice', 'PRACTICE')+' '+(LEARN.task+1)+' / '+L.tasks.length+'</span>'
       + '<div class="lp-prompt">'+T.prompt+'</div>';
     // Goals are visible from the start — grey/pending before the first Check, then
     // green/red. Guessing what is graded is not the exercise; writing the code is.
     practice += '<div class="lp-goals'+(res?' checked':'')+'">'
-      + '<div class="lp-goals-cap">GOALS'+(res?'':' \u00b7 not checked yet')+'</div>'
+      + '<div class="lp-goals-cap">'+_lt('learn.goals', 'GOALS')+(res?'':' \u00b7 '+_lt('learn.notChecked', 'not checked yet'))+'</div>'
       + T.checks.map(function(ch, i){
           var r = res ? res[i] : null;
           var col = !r ? 'var(--text3)' : (r.ok ? '#5dcaa5' : 'var(--text2)');
@@ -1239,30 +1390,36 @@ function learnRender(){
     // progressive hints, revealed one press at a time
     if(shown > 0){
       practice += '<div class="lp-hints">' + T.hints.slice(0, shown).map(function(h, i){
-        return '<div class="lp-hint-row"><span class="lp-hint-n">'+(i===nHints-1?'ANSWER':'HINT '+(i+1))+'</span>'
+        return '<div class="lp-hint-row"><span class="lp-hint-n">'+(i===nHints-1
+          ? _lt('learn.answer', 'ANSWER')
+          : _lt('learn.hint', 'HINT')+' '+(i+1))+'</span>'
           + '<div class="lp-hint-b">'+h+'</div></div>';
       }).join('') + '</div>';
     }
     if(allOk){
-      practice += '<div class="lp-success">&#127881;<span>All checks passed \u2014 well done!'
+      practice += '<div class="lp-success">&#127881;<span>'+_lt('learn.allChecks', 'All checks passed \u2014 well done!')
         + (lastTask
-            ? ' Lesson complete.<br>&#9654; Press <b>Run</b> and watch what your program does in 3D.'
-            : ' Ready for the next task.') + '</span></div>';
+            ? ' '+_lt('learn.lessonDone', 'Lesson complete.')+'<br>&#9654; '
+              + _lt('learn.pressRun', 'Press <b>Run</b> and watch your program in 3D.')
+            : ' '+_lt('learn.readyNext', 'Ready for the next task.')) + '</span></div>';
     }
     practice += '<div class="lp-practice-btns">'
-      + '<button class="lp-btn lp-exit" style="padding:8px 10px;" onclick="closeLearn()" title="Exit practice \u2014 back to editor">&#10005;</button>'
+      + '<button class="lp-btn lp-exit" style="padding:8px 10px;" onclick="closeLearn()" title="'
+      + _lt('learn.exitPractice', 'Exit practice \u2014 back to editor') + '">&#10005;</button>'
       + (L.intro ? '' : '<button class="lp-btn lp-solve" style="opacity:.25;padding:8px 8px;border-color:transparent;" onclick="learnSolve()" title="">&#8943;</button>')
-      + '<button class="lp-btn" onclick="learnStartTask('+LEARN.task+')" title="Reload starter code">Reset</button>'
+      + '<button class="lp-btn" onclick="learnStartTask('+LEARN.task+')" title="'
+      + _lt('learn.resetTask', 'Reload the starter program') + '">'+_lt('learn.reset', 'Reset')+'</button>'
       + (!allOk && nHints
           ? '<button class="lp-btn hint'+(shown>=nHints?' spent':'')+'" onclick="learnHint()"'
-            + (shown>=nHints?' disabled':'')+' title="Reveal one more hint">&#128161; '+(shown===nHints-1?'Show answer':'Hint')
+            + (shown>=nHints?' disabled':'')+' title="'+_lt('learn.hintMore', 'Reveal one more hint')+'">&#128161; '
+            +(shown===nHints-1?_lt('learn.showAnswer', 'Show answer'):_lt('learn.hintBtn', 'Hint'))
             + (shown ? ' '+shown+'/'+nHints : '') + '</button>'
           : '')
       + (allOk
           ? (lastTask
-              ? '<button class="lp-btn pri grow" onclick="learnFinishLesson()">Finish lesson &#10003;</button>'
-              : '<button class="lp-btn pri grow" onclick="learnStartTask('+(LEARN.task+1)+')">Next \u2192</button>')
-          : '<button class="lp-btn chk grow" onclick="learnCheck()">Check</button>')
+              ? '<button class="lp-btn pri grow" onclick="learnFinishLesson()">'+_lt('learn.finish', 'Finish lesson')+' &#10003;</button>'
+              : '<button class="lp-btn pri grow" onclick="learnStartTask('+(LEARN.task+1)+')">'+_lt('learn.next', 'Next')+' \u2192</button>')
+          : '<button class="lp-btn chk grow" onclick="learnCheck()">'+_lt('learn.check', 'Check')+'</button>')
       + '</div>';
   }
 
@@ -1281,7 +1438,7 @@ function learnRender(){
       });
       svg.setAttribute('aria-label', parts.length
         ? L.title + ': ' + parts.join('; ')
-        : L.title + ' instructional diagram ' + (i+1));
+        : L.title + ' ' + _lt('learn.instructionalDiagram', 'instructional diagram') + ' ' + (i+1));
     }
   });
 
@@ -1290,7 +1447,7 @@ function learnRender(){
   var mb = document.getElementById('learnMobileBar');
   if(mb){
     if(LEARN.task >= 0){
-      var core = practice.replace('<div class="lp-divider"><span>PRACTICE</span></div>', '');
+      var core = practice.replace('<div class="lp-divider"><span>' + _lt('learn.practice', 'PRACTICE') + '</span></div>', '');
       mb.innerHTML = core;
       mb.classList.add('on');
       document.body.classList.add('practice-on');

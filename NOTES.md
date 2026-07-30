@@ -218,8 +218,16 @@ The detailed module-split rationale is in
     must also reset the key's `aria-expanded` and active visual state even when
     the picker node has already been removed. Password-provided Learn solutions
     and carried-forward starters use the same NC block serialization as the
-    editor; if a task instructs Run, its completed official program must pass
-    full `validateProgram(code, false)`, not only the task checks.
+    editor. Every graded Practice task exposes an answer range: insertion tasks
+    reserve highlighted blank rows sized for the official solution, while
+    direct-edit tasks highlight the existing source rows that must change.
+    Backspace/Delete may edit their text but must not merge the range's outer
+    boundaries into neighbouring blocks. In the shared field-mode panel,
+    `Done`/`END` commits, while `X` restores the complete pre-panel transaction:
+    it removes a newly inserted Path block and restores an existing block
+    without losing the prior selection or undo/redo history. If a task
+    instructs Run, its completed official program must pass full
+    `validateProgram(code, false)`, not only the task checks.
 
 25. **Positioning M tails and validator control mirror the accepted web
     contract:** `L`, `C`, `CR`, `CT`, `LP` and `CP` expose at most two M
@@ -269,6 +277,17 @@ The detailed module-split rationale is in
     happen before `documentElement` exists, so device acceptance is based on
     the final populated property and visible spacing, not that early upstream
     console line alone.
+29. **Android localization mirrors web deliberately, not automatically:**
+    `android/i18n.js` loads synchronously before the UI and keeps English in
+    markup/code as the fallback. The persistent `tncsim.lang` switch reloads
+    the WebView so every dynamic panel is rebuilt. German lesson/cycle overlays
+    load immediately after `data-tables.js`, demo comments after
+    `demo-programs.js`, and `i18n-runtime-de.js` before `android/app.js`;
+    the About override loads after `theme-toast.js`. Preserve that order.
+    Klartext commands and numeric values are never translated: demo overlays
+    may change comments only. Android-specific shell/onboarding strings live
+    in the same translation map, and ported web translation data must retain
+    the Android repository link and pass the localization parity regressions.
 
 Add a numbered rule only for a durable invariant that is not already covered.
 Resolved narratives belong in `BUG_HISTORY.md`; retired architecture detail and

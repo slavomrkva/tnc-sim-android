@@ -6,6 +6,7 @@ const vm = require('vm');
 const root = path.join(__dirname, '..');
 const editorSource = fs.readFileSync(path.join(root, 'www', 'core', 'editor-core.js'), 'utf8');
 const fieldSource = fs.readFileSync(path.join(root, 'www', 'core', 'field-editing.js'), 'utf8');
+const keyboardSource = fs.readFileSync(path.join(root, 'www', 'android', 'custom-keyboard.js'), 'utf8');
 
 const ctxPanel = {innerHTML:'', style:{}};
 const mobileInput = {
@@ -147,4 +148,77 @@ assert.strictEqual(context.FM.fields[0].incr,true);
 assert.ok(codeEl.value.split('\n')[lLine].startsWith('L IX+20'),
   'I toggles the active X field during Edit L even when lastSel is stale');
 
-console.log('field-editing-workflow.test.js: TOOL CALL anchoring and Edit L incremental verified');
+assert.match(fieldSource, /onclick="cancelFieldMode\(\)"[^>]*aria-label="Cancel input"/,
+  'the guided-panel X is wired to transaction cancel, not Done');
+assert.match(keyboardSource, /wrap\('cancelFieldMode'[^]*?hide\(false\)/,
+  'cancelling a guided panel also closes the Android custom keyboard');
+
+const pathBuilders=[
+  'L','P','CHF','CC','C','CR','CT','CP','RND',
+  'APPR LT','APPR LN','APPR CT','APPR LCT',
+  'APPR PLT','APPR PLN','APPR PCT','APPR PLCT',
+  'DEP LT','DEP LN','DEP CT','DEP LCT','DEP PLCT'
+];
+pathBuilders.forEach(label => {
+  if(!context.BUILDERS[label]){
+    context.BUILDERS[label]={
+      cmd:label==='P'?'LP':label,
+      fields:[{p:'X',type:'coord',prompt:'X',opt:true}]
+    };
+  }
+});
+
+const cancelProgram='BEGIN PGM CANCEL MM\nL X+0 Y+0 R0\nEND PGM CANCEL MM';
+for(const label of pathBuilders){
+  codeEl.value=cancelProgram;
+  const anchor=lineOffset(codeEl.value,1)+'L X+0 Y+0 R0'.length;
+  codeEl.setSelectionRange(anchor,anchor);
+  context.lastSel={start:anchor,end:anchor};
+  context.dirty=false;
+  context._undoStack.length=0;
+  context._redoStack=['redo-before-'+label];
+  context.enterFieldMode(label);
+  assert.notStrictEqual(codeEl.value,cancelProgram,`${label} inserts a provisional block`);
+  context.cancelFieldMode();
+  assert.strictEqual(codeEl.value,cancelProgram,`${label} X removes the complete provisional block`);
+  assert.strictEqual(context.FM.active,false,`${label} X closes field mode`);
+  assert.strictEqual(context.dirty,false,`${label} X restores the prior dirty state`);
+  assert.deepStrictEqual(Array.from(context._undoStack),[],`${label} X removes its no-op undo entry`);
+  assert.deepStrictEqual(Array.from(context._redoStack),['redo-before-'+label],
+    `${label} X preserves pre-existing redo history`);
+  assert.strictEqual(codeEl.selectionStart,anchor,`${label} X restores the original caret`);
+}
+
+// X on an existing path block is also a cancellation, but it restores the
+// original block instead of deleting it.
+codeEl.value='BEGIN PGM CANCEL MM\nC X+10 Y+20 DR+\nEND PGM CANCEL MM';
+context.BUILDERS.C={cmd:'C',fields:[
+  {p:'X',type:'coord',prompt:'X',opt:true},
+  {p:'Y',type:'coord',prompt:'Y',opt:true},
+  {p:'DR',type:'dr',prompt:'DR',opt:false}
+]};
+const existingCStart=lineOffset(codeEl.value,1);
+codeEl.setSelectionRange(existingCStart+2,existingCStart+2);
+context.lastSel={start:existingCStart+2,end:existingCStart+2};
+const existingCProgram=codeEl.value;
+context.enterFieldModeOnLine(context.getCaretLine());
+context.FM.fields[0].val='+99';
+context.refreshSelection();
+assert.match(codeEl.value,/C X\+99 Y\+20 DR\+/,'existing C changes while its panel is open');
+context.cancelFieldMode();
+assert.strictEqual(codeEl.value,existingCProgram,
+  'X restores an existing path block instead of keeping partial edits or deleting it');
+
+// The same transaction also covers guided builders with automatic companion
+// lines, so cancellation cannot leave TOOL CALL's M3/M8 suffix behind.
+codeEl.value=cancelProgram;
+const toolAnchor=lineOffset(codeEl.value,1)+'L X+0 Y+0 R0'.length;
+codeEl.setSelectionRange(toolAnchor,toolAnchor);
+context.lastSel={start:toolAnchor,end:toolAnchor};
+context.enterFieldMode('TOOL CALL');
+assert.match(codeEl.value,/TOOL CALL[\s\S]*M3[\s\S]*M8/);
+context.cancelFieldMode();
+assert.strictEqual(codeEl.value,cancelProgram,
+  'X removes a complete multi-line guided insertion transaction');
+
+console.log('field-editing-workflow.test.js: guided insertion, existing edit and transactional X cancel verified');

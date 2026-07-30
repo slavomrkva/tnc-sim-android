@@ -180,7 +180,11 @@ for(const [name, source] of [
   assert.match(source, /insertProgramBlock\(/, `${name} uses the shared logical insertion primitive`);
 }
 assert.match(panelsSource, /analyzeProgramRows\(lines\)/);
-assert.match(panelsSource, /model\.blocks\.length \+ ' blocks'/);
+assert.match(
+  panelsSource,
+  /model\.blocks\.length \+ ' '[\s\S]{0,160}t\('editor\.blocks','blocks'\)/,
+  'block count uses the localized editor.blocks label'
+);
 assert.match(panelsSource,/var deleteBtn=rowBlock\s*\?/,
   'BEGIN and END receive the same gutter delete control as other logical blocks');
 

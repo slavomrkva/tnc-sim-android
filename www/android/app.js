@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.102';
+var APP_VERSION = '1.0.107';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -809,15 +809,37 @@ _applyThemeUI(document.documentElement.getAttribute('data-theme')==='light' ? 'l
 
 // ---------- DOM ----------
 var codeEl = document.getElementById('code');
-var DEFAULT_CODE = codeEl ? codeEl.value : '';
+
+// A language switch reloads the WebView. Keep user-authored/restored code, but
+// swap the shipped starter between its English and German comment overlays.
+function _selectDefaultDemoCode(el, lang, deCode){
+  var enCode = el ? el.defaultValue : '';
+  if(!el) return lang === 'de' ? deCode : enCode;
+  if(lang === 'de'){
+    el.value = deCode;
+    return deCode;
+  }
+  if(el.value === deCode) el.value = enCode;
+  return enCode;
+}
+var DEFAULT_CODE = _selectDefaultDemoCode(
+  codeEl,
+  (window.I18N && I18N.getLang()) || 'en',
+  typeof DEFAULT_CODE_DE!=='undefined' ? DEFAULT_CODE_DE : (codeEl ? codeEl.defaultValue : '')
+);
+
+if(typeof applyAndroidGermanRuntime==='function') applyAndroidGermanRuntime();
 
 // ---------- Demo program library ----------
-// The first entry ("General Basic") is the program shipped in the editor.
-// To add more demos later, push { name:'...', code:'...' } onto this array.
+// Complete Part is shipped in the editor; APPR/DEP Contour stays second.
+// To add more demos later, append { name:'...', code:'...' } to this array.
 var DEMO_PROGRAMS = [
   { name: 'Complete Part', code: DEFAULT_CODE },
+  APPR_DEP_DEMO_PROGRAM,
   { name: 'Angle Mill', code: 'BEGIN PGM PROGRAM MM\n; Angle Mill - 30deg ramp, two passes\n; T1: end mill roughs a 22-step staircase approximating the ramp (X=Q2 0..21, Z=Q1),\n;     DL+0.2 leaves 0.2mm stock on the face for finishing.\n; T2: ball nose (R2=4) reuses the SAME staircase macro. DL-0.536 DR-2 shift the ball\n;     tip/center so it is exactly tangent to the ideal 30deg plane at each step\n;     (no gouge, no leftover stock) - see DL=-R2*(1-cos A), DR=-R2*(1-sin A).\n; Note: the milled surface still looks stepped/staircase in the 3D view because of\n;     the simulation resolution limit (voxel grid size), not the toolpath itself.\nBLK FORM 0.1 Z X+0.5 Y+0 Z+0\nBLK FORM 0.2 X+50 Y+50 Z+20\nTOOL CALL 1 Z S10000 F5000 DL+0.2 ; T1 end mill - roughing pass\nM8\nM3\nQ1=+10 ; Z start depth\nQ2=+0 ; X start position\nL X-10 Y-10 Z+40 FMAX R0\nLBL 1 ; one ramp step: plunge, cut across Y, retract, return\nL X+Q2 Y-10 Z+Q1 FMAX RL\nL Y+60\nL Z+40 FMAX R0\nL Y-10 FMAX\nQ1 = Q1+0,5774 ; tan(30deg) Z step -> exact 30deg slope\nQ2 = Q2+1 ; 1mm X step\nLBL 0\nCALL LBL 1 REP 21 ; 22 steps total (X=0..21)\nTOOL CALL 2 Z S2000 F5000 DL-0.536 DR-2 ; T2 ball nose - contact-point corrected finishing pass\nM3\nM8\nL X-10 Y-10 Z+40 FMAX R0\nQ1=+10\nQ2=+0\nCALL LBL 1 REP 22\nEND PGM PROGRAM MM' }
 ].concat(typeof EXTRA_DEMO_PROGRAMS!=='undefined' ? EXTRA_DEMO_PROGRAMS : []);
+if(window.I18N && I18N.getLang()==='de' && typeof ANGLE_MILL_DE!=='undefined')
+  DEMO_PROGRAMS[2].code=ANGLE_MILL_DE;
 var _currentDemoIdx = 0; // textarea starts out as DEMO_PROGRAMS[0] ("Complete Part")
 // Seed the header document name with the starter demo (editor-core declares _docName).
 if(typeof _setDocName==='function' && DEMO_PROGRAMS[0]) _setDocName(DEMO_PROGRAMS[0].name);
@@ -888,6 +910,23 @@ if(codeEl){
       var row=model.rows[idx], block=blockAt(idx);
       return !!(row && row.kind!=='trailing-artifact' &&
         (row.kind==='continuation'||(block&&(block.type==='cycle'||block.type==='begin'||block.type==='end'))));
+    }
+
+    // Keep the outer boundaries of a highlighted Learn answer range stable.
+    // Characters inside an answer row still use native text editing.
+    var answerRange = typeof learnAnswerLineRange === 'function' ? learnAnswerLineRange() : null;
+    if(isDeletion && s === en && answerRange){
+      var answerLine = lineIdxAt(s);
+      var answerStart = lineStartOffset(answerLine);
+      var answerEnd = answerStart + (lines[answerLine] || '').length;
+      var atProtectedStart = type === 'deleteContentBackward'
+        && answerLine === answerRange.start && s === answerStart;
+      var atProtectedEnd = type === 'deleteContentForward'
+        && answerLine === answerRange.end && s === answerEnd;
+      if(atProtectedStart || atProtectedEnd){
+        e.preventDefault();
+        return;
+      }
     }
 
     // ---- Path 1: a whole-line (or whole multi-line) selection touching a
@@ -1883,7 +1922,10 @@ if(THREE_OK && renderer){
 /* ── Check engine (pure: code string + task -> results) ─────── */
 
 /* ── State + persistence ────────────────────────────────────── */
-var LEARN = { open:false, lesson:-1, slide:0, task:-1, savedCode:null, lastResults:null };
+var LEARN = {
+  open:false, lesson:-1, slide:0, task:-1, savedCode:null, lastResults:null,
+  answerStartLine:-1, answerLineCount:0
+};
 
 /* ── UI: docked Learn panel (list / slides / task in one column) ── */
 

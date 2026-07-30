@@ -16,7 +16,11 @@ assert.match(button[0], /<path d="M6 7\.2 19 10\.9a1\.2 1\.2 0 0 1 0 2\.2L6 16\.
 const styles = fs.readFileSync(path.join(root, 'www', 'android', 'styles.css'), 'utf8');
 assert.match(styles, /\.mtab-bar #mtabView \.mi svg\{width:26px;height:26px;\}/,
   'the Simulate icon must be slightly larger than the other tab icons');
-assert.match(button[0], /<\/svg><\/span>Simulate<\/button>/, 'the visible tab label must be Simulate');
+assert.match(
+  button[0],
+  /<\/svg><\/span><span data-i18n="android\.simulate">Simulate<\/span><\/button>/,
+  'the visible tab label must be localizable and default to Simulate'
+);
 assert.doesNotMatch(button[0], />3D<\/button>/, 'the old visible 3D label must be removed');
 
 console.log('Mobile Simulate tab regression passed.');

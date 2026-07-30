@@ -49,6 +49,7 @@ function updateLineNums(){
   var blockNums = computeBlockNumbers(lines);
   var selectedRow = model.rows[_selectedLine];
   var selectedBlock = selectedRow ? selectedRow.blockIndex : null;
+  var answer = typeof learnAnswerLineRange === 'function' ? learnAnswerLineRange() : null;
   var marks = {};
   for(var k=0;k<problemsData.length;k++){
     var pr=problemsData[k];
@@ -61,6 +62,7 @@ function updateLineNums(){
   for(var i=0;i<lines.length;i++){
     var cls='ln'; if(marks[i]==='err')cls+=' err'; else if(marks[i]==='warn')cls+=' warn'; else if(marks[i]==='fixed')cls+=' fixed';
     if(selectedBlock!==null && model.rows[i] && model.rows[i].blockIndex===selectedBlock) cls+=' selected';
+    if(answer && i>=answer.start && i<=answer.end) cls+=' learn-target';
     var numLabel = blockNums[i]===null ? '' : blockNums[i];
     var rowBlock=model.rows[i]&&model.rows[i].blockIndex!==null ? model.blocks[model.rows[i].blockIndex] : null;
     var deleteBtn=rowBlock
@@ -68,7 +70,8 @@ function updateLineNums(){
     html += '<div class="'+cls+'">'+deleteBtn+numLabel+'</div>';
   }
   lineNums.innerHTML = '<div class="line-nums-inner">' + html + '</div>';
-  _blockCountText = model.blocks.length + ' blocks';
+  _blockCountText = model.blocks.length + ' '
+    + (typeof t==='function' ? t('editor.blocks','blocks') : 'blocks');
   var _ib = document.getElementById('_idleBlocks'); if(_ib) _ib.textContent = _blockCountText;
   var _progTitleEl = document.getElementById('progTitleName');
   // Header follows the document name (demo/import/export/clear), not the body's

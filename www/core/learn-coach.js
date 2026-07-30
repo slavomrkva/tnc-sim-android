@@ -28,6 +28,7 @@ function _coachTarget(key){
   var root = mob ? document.getElementById('learnMobileBar') : document.getElementById('learnPanel');
   if(!root) return null;
   if(key === 'editor') return document.getElementById('code');
+  if(key === 'answer') return document.querySelector('#hlLayer .learn-answer-line');
   if(key === 'prompt') return root.querySelector('.lp-prompt');
   if(key === 'goals')  return root.querySelector('.lp-goals');
   if(key === 'hint')   return root.querySelector('.lp-btn.hint');
@@ -58,8 +59,8 @@ function learnCoachStart(){
   COACH.steps = [
     { k:'prompt', t:'1. Read the assignment',
       d:'One clear action. This warm-up asks you to add a comment before END PGM.' },
-    { k:'editor', t:'2. Make the edit here',
-      d:'This is the real editor with a safe starter program. Add your own line; nothing is submitted until you choose Check.' },
+    { k:'answer', t:'2. Make the edit here',
+      d:'This is the real editor. The amber answer row marks exactly where to work.' },
     { k:'goals',  t:'3. Know what counts',
       d:'Every graded goal is visible from the start. Grey means not checked yet; green means passed.' },
     { k:'hint',   t:'4. Ask for help when needed',

@@ -699,6 +699,7 @@
   // FM (path functions / cycle builders)
   wrap('selectField', function(){ if(FM.active) show(); });
   wrap('exitFieldMode', function(){ if(!FM.active) hide(false); });
+  wrap('cancelFieldMode', function(){ if(!FM.active) hide(false); });
   // Guided insert (CHF/RND/L/TOOL CALL…): commit any in-progress edit first so
   // no half-filled line is left dangling, fix the anchor when no caret is placed,
   // and apply per-block defaults (TOOL CALL S/F only).

@@ -7,6 +7,56 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.107 — 2026-07-30 — compact restored status
+
+- Replaced the long restored-draft labels with `Loaded` / `Geladen` while
+  keeping the saved time visible.
+- Capped the autosave status at 76 px with shrinking and ellipsis so it cannot
+  push the language, theme and About controls onto another header row.
+- Extended autosave and German-localization regressions for the compact state.
+
+## APP_VERSION 1.0.106 — 2026-07-30 — German Android localization
+
+- Ported the web EN/DE localization layer and persistent language switch into
+  the Android shell, including its Android-only simulation drawer, bottom
+  navigation and onboarding.
+- Ported all 16 German lesson overlays, cycle names and Q descriptions, demo
+  comment overlays, the German starter/Angle Mill programs, M descriptions,
+  context help and About text while preserving Klartext code byte-for-byte.
+- Added dependency-order, translation-key, lesson-parity, demo-code,
+  M/help-runtime and DE↔EN starter-switch regressions.
+
+## APP_VERSION 1.0.105 — 2026-07-30 — APPR/DEP contour demo
+
+- Added the validated **APPR/DEP Contour** program as the second demo in the
+  library, ahead of Angle Mill, in parity with the web product.
+- Extended demo regressions to lock its order, clean validation and simulated
+  APPR/DEP tangential transitions.
+
+## APP_VERSION 1.0.104 — 2026-07-30 — transactional Path-function cancel
+
+- Split guided-field completion into explicit commit (`Done`/`END`) and cancel
+  (`X`) paths. Cancel restores the complete pre-panel program, selection,
+  dirty state and undo/redo history.
+- New Path-function cancellation removes the whole provisional block; editing
+  cancellation restores the original block. The same transaction prevents
+  guided multi-line inserts from leaving companion rows behind.
+- Added runtime coverage for every Cartesian, polar and APPR/DEP Path builder,
+  existing-block restoration and custom-keyboard cleanup.
+
+## APP_VERSION 1.0.103 — 2026-07-30 — highlighted Learn answer ranges
+
+- Ported the web answer-range model deliberately into the Android Practice
+  flow: insertion tasks reserve the number of blank rows required by the
+  official solution, while direct-edit tasks highlight their existing source
+  rows.
+- Painted the same amber range in the syntax layer and line-number gutter,
+  placed the caret at its first editable position, and protected its outer
+  Backspace/Delete boundaries without blocking normal text editing.
+- Updated Start Here to exercise the real highlighted row, prevented the
+  reserved answer marker from satisfying comment grading, and added
+  all-lesson answer-range and solution regressions.
+
 ## APP_VERSION 1.0.102 — 2026-07-30 — close accepted TODO work
 
 - Archived the accepted C39-C59 evidence in `BUG_HISTORY.md` and cleared every

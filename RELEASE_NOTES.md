@@ -12,6 +12,26 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.107)
+- Shortened the restored-program status in English and German while keeping
+  its save time, so the language, theme and About buttons stay on one row.
+
+## Unreleased test build (APP_VERSION 1.0.106)
+- Added a persistent EN/DE language switch and the web product's complete
+  German localization: interface, all 16 Learn lessons, cycles, demo comments,
+  M-function descriptions, context help, About and Android onboarding.
+
+## Unreleased test build (APP_VERSION 1.0.105)
+- Added **APPR/DEP Contour** as the second demo program.
+
+## Unreleased test build (APP_VERSION 1.0.104)
+- The X in every Path function input panel now cancels the complete input:
+  a newly inserted row is removed, while an existing edited row is restored.
+
+## Unreleased test build (APP_VERSION 1.0.103)
+- Learn practice now highlights the exact program rows where the answer belongs,
+  including multi-row answers and tasks that modify existing code.
+
 ## Unreleased test build (APP_VERSION 1.0.101)
 - Added the complete APPR/DEP family and analytic CT with `LIN_Z`.
 - Validation now runs only on Run/Step and correctly handles the spindle on

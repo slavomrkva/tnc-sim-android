@@ -41,7 +41,7 @@ function _programAutosaveTime(savedAt){
 
 function _programAutosaveSavedStatus(state){
   var label = state === 'restored'
-    ? _programAutosaveT('autosave.restored', 'Restored')
+    ? _programAutosaveT('autosave.restored', 'Loaded')
     : _programAutosaveT('autosave.saved', 'Saved');
   var time = _programAutosaveSavedAt ? _programAutosaveTime(_programAutosaveSavedAt) : '';
   _programAutosaveStatus(state, label + (time ? ' ' + time : ''));
