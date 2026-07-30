@@ -203,7 +203,23 @@ The detailed module-split rationale is in
     entry accepts whole numbers only and visibly disables decimal input, while
     merely opening an imported legacy decimal TOOL CALL feed must preserve its
     text. A newly inserted TOOL CALL adds commented M3/M8 blocks and finishing
-    that editor anchors the next insertion after M8.
+    that editor anchors the next insertion after M8. The path-function family
+    remains one fixed-height, horizontally scrollable row. Its single
+    standard-size APPR/DEP key stacks APPR above DEP and toggles an exclusive
+    compact picker in place of the idle Undo/Redo/Reset/Clear/text-size control
+    strip, never over the program text and never at a greater strip height.
+    A horizontal rule separates APPR from DEP on the key, and the picker uses
+    neutral grey subfunction buttons.
+    The picker is ordered APPR LT/LN/CT/LCT then DEP LT/LN/CT/LCT; selecting a
+    function opens its guided fields, while pressing APPR/DEP again closes it.
+    P maps the supported functions to their documented polar forms while
+    preserving shared LEN/CCA/R/RL/RR/F/M values.
+    Any transition that replaces the context strip, including Learn/Practice,
+    must also reset the key's `aria-expanded` and active visual state even when
+    the picker node has already been removed. Password-provided Learn solutions
+    and carried-forward starters use the same NC block serialization as the
+    editor; if a task instructs Run, its completed official program must pass
+    full `validateProgram(code, false)`, not only the task checks.
 
 25. **Positioning M tails and validator control mirror the accepted web
     contract:** `L`, `C`, `CR`, `CT`, `LP` and `CP` expose at most two M
@@ -211,10 +227,20 @@ The detailed module-split rationale is in
     documented M parameters stay attached to their M instead of being parsed
     as coordinates or feed. Known spindle, coolant, stop and modal-cycle
     effects are simulated, while unsupported machine effects remain explicit
-    warnings. Tapping either embedded M opens the complete guided positioning
-    block. The persistent validator switch is available only in the bottom
+    warnings. The missing-spindle warning applies to the first non-FMAX
+    positioning motion, not to preceding rapid positioning. M3, M4, M13 or M14
+    at the end of that same first feed block is start-effective and satisfies
+    the check; an end-effective M5 on an earlier rapid block still leaves the
+    following feed move without a running spindle. Tapping either embedded M
+    opens the complete guided positioning block. The persistent validator
+    switch is available only in the bottom
     Problems row when an error exists, or while validation is OFF; OFF removes
-    diagnostics and Run/Step blocking but never disables parsing.
+    diagnostics and Run/Step blocking but never disables parsing. Every
+    programming key, custom-keyboard action, guided panel, import and raw edit
+    calls `runValidation()` only to invalidate stale Problems; it must not call
+    `validateProgram` or `parseProgram`. Only Run and Step request full
+    validation with `runValidation(false)`, after cancelling any pending edit
+    timer. Changing the validator switch waits for that next simulation start.
 
 26. **Imported HEIDENHAIN feed and numeric-label spellings stay equivalent:**
     supported positioning blocks accept both `FAUTO` and the control-generated
@@ -225,6 +251,10 @@ The detailed module-split rationale is in
     the 32-level recursion guard and the 200000-block expansion budget. Polar
     straight line LP may activate RL/RR; angle-less `CP DR+`/`CP DR-` is a full
     circle, and compensated CP joins must preserve every programmed full turn.
+    APPR/DEP must derive PS/PH/PA/PE/PN from the exact first/last compensated
+    contour tangent and DEP cancels RL/RR automatically. Standalone CT uses the
+    immediately preceding analytic contour tangent; `LIN_Z` changes only the
+    simultaneous tool-axis endpoint.
 27. **NC transport formatting is not program semantics:** repeated spaces and
     tabs outside comments, a leading Unicode BOM, and CRLF/CR versus LF line
     endings must not change validation, BLK FORM geometry, LBL expansion or

@@ -145,6 +145,7 @@
       || !!el('qPanelInput')
       || !!el('toolDefPicker')
       || !!el('cyclePicker')
+      || !!el('apprDepPicker')
       || !!panelOwner()
       || qpBuilderOpen();
   }
@@ -163,10 +164,11 @@
       var b=buttons[i];
       if(b.dataset.editBaseDisabled===undefined)
         b.dataset.editBaseDisabled=b.disabled?'1':'0';
-      var disabled=locked||b.dataset.editBaseDisabled==='1';
+      var pickerToggle=b.id==='apprDepKey'&&panelOwner()==='apprdep'&&!!el('apprDepPicker');
+      var disabled=(locked&&!pickerToggle)||b.dataset.editBaseDisabled==='1';
       b.disabled=disabled;
       b.setAttribute('aria-disabled',disabled?'true':'false');
-      b.classList.toggle('edit-locked',locked);
+      b.classList.toggle('edit-locked',locked&&!pickerToggle);
     }
   }
   var programmingPad=el('keypad');
@@ -418,6 +420,11 @@
     fireInput(t.input);
   }
 
+  function keyboardPolarTarget(builderKey){
+    if(typeof polarBuilderTarget==='function') return polarBuilderTarget(builderKey);
+    return builderKey==='L'?'P':(builderKey==='P'?'L':null);
+  }
+
   function keyEnabled(t,key,action){
     if(!t) return false;
     if(key!==undefined && key!==null){
@@ -440,7 +447,7 @@
       if(action==='backspace') return ff.type!=='tool'&&ff.type!=='dr'&&ff.type!=='rc';
       if(action==='sign') return ff.type==='dr'||(typeof _fieldAcceptsSign==='function'&&_fieldAcceptsSign(ff));
       if(action==='q') return ff.type==='coord'||ff.type==='num'||ff.type==='feed';
-      if(action==='p') return FM.builderKey==='L'||FM.builderKey==='P';
+      if(action==='p') return !!keyboardPolarTarget(FM.builderKey);
       if(action==='i') return typeof fieldAllowsIncremental==='function' &&
         fieldAllowsIncremental(FM.builderKey,ff);
       if(action==='prev') return FM.idx>0;
@@ -478,7 +485,8 @@
       b.disabled=!enabled;
       b.setAttribute('aria-disabled',enabled?'false':'true');
       var selected =
-        (action==='p' && t && t.kind==='fm' && FM.builderKey==='P') ||
+        (action==='p' && t && t.kind==='fm' &&
+          (FM.builderKey==='P'||/^APPR P/.test(FM.builderKey)||FM.builderKey==='DEP PLCT')) ||
         (action==='i' && t && t.kind==='fm' && !!fmField() && !!fmField().incr);
       b.classList.toggle('ck-selected',!!selected);
       if(action==='p'||action==='i') b.setAttribute('aria-pressed',selected?'true':'false');
@@ -564,7 +572,12 @@
     switch(action){
       case 'backspace': t.kind==='fm' ? fmBackspace() : t.kind==='qp' ? qpBackspace() : inputBackspace(t); break;
       case 'sign':      t.kind==='fm' ? fmSign()      : t.kind==='qp' ? qpSign()      : inputSign(t); break;
-      case 'p': if(t.kind==='fm' && typeof switchFieldMode==='function') switchFieldMode(FM.builderKey==='P'?'L':'P'); break;
+      case 'p':
+        if(t.kind==='fm'&&typeof switchFieldMode==='function'){
+          var polarTarget=keyboardPolarTarget(FM.builderKey);
+          if(polarTarget) switchFieldMode(polarTarget);
+        }
+        break;
       case 'i': if(t.kind==='fm' && typeof toggleIncrementalToken==='function') toggleIncrementalToken(); break;
       // Inserting a Q reference is a deliberate edit — the next digit must
       // append to the "Q", not be treated as the first char that replaces the
@@ -661,6 +674,7 @@
     var hasCtxOwner =
       (typeof BLK!=='undefined' && BLK.active) ||
       !!el('mCustomInput') || !!el('toolDefPicker') || !!el('cyclePicker') ||
+      !!el('apprDepPicker') ||
       qpBuilderOpen() || !!panelOwner();
     if(hasCtxOwner && typeof closeCtxPanel==='function') closeCtxPanel();
     clearPanelOwner();
@@ -772,9 +786,17 @@
   // keyboard input, but whole-block programming keys stay locked until close.
   wrapBefore('openCyclePicker', function(){ prepareOwner('cycle'); });
   wrap('openCyclePicker', function(){ markPanelOwner('cycle'); hide(false); blurEditorNow(); });
+  // APPR/DEP uses the same exclusive docked-panel lifecycle. Selecting a
+  // subfunction closes this owner before enterFieldMode opens its guided fields.
+  wrapBefore('openApprDepPicker', function(){ prepareOwner('apprdep'); });
+  wrap('openApprDepPicker', function(){ markPanelOwner('apprdep'); hide(false); blurEditorNow(); });
 
   // closing any editor hides the keyboard
-  wrap('closeCtxPanel', function(){ clearPanelOwner(); hide(false); });
+  wrap('closeCtxPanel', function(){
+    if(typeof setApprDepPickerExpanded==='function') setApprDepPickerExpanded(false);
+    clearPanelOwner();
+    hide(false);
+  });
   wrap('closeQPopup', function(){ clearPanelOwner('q'); hide(false); });
 
   // Some Android WebViews resolve 100svh against the full window including

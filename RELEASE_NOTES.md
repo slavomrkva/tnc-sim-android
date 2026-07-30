@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.101)
+- Added the complete APPR/DEP family and analytic CT with `LIN_Z`.
+- Validation now runs only on Run/Step and correctly handles the spindle on
+  the first working move.
+- Corrected the Learn/Practice APPR state, Lesson 7 retract and complete
+  multiline Cycle 209 solutions.
+
 ## Unreleased test build (APP_VERSION 1.0.100)
 - Learn diagrams now have meaningful screen-reader descriptions, and the datum
   label in Lesson 15 stays fully visible.

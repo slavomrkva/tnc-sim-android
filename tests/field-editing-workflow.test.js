@@ -56,6 +56,15 @@ const context = {
       {p:'',type:'tool',prompt:'T',opt:false},
       {p:'S',type:'num',prompt:'S',opt:false},
       {p:'F',type:'num',prompt:'F',opt:true}
+    ]},
+    'APPR CT':{cmd:'APPR CT',fields:[
+      {p:'R',type:'num',prompt:'R',opt:false}
+    ]},
+    'APPR PCT':{cmd:'APPR PCT',fields:[
+      {p:'R',type:'num',prompt:'R',opt:false}
+    ]},
+    'DEP CT':{cmd:'DEP CT',fields:[
+      {p:'R',type:'num',prompt:'R',opt:false}
     ]}
   },
   _undoStack:[],
@@ -100,6 +109,17 @@ assert.strictEqual(parsedCompactRepeat[1].val,'6',
 
 assert.strictEqual(context.tokenFor({p:'',type:'rc',opt:true,val:null}),'',
   'NO ENT on optional radius compensation serializes as omission, never literal null');
+
+context.FM={active:true,builderKey:'APPR CT'};
+assert.strictEqual(context.tokenFor({p:'R',type:'num',opt:false,val:'10'}),'R+10',
+  'Android APPR CT emits the required positive radius sign automatically');
+context.FM={active:true,builderKey:'APPR PCT'};
+assert.strictEqual(context.tokenFor({p:'R',type:'num',opt:false,val:'8.5'}),'R+8.5',
+  'Android APPR PCT emits the required positive radius sign automatically');
+context.FM={active:true,builderKey:'DEP CT'};
+assert.strictEqual(context.tokenFor({p:'R',type:'num',opt:false,val:'-8'}),'R-8',
+  'Android DEP CT preserves the selected negative radius');
+context.FM={active:false};
 
 // TOOL CALL inserts documented M comments and finishing the guided edit leaves
 // the logical insertion anchor at the end of M8.

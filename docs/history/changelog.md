@@ -7,6 +7,33 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.101 — 2026-07-30 — documented APPR/DEP and analytic CT
+
+- Ported the complete APPR/DEP parser, validator and analytic
+  radius-compensation geometry from the accepted web implementation while
+  preserving Android memory limits.
+- Added exact standalone CT tangency, `LIN_Z`, RND/CHF block-local feeds,
+  guided Cartesian/polar editors and custom-keyboard P switching.
+- Kept the path-function family in one fixed-height, horizontally scrollable
+  Android row and moved APPR/DEP subfunctions behind a standard-size stacked
+  APPR/DEP key whose exclusive compact picker replaces the idle editor-control
+  strip without covering the program or increasing that strip's height and
+  toggles closed on a second press. Gave its subfunctions a neutral grey
+  treatment and separated APPR from DEP with the machine-style horizontal
+  rule. Added official-program, geometry, keyboard and layout regressions.
+- Centralized edit-time validator invalidation so programming keys, the custom
+  keyboard, panels, import and raw editing defer all static/parser diagnostics
+  until Run/Step; pending edit timers cannot erase blocked-run results.
+- Corrected the spindle-presence warning to ignore preceding `FMAX` rapid
+  positioning, evaluate the first non-FMAX motion, and honor start-effective
+  M3/M4/M13/M14 in that same block. Added official-program and explicit
+  start/end M-timing regressions.
+- Made every context-strip replacement clear the APPR/DEP expanded state.
+- Corrected the Lesson 7 task-1 retract to cancel RR and serialized all three
+  Cycle 209 task programs in the editor's complete multiline parameter order,
+  including Q336/Q403. Added full Run-validator regressions for the password
+  solutions and Q403 to the guided schema.
+
 ## APP_VERSION 1.0.100 — 2026-07-29 — Learn clarity and clean Reset
 
 - Moved Lesson 15's datum label inside its SVG boundary and added semantic

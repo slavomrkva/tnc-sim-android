@@ -323,6 +323,10 @@ function createHarness() {
   const programKey = document.createElement('button');
   programKey.classList.add('key');
   keypad.appendChild(programKey);
+  const apprDepKey = document.createElement('button');
+  apprDepKey.id = 'apprDepKey';
+  apprDepKey.classList.add('key');
+  keypad.appendChild(apprDepKey);
   document.body.appendChild(keypad);
 
   const context = {
@@ -527,6 +531,13 @@ function createHarness() {
     clearPanel();
     makeInput('cyclePicker', '200', 'none');
   };
+  context.openApprDepPicker = function() {
+    log.push('openApprDepPicker');
+    clearPanel();
+    const picker = document.createElement('div');
+    picker.id = 'apprDepPicker';
+    ctxPanel.appendChild(picker);
+  };
   context.closeCtxPanel = function() {
     log.push('closeCtxPanel');
     clearPanel();
@@ -547,6 +558,7 @@ function createHarness() {
     mobileInput,
     keypad,
     programKey,
+    apprDepKey,
     dispatchWindow(type) {
       (windowListeners[type] || []).forEach(listener => listener());
     },
@@ -958,6 +970,22 @@ test('central lifecycle cleanup closes real, virtual and docked editor owners', 
   assert.strictEqual(h.ctxPanel.dataset.editorOwner, 'cycle', 'cycle picker owns the panel');
   c._endAllEditorInput();
   assert.strictEqual(h.document.getElementById('cyclePicker'), null, 'cycle picker closes');
+
+  c.openApprDepPicker();
+  assert.strictEqual(h.ctxPanel.dataset.editorOwner, 'apprdep', 'APPR/DEP picker owns the panel');
+  assert.ok(h.document.getElementById('apprDepPicker'), 'APPR/DEP picker is open');
+  assert.strictEqual(h.document.documentElement.classList.contains('ck-open'), false,
+    'APPR/DEP selection does not open the numeric keyboard');
+  assert.strictEqual(!!h.programKey.disabled, true,
+    'APPR/DEP selection locks whole-block programming keys');
+  assert.strictEqual(!!h.apprDepKey.disabled, false,
+    'the active APPR/DEP key stays enabled so a second press can close its picker');
+  c._endAllEditorInput();
+  assert.strictEqual(h.document.getElementById('apprDepPicker'), null, 'APPR/DEP picker closes');
+  assert.strictEqual(!!h.programKey.disabled, false,
+    'closing APPR/DEP selection unlocks programming keys');
+  assert.strictEqual(!!h.apprDepKey.disabled, false,
+    'APPR/DEP remains enabled after its picker closes');
 });
 
 test('leaving Editor closes custom keyboard ownership before switching tabs', () => {

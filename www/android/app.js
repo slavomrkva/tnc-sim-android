@@ -5,7 +5,7 @@
 // latest edit. Independent of android/app/build.gradle's versionCode/versionName
 // (those are the Play Store release identifiers, bumped only per release).
 // Shown in the About popup and the bug-report info.
-var APP_VERSION = '1.0.100';
+var APP_VERSION = '1.0.101';
 (function(){
   var b = document.getElementById('verBadge');
   if(b) b.textContent = 'v' + APP_VERSION + ' · 3D';
@@ -261,10 +261,19 @@ var HELP_MAP = {
   'L':        {title:'L — Linear move', desc:'Moves the tool in a straight line to the given coordinates. Omit any axis to keep its current position. F sets feed in mm/min, FMAX is rapid traverse.', ex:'L X+50 Y+20 Z+0 F800'},
   'C':        {title:'C — Circular arc (CC center)', desc:'Arc move around the last CC center point to the endpoint. DR+ = counter-clockwise, DR- = clockwise.', ex:'C X+80 Y+50 DR+ R30 F800'},
   'CC':       {title:'CC — Circle center', desc:'Defines the center point for the next C arc or polar origin for LP/CP. IX/IY are relative to the last tool position. CC without coordinates takes the last position.', ex:'CC IX+10 IY+0'},
-  'CR':       {title:'CR — Circular arc (radius)', desc:'Arc defined by radius R. DR+ = CCW, DR- = CW. The sign of R selects the minor (-) or major (+) arc.', ex:'CR X+60 Y+30 R+20 DR+ F800'},
-  'CT':       {title:'CT — Tangential arc', desc:'Arc that starts tangentially from the previous move direction to the endpoint. No radius needed.', ex:'CT X+60 Y+70 F800'},
-  'RND':      {title:'RND — Corner rounding', desc:'Inserts a rounding arc of radius R at the corner between the preceding and following L blocks.', ex:'RND R5'},
-  'CHF':      {title:'CHF — Chamfer', desc:'Inserts a straight chamfer of the given length at the corner between two L blocks.', ex:'CHF 2'},
+  'CR':       {title:'CR — Circular arc (radius)', desc:'Arc defined by radius R. DR+ = CCW, DR- = CW. R+ selects an arc up to 180°, R- an arc greater than 180°.', ex:'CR X+60 Y+30 R+20 DR+ F800'},
+  'CT':       {title:'CT — Tangential arc', desc:'Arc tangent to the immediately preceding contour element. LIN_Z adds a simultaneous linear Z movement while tangency remains in the XY plane.', ex:'CT X+60 Y+70 LIN_Z-5 F800'},
+  'RND':      {title:'RND — Corner rounding', desc:'Inserts a rounding arc of radius R at the corner between the preceding and following contour blocks. An optional F applies only to the RND block.', ex:'RND R5 F150'},
+  'CHF':      {title:'CHF — Chamfer', desc:'Inserts a straight chamfer of the given length at the corner between two contour blocks. An optional F applies only to the CHF block.', ex:'CHF 2 F150'},
+  'APPR/DEP': {title:'APPR/DEP — Approach and departure', desc:'Replaces the editor control strip with the APPR/DEP function family while leaving the program text visible. Select APPR or DEP, then LT, LN, CT or LCT; press APPR/DEP again to close the panel.', ex:'APPR LCT X+5 Y+5 R5 RL F300\nDEP LCT X-20 Y-20 R5 F1000'},
+  'APPR LT':  {title:'APPR LT — Tangential straight approach', desc:'Moves from starting point PS to auxiliary point PH, then approaches first contour point PA on a tangent straight line of length LEN. R0, RL and RR are permitted.', ex:'APPR LT X+20 Y+20 Z-10 LEN15 RR F100'},
+  'APPR LN':  {title:'APPR LN — Perpendicular straight approach', desc:'Approaches PA on a straight line of length LEN perpendicular to the first contour element. Requires RL or RR.', ex:'APPR LN X+10 Y+20 Z-10 LEN+15 RR F100'},
+  'APPR CT':  {title:'APPR CT — Tangential circular approach', desc:'Approaches PA on a tangential circle defined by signed R and center angle CCA. Requires RL or RR.', ex:'APPR CT X+10 Y+20 Z-10 CCA180 R+10 RR F100'},
+  'APPR LCT': {title:'APPR LCT — Line and tangential circle approach', desc:'Moves from PS to PH on a straight line and from PH to PA on a circle tangent to both that line and the first contour element. R must be positive.', ex:'APPR LCT X+5 Y+5 R5 RL F300'},
+  'DEP LT':   {title:'DEP LT — Tangential straight departure', desc:'Leaves the last contour point PE on a tangent straight line of length LEN and cancels radius compensation automatically.', ex:'DEP LT LEN12.5 F100'},
+  'DEP LN':   {title:'DEP LN — Perpendicular straight departure', desc:'Leaves PE on a straight line of length LEN perpendicular to the last contour element and cancels radius compensation automatically.', ex:'DEP LN LEN+20 F100'},
+  'DEP CT':   {title:'DEP CT — Tangential circular departure', desc:'Leaves PE on a tangential circle defined by signed R and center angle CCA, then cancels radius compensation automatically.', ex:'DEP CT CCA180 R+8 F100'},
+  'DEP LCT':  {title:'DEP LCT — Tangential circle and line departure', desc:'Leaves PE on a tangential circle, then continues tangentially to programmed end point PN. R must be positive; compensation is cancelled automatically.', ex:'DEP LCT X-20 Y-20 R5 F1000'},
   'LP':       {title:'LP — Linear polar', desc:'Linear polar move. PR may be omitted to retain the current radius; IPA increments the angle from the current polar position.', ex:'LP PR+30 PA+0\nLP IPA+60'},
   'CP':       {title:'CP — Circular polar', desc:'Polar arc around CC. Use PA for an absolute target angle or IPA for an incremental sweep. IZ adds a simultaneous tool-axis move for a helix; IPA and DR need the same sign.', ex:'CP IPA+360 IZ+5 DR+ F800'},
   'BLK FORM': {title:'BLK FORM — Workpiece blank', desc:'Defines the raw stock as a rectangular box. 0.1 is the minimum corner, 0.2 is the maximum corner. Z+ is the top surface.', ex:'BLK FORM 0.1 Z X+0 Y+0 Z+0\nBLK FORM 0.2 X+100 Y+100 Z+20'},
@@ -390,13 +399,90 @@ var _bugErrors = [];
 
 // ---------- keypad (Heidenhain-style path/program keys) ----------
 var PATH_KEYS=[
-  {l:'L',  code:'L X+0 Y+0 F500',          icon:'line', sup:true},
-  {l:'C',  code:'C X+0 Y+0 DR+ R0 F500',   icon:'arc'},
-  {l:'CC', code:'CC X+0 Y+0',              icon:'cc'},
-  {l:'CR', code:'CR X+0 Y+0 R0 DR+ F500',  icon:'cr'},
-  {l:'RND',code:'RND R0',                  icon:'rnd', sup:true},
-  {l:'CHF',code:'CHF 0',                   icon:'chf', sup:true}
+  {l:'L',        code:'L X+0 Y+0 F500',         icon:'line', sup:true},
+  {l:'CHF',      code:'CHF 0',                  icon:'chf', sup:true},
+  {l:'CC',       code:'CC X+0 Y+0',             icon:'cc'},
+  {l:'C',        code:'C X+0 Y+0 DR+ R0 F500',  icon:'arc'},
+  {l:'CR',       code:'CR X+0 Y+0 R0 DR+ F500', icon:'cr'},
+  {l:'CT',       code:'CT X+0 Y+0 F500',        icon:'ct'},
+  {l:'RND',      code:'RND R0',                 icon:'rnd', sup:true},
+  {l:'APPR/DEP', code:'APPR/DEP', apprDepPicker:true}
 ];
+
+// The documented APPR/DEP soft-key order: approach functions first, followed
+// by departure functions; each group progresses LT, LN, CT, LCT.
+var APPR_DEP_PICKER_GROUPS=[
+  {label:'APPR', functions:['APPR LT','APPR LN','APPR CT','APPR LCT']},
+  {label:'DEP',  functions:['DEP LT','DEP LN','DEP CT','DEP LCT']}
+];
+
+function openApprDepPicker(){
+  var panel=document.getElementById('ctxPanel');
+  if(!panel) return;
+  closeCtxPanel();
+  var panelHeight=panel.getBoundingClientRect ? panel.getBoundingClientRect().height : panel.offsetHeight;
+  if(panelHeight) panel.style.height=Math.ceil(panelHeight)+'px';
+
+  var groups=APPR_DEP_PICKER_GROUPS.map(function(group){
+    var buttons=group.functions.map(function(builderKey){
+      var shortLabel=builderKey.slice(group.label.length+1);
+      return '<button type="button" class="appr-dep-picker-btn" data-appr-dep-builder="'+builderKey+'" aria-label="'+builderKey+'">'+shortLabel+'</button>';
+    }).join('');
+    return '<div class="appr-dep-picker-group" role="group" aria-label="'+group.label+' functions">'
+      +'<span class="appr-dep-picker-label">'+group.label+'</span>'+buttons+'</div>';
+  }).join('');
+
+  var picker=document.createElement('div');
+  picker.id='apprDepPicker';
+  picker.className='appr-dep-picker';
+  picker.setAttribute('role','dialog');
+  picker.setAttribute('aria-label','APPR and DEP functions');
+  picker.innerHTML=groups;
+  panel.innerHTML='';
+  panel.appendChild(picker);
+
+  setApprDepPickerExpanded(true);
+  var buttons=picker.querySelectorAll('[data-appr-dep-builder]');
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].addEventListener('click', function(){
+      selectApprDepFunction(this.getAttribute('data-appr-dep-builder'));
+    });
+  }
+  if(buttons.length&&buttons[0].focus){
+    try{ buttons[0].focus({preventScroll:true}); }
+    catch(e){ try{ buttons[0].focus(); }catch(e2){} }
+  }
+}
+
+function setApprDepPickerExpanded(expanded){
+  var trigger=document.getElementById('apprDepKey');
+  if(trigger) trigger.setAttribute('aria-expanded',expanded?'true':'false');
+}
+
+function closeApprDepPicker(restoreFocus){
+  closeCtxPanel();
+  setApprDepPickerExpanded(false);
+  if(!restoreFocus) return;
+  var trigger=document.getElementById('apprDepKey');
+  if(!trigger) return;
+  setTimeout(function(){
+    if(trigger.disabled) return;
+    try{ trigger.focus({preventScroll:true}); }
+    catch(e){ try{ trigger.focus(); }catch(e2){} }
+  },0);
+}
+
+function toggleApprDepPicker(){
+  if(document.getElementById('apprDepPicker')) closeApprDepPicker(false);
+  else openApprDepPicker();
+}
+
+function selectApprDepFunction(builderKey){
+  if(typeof BUILDERS==='undefined'||!BUILDERS[builderKey]) return;
+  closeApprDepPicker(false);
+  enterFieldMode(builderKey);
+}
+
 var PROG_KEYS=[
   {l:'BLK FORM', code:'BLK FORM', blkForm:true},
   {l:'CYCL DEF',  code:'CYCL DEF 208',     bld:'CYCL DEF 208', cyclPicker:true},
@@ -499,9 +585,113 @@ var BUILDERS = {
   'CT': {title:'CT — tangential arc', fields:[
     {p:'X', prompt:'End point X', type:'coord', opt:true},
     {p:'Y', prompt:'End point Y', type:'coord', opt:true},
+    {p:'LIN_Z', prompt:'Superimposed linear Z end coordinate', type:'coord', opt:true},
     {p:'F', prompt:'Feed rate', type:'feed', opt:true},
     {p:'M', prompt:'Miscellaneous function M (e.g. 3,4,5,6,99)', type:'mval', opt:true},
     {p:'M', prompt:'Second miscellaneous function M', type:'mval', opt:true}
+  ]},
+  'APPR LT': {title:'APPR LT — tangential straight approach', cmd:'APPR LT', fields:[
+    {p:'X', prompt:'First contour point PA, X', type:'coord', opt:true},
+    {p:'Y', prompt:'First contour point PA, Y', type:'coord', opt:true},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'LEN', prompt:'Length of the tangential approach segment', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation at the contour', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate from PH to PA', type:'feed', opt:true}
+  ]},
+  'APPR LN': {title:'APPR LN — perpendicular straight approach', cmd:'APPR LN', fields:[
+    {p:'X', prompt:'First contour point PA, X', type:'coord', opt:true},
+    {p:'Y', prompt:'First contour point PA, Y', type:'coord', opt:true},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'LEN', prompt:'Length of the perpendicular approach segment', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation RL or RR', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate from PH to PA', type:'feed', opt:true}
+  ]},
+  'APPR CT': {title:'APPR CT — tangential circular approach', cmd:'APPR CT', fields:[
+    {p:'X', prompt:'First contour point PA, X', type:'coord', opt:true},
+    {p:'Y', prompt:'First contour point PA, Y', type:'coord', opt:true},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'CCA', prompt:'Center angle (0 to 360 degrees)', type:'num', opt:false},
+    {p:'R', prompt:'Signed approach radius', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation RL or RR', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate from PH to PA', type:'feed', opt:true}
+  ]},
+  'APPR LCT': {title:'APPR LCT — line and tangential circular approach', cmd:'APPR LCT', fields:[
+    {p:'X', prompt:'First contour point PA, X', type:'coord', opt:true},
+    {p:'Y', prompt:'First contour point PA, Y', type:'coord', opt:true},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'R', prompt:'Positive transition radius', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation at the contour', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate for the complete PS to PA path', type:'feed', opt:true}
+  ]},
+  'APPR PLT': {title:'APPR PLT — polar tangential straight approach', cmd:'APPR PLT', fields:[
+    {p:'PR', prompt:'Polar radius of PA', type:'coord', opt:false},
+    {p:'PA', prompt:'Polar angle of PA (I toggles IPA)', type:'coord', opt:false},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'LEN', prompt:'Length of the tangential approach segment', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation at the contour', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate from PH to PA', type:'feed', opt:true}
+  ]},
+  'APPR PLN': {title:'APPR PLN — polar perpendicular straight approach', cmd:'APPR PLN', fields:[
+    {p:'PR', prompt:'Polar radius of PA', type:'coord', opt:false},
+    {p:'PA', prompt:'Polar angle of PA (I toggles IPA)', type:'coord', opt:false},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'LEN', prompt:'Length of the perpendicular approach segment', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation RL or RR', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate from PH to PA', type:'feed', opt:true}
+  ]},
+  'APPR PCT': {title:'APPR PCT — polar tangential circular approach', cmd:'APPR PCT', fields:[
+    {p:'PR', prompt:'Polar radius of PA', type:'coord', opt:false},
+    {p:'PA', prompt:'Polar angle of PA (I toggles IPA)', type:'coord', opt:false},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'CCA', prompt:'Center angle (0 to 360 degrees)', type:'num', opt:false},
+    {p:'R', prompt:'Signed approach radius', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation RL or RR', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate from PH to PA', type:'feed', opt:true}
+  ]},
+  'APPR PLCT': {title:'APPR PLCT — polar line and circular approach', cmd:'APPR PLCT', fields:[
+    {p:'PR', prompt:'Polar radius of PA', type:'coord', opt:false},
+    {p:'PA', prompt:'Polar angle of PA (I toggles IPA)', type:'coord', opt:false},
+    {p:'Z', prompt:'First contour point PA, Z', type:'coord', opt:true},
+    {p:'R', prompt:'Positive transition radius', type:'num', opt:false},
+    {p:'', prompt:'Radius compensation at the contour', type:'rc', opt:false},
+    {p:'F', prompt:'Feed rate for the complete PS to PA path', type:'feed', opt:true}
+  ]},
+  'DEP LT': {title:'DEP LT — tangential straight departure', cmd:'DEP LT', fields:[
+    {p:'LEN', prompt:'Length of the tangential departure segment', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'First miscellaneous function', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function (optional)', type:'mval', opt:true}
+  ]},
+  'DEP LN': {title:'DEP LN — perpendicular straight departure', cmd:'DEP LN', fields:[
+    {p:'LEN', prompt:'Length of the perpendicular departure segment', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'First miscellaneous function', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function (optional)', type:'mval', opt:true}
+  ]},
+  'DEP CT': {title:'DEP CT — tangential circular departure', cmd:'DEP CT', fields:[
+    {p:'CCA', prompt:'Center angle (0 to 360 degrees)', type:'num', opt:false},
+    {p:'R', prompt:'Signed departure radius', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'First miscellaneous function', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function (optional)', type:'mval', opt:true}
+  ]},
+  'DEP LCT': {title:'DEP LCT — tangential circle and line departure', cmd:'DEP LCT', fields:[
+    {p:'X', prompt:'Departure end point PN, X', type:'coord', opt:true},
+    {p:'Y', prompt:'Departure end point PN, Y', type:'coord', opt:true},
+    {p:'Z', prompt:'Departure end point PN, Z', type:'coord', opt:true},
+    {p:'R', prompt:'Positive transition radius', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'First miscellaneous function', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function (optional)', type:'mval', opt:true}
+  ]},
+  'DEP PLCT': {title:'DEP PLCT — polar tangential circle and line departure', cmd:'DEP PLCT', fields:[
+    {p:'PR', prompt:'Polar radius of PN', type:'coord', opt:false},
+    {p:'PA', prompt:'Polar angle of PN (I toggles IPA)', type:'coord', opt:false},
+    {p:'Z', prompt:'Departure end point PN, Z', type:'coord', opt:true},
+    {p:'R', prompt:'Positive transition radius', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate', type:'feed', opt:true},
+    {p:'M', prompt:'First miscellaneous function', type:'mval', opt:true},
+    {p:'M', prompt:'Second miscellaneous function (optional)', type:'mval', opt:true}
   ]},
   'CYCL DEF 201':{title:'CYCL DEF 201 — Reaming', cmd:'CYCL DEF 201', fields:[
     {p:'Q200', prompt:'Safety clearance (mm)', type:'num', opt:false},
@@ -521,6 +711,7 @@ var BUILDERS = {
     {p:'Q257', prompt:'Depth per chip break (mm)', type:'num', opt:false},
     {p:'Q256', prompt:'Chip break retract factor (× thread pitch Q239; 0 = full retract)', type:'num', opt:false},
     {p:'Q336', prompt:'Spindle orientation angle (deg)', type:'num', opt:false},
+    {p:'Q403', prompt:'Retraction speed factor', type:'num', opt:false},
   ]},
   'CYCL DEF 200':{title:'CYCL DEF 200 — Drilling', cmd:'CYCL DEF 200', fields:[
     {p:'Q200', prompt:'Safety clearance (mm)', type:'num', opt:false},
@@ -560,10 +751,12 @@ var BUILDERS = {
     {p:'REP', prompt:'Repeat count (omit = run once)', type:'num', opt:true}
   ]},
   'RND':{title:'RND — corner rounding', fields:[
-    {p:'R', prompt:'Rounding radius', type:'num', opt:false}
+    {p:'R', prompt:'Rounding radius', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate for the rounding block', type:'feed', opt:true}
   ]},
   'CHF':{title:'CHF — chamfer', fields:[
-    {p:'', prompt:'Chamfer size', type:'num', opt:false}
+    {p:'', prompt:'Chamfer size', type:'num', opt:false},
+    {p:'F', prompt:'Feed rate for the chamfer block', type:'feed', opt:true}
   ]},
   'CP': {title:'CP — polar circular arc', cmd:'CP', fields:[
     {p:'PA', prompt:'Target angle (degrees)', type:'coord', opt:false},
@@ -826,9 +1019,11 @@ var FM={active:false};
 var lastMobileVal='';
 
 function _fieldAcceptsSign(f){
-  // CR radius uses its sign to choose the minor/major arc, just like
-  // coordinates use it for direction. Other generic numeric fields stay unsigned.
-  return !!f && (f.type==='coord' || (FM.builderKey==='CR' && f.p==='R'));
+  // CR and APPR/DEP CT radii use their sign to select documented geometry,
+  // just like coordinates use it for direction. Other numeric fields stay unsigned.
+  return !!f && (f.type==='coord' ||
+    (f.p==='R'&&(FM.builderKey==='CR'||FM.builderKey==='APPR CT'||
+      FM.builderKey==='APPR PCT'||FM.builderKey==='DEP CT')));
 }
 
 function _setFieldSign(f, sign){
