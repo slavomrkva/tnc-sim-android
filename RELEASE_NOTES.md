@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## 1.0.6 (versionCode 7) — next Google Play release
+- Added a persistent English/German language switch and complete German
+  localization.
+- Learn practice now highlights the exact answer rows.
+- Cancelling any Path-function panel removes the unfinished input completely.
+- Added the APPR/DEP Contour demo and kept the restored-program status compact.
+
 ## Unreleased test build (APP_VERSION 1.0.107)
 - Shortened the restored-program status in English and German while keeping
   its save time, so the language, theme and About buttons stay on one row.

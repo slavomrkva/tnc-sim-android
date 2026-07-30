@@ -14,6 +14,9 @@ History through APP_VERSION 1.0.36 is preserved in
 - Capped the autosave status at 76 px with shrinking and ellipsis so it cannot
   push the language, theme and About controls onto another header row.
 - Extended autosave and German-localization regressions for the compact state.
+- Prepared the already-merged feature set as the next Play release:
+  `versionName 1.0.6` / `versionCode 7`, following the published
+  `1.0.5` / code `6`, without changing this build's `APP_VERSION`.
 
 ## APP_VERSION 1.0.106 — 2026-07-30 — German Android localization
 

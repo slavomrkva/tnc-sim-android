@@ -108,7 +108,7 @@ public class TncSimInstrumentedTest {
             });
 
             waitForTncUi(webViewRef.get());
-            assertEquals("\"1.0.97\"", evaluate(webViewRef.get(), "APP_VERSION"));
+            assertEquals("\"1.0.107\"", evaluate(webViewRef.get(), "APP_VERSION"));
             assertTrue("Capacitor must eventually inject native safe-area values",
                 !"\"\"".equals(evaluate(webViewRef.get(),
                     "getComputedStyle(document.documentElement)" +
