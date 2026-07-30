@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.108 — 2026-07-30 — current Play Store media
+
+- Replaced the old Play listing screenshots with five current 1080×1920 RGB
+  captures covering Editor, machining, the toolpath view and Learn.
+- Removed the recording and Android system bars without distorting the app UI,
+  converted the feature graphic to the required RGB PNG format and added the
+  43-second Editor/Simulate/Learn preview video.
+- Added a store-asset regression that locks required files, dimensions, PNG
+  color types, size limits and the preview video's MP4 container.
+
 ## APP_VERSION 1.0.107 — 2026-07-30 — compact restored status
 
 - Replaced the long restored-draft labels with `Loaded` / `Geladen` while

@@ -18,6 +18,8 @@ user-facing history.
 - Learn practice now highlights the exact answer rows.
 - Cancelling any Path-function panel removes the unfinished input completely.
 - Added the APPR/DEP Contour demo and kept the restored-program status compact.
+- Refreshed the Play Store icon, screenshots, feature graphic and preview video
+  to match the current app.
 
 ## Unreleased test build (APP_VERSION 1.0.107)
 - Shortened the restored-program status in English and German while keeping
