@@ -7,6 +7,11 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.102 — 2026-07-30 — close accepted TODO work
+
+- Archived the accepted C39-C59 evidence in `BUG_HISTORY.md` and cleared every
+  resolved bug from `TODO.md`.
+
 ## APP_VERSION 1.0.101 — 2026-07-30 — documented APPR/DEP and analytic CT
 
 - Ported the complete APPR/DEP parser, validator and analytic

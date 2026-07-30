@@ -13,6 +13,76 @@ Newest first.
 
 ---
 
+## C55-C59 — Deferred validation, spindle timing and valid Learn solutions
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.101 and web `tnc-sim`
+v0.926. **Fixed and accepted:** 2026-07-30.
+
+### Reported symptoms
+- Programming keys and guided editors started validation before Run/Step.
+- A valid first feed move containing M3 could still produce a missing-spindle
+  warning after preceding FMAX positioning.
+- Entering Practice could leave the APPR/DEP key visually expanded.
+- Lesson 7 task 1 passed Check but failed Run because RR remained active on its
+  Z retract.
+- The Cycle 209 password answer used a non-editor header format, and the
+  following tasks omitted required Q336/Q403 rows.
+
+### Root causes and accepted fixes
+Edit invalidation and simulation validation shared one path; no-argument
+`runValidation()` now only clears stale diagnostics, while Run/Step request
+full validation after cancelling pending edit timers. Spindle state is checked
+on the first non-FMAX motion and honors M3/M4/M13/M14 in that same block.
+Idle-panel rendering now always resets the APPR/DEP trigger even if another
+transition already removed the picker. Learn's task checks did not prove that
+the completed program passed the Run validator, so Lesson 7 now uses
+`L Z+50 R0 FMAX`, and Cycle 209 serializes separate Q rows in editor order
+Q200/Q201/Q239/Q203/Q204/Q257/Q256/Q336/Q403; the guided schema includes Q403.
+
+### Attempts and verification
+Picker cleanup tied only to the picker DOM node failed when Learn replaced the
+panel first, and goal-only Learn regressions missed full-program errors. The
+accepted tests cover every programming entry path, spindle M timing, trigger
+reset, exact Cycle 209 formatting and full Run validation of the affected
+solutions. All 38 Android and 40 web test files passed. Capacitor assets were
+synchronized, the Android 1.0.101 debug APK built successfully with the
+expected `org.tncsim.twa` package and V2 debug signature, and the user accepted
+the result.
+
+**Cross-reference:** web `BUG_HISTORY.md`, C54-C59.
+
+## C39-C48 — Official-program compatibility and transport normalization
+**Repos:** Android `tnc-sim-android` APP_VERSION 1.0.96-1.0.97 and web
+`tnc-sim` v0.921-v0.922. **Fixed and accepted:** 2026-07-30.
+
+### Reported symptoms
+Official HEIDENHAIN programs using `F AUTO`, supported-cycle `Q206=AUTO`,
+compact `REP6`, program-section or nested numeric-label repeats, LP
+radius-compensation activation, and angle-less or multi-turn CP contours were
+rejected or lost motion. Repeated whitespace could pass validation while the
+BLK FORM pre-scan missed the blank; BOM and mixed line endings could prevent
+structural recognition.
+
+### Root causes and accepted fixes
+Input normalization was duplicated across validator, parser, BLK FORM and
+label expansion. The old label expander modeled only LBL-0 subprograms, while
+polar compensation joins did not retain complete-turn identity. The deliberate
+Android port now accepts the equivalent documented spellings only in their
+supported contexts, distinguishes subprograms from program-section repeats,
+supports bounded nesting, activates compensation on LP and retains all CP
+turns. Import and direct parser input normalize BOM, line endings and
+insignificant whitespace consistently while preserving Android memory guards.
+
+### Attempts and verification
+Validator-only normalization did not repair the separate blank pre-scan, flat
+label expansion could not represent nested program sections, and tessellated
+joins lost full revolutions. The accepted regressions cover official programs,
+guided input, full circles, compensated 25-turn helices, nine equivalent input
+spellings and 200 seeded programs under the 32-level/200000-block limits. The
+user accepted all remaining TODO bugs after the current web and Android suites
+passed.
+
+**Cross-reference:** web `BUG_HISTORY.md`, C39-C48.
+
 ## C51-C53 — Custom-keyboard viewport, M30 playback and omitted RC field
 **Repo:** Android `tnc-sim-android` APP_VERSION 1.0.98.
 **Fixed and accepted:** 2026-07-28.
