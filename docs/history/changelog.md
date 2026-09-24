@@ -7,6 +7,16 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.109 — 2026-09-24 — compensated retrace and report text
+
+- Ported the web issue #44 analytic loop fix deliberately to Android's shared
+  parser, preserving intentional nominal retraces and the complete RL run.
+- Repeated XY endpoints remain no-ops rather than false pure-Z errors; added
+  exact-program and genuine-loop regression coverage.
+- Removed automatic report-description templates, required nonblank text for
+  bugs and suggestions, kept validator context automatic, and dropped only
+  "One-click" from the footer wording in English and German.
+
 ## APP_VERSION 1.0.108 — 2026-07-30 — current Play Store media
 
 - Replaced the old Play listing screenshots with five current 1080×1920 RGB

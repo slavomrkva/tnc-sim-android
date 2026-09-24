@@ -6,6 +6,17 @@
 
 ## Open bugs
 
+- **C62 / web issue #44 — compensated retrace skips the contour (implemented,
+  awaiting Android acceptance).** The analytic loop check lacked the nominal
+  source geometry for generated corner transitions and missed collinear
+  nominal overlap. It mistook the reported return along an earlier edge for a
+  compensation-created loop and dropped the whole RL run after `L Z-5 F400`.
+  Attempt 1 ported the tested web branch's geometry-aware loop check and
+  restricted the pure-Z validator diagnostic to blocks specifying Z. The
+  exact six-pass program now retains every compensated pass, with or without
+  its repeated `L Y+95`, and a genuinely new crossing is still rejected in
+  the regression test. Keep open until accepted in the Android app.
+
 - **C61 — Restored status expanded the Android header (implemented, awaiting
   acceptance).**
   The status shared the first header row with the language, theme and About

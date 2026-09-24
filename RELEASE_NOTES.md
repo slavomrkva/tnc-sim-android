@@ -21,6 +21,12 @@ user-facing history.
 - Refreshed the Play Store icon, screenshots, feature graphic and preview video
   to match the current app.
 
+## Unreleased test build (APP_VERSION 1.0.109)
+- Fixed compensated contours that return along an earlier edge so the
+  simulator keeps the full toolpath instead of skipping it.
+- The Bug report / Suggest an improvement form now requires your own written
+  description and no longer fills one in automatically.
+
 ## Unreleased test build (APP_VERSION 1.0.107)
 - Shortened the restored-program status in English and German while keeping
   its save time, so the language, theme and About buttons stay on one row.
