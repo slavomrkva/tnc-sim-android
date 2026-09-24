@@ -259,6 +259,8 @@ The detailed module-split rationale is in
     the 32-level recursion guard and the 200000-block expansion budget. Polar
     straight line LP may activate RL/RR; angle-less `CP DR+`/`CP DR-` is a full
     circle, and compensated CP joins must preserve every programmed full turn.
+    A nominal contour may retrace an earlier edge; loop detection rejects only
+    intersections introduced by compensation, including at generated corners.
     APPR/DEP must derive PS/PH/PA/PE/PN from the exact first/last compensated
     contour tangent and DEP cancels RL/RR automatically. Standalone CT uses the
     immediately preceding analytic contour tangent; `LIN_Z` changes only the
