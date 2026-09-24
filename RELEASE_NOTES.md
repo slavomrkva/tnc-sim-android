@@ -21,7 +21,7 @@ user-facing history.
 - Refreshed the Play Store icon, screenshots, feature graphic and preview video
   to match the current app.
 
-## Unreleased test build (APP_VERSION 1.0.109)
+## Unreleased test build (APP_VERSION 1.0.110)
 - Fixed compensated contours that return along an earlier edge so the
   simulator keeps the full toolpath instead of skipping it.
 - The Bug report / Suggest an improvement form now requires your own written
