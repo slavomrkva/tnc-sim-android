@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.111 — 2026-10-10 — token-free bug reporting
+
+- Replace the token-dependent dialog with prefilled GitHub issues and email drafts to info@tncsim.org. Suggestions omit the NC program.
+- Add full-report export, long-link warnings, German labels and a manual test guide. Browser dialog tests passed during implementation; native device acceptance remains pending.
+- Preserve Play versionCode/versionName. No APK build requested.
+
 ## APP_VERSION 1.0.110 — 2026-09-24 — keep build-marker check current
 
 - Replaced the store-asset test's fixed APP_VERSION value with a 1.0.x floor,
