@@ -736,3 +736,8 @@ could be read off the device.
 - Confirmed on a real device at `1.0.16`: nothing left above the keyboard, no
   black gap, bar returns cleanly on close, no flicker/animation. Debug HUD
   removed in `1.0.17`.
+
+
+## Token-free bug reporting — accepted 2026-10-10
+
+The previous dialog required the website's GitHub/Turnstile reporting endpoint. Ported the accepted web flow deliberately to the standalone Android app: locally prepared GitHub issues in tnc-sim-android, email drafts to info@tncsim.org, full-report export through the existing Filesystem/Share adapter, and visible warnings for shortened drafts. Suggestions omit the NC program. The existing regression suite and browser dialog tests passed during implementation; native adapters were simulated in browser tests. External-app navigation and sharing still require device verification. No APK was built for this merge.
