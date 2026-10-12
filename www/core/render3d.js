@@ -234,7 +234,7 @@ function _applyRefinedMesh(vertsArr, normsArr, triColors){
 }
 
 function buildScene(prog){
-  if(!THREE_OK) return;
+  if(!THREE_OK || !renderer || !controls) return;
   var min = prog.viewMin || prog.blkMin, max = prog.viewMax || prog.blkMax;
   var w = max.x-min.x, d = max.y-min.y, h = max.z-min.z;
 

@@ -12,6 +12,16 @@ user-facing history.
 
 ---
 
+## Unreleased test branch (APP_VERSION 1.0.112; no APK built)
+- Corrected tiny arcs, nested Q formulas and inverse trigonometry.
+- Editing a paused program now validates and rebuilds its path before Run.
+- Detect rapid collisions in every direction; a stopped spindle no longer
+  removes material in live simulation or Refine.
+- Corrected short tapping retracts, improved bore-milling path accuracy and
+  bounded excessive cycle expansion.
+- Show M4 correctly and make view buttons accessible with larger touch targets.
+- Preserve Android's keyboard, memory limits and manual 3D compatibility mode.
+
 ## 1.0.6 (versionCode 7) — next Google Play release
 - Added a persistent English/German language switch and complete German
   localization.

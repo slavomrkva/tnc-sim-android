@@ -128,6 +128,9 @@ function updateToolLegend(){
 
 function switchView(v){
   curView=v;
+  ['tab3d','tab2d','tabTools'].forEach(function(id,i){
+    document.getElementById(id).setAttribute('aria-pressed',String(v===['3d','2d','tools'][i]));
+  });
   document.getElementById('tab3d').classList.toggle('active', v==='3d');
   document.getElementById('tab2d').classList.toggle('active', v==='2d');
   document.getElementById('tabTools').classList.toggle('active', v==='tools');
