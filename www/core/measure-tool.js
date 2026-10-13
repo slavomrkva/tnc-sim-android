@@ -188,7 +188,7 @@ function renderMeasureOverlay(){
 }
 
 function initMeasureRaycaster(){
-  if(!THREE_OK) return;
+  if(!THREE_OK || !renderer) return;
   measureRaycaster = new THREE.Raycaster();
 
   function doMeasureHit(clientX, clientY){

@@ -1,0 +1,12 @@
+<en-US>
+- Improved arcs, Q formulas and machining cycles.
+- Fixed restarting edited programs and material removal with a stopped spindle.
+- Improved collision warnings, M4 status and touch controls.
+- Bug reports now use GitHub or email without tokens.
+</en-US>
+<de-DE>
+- Genauere Bögen, Q-Formeln und Bearbeitungszyklen.
+- Korrigierter Neustart bearbeiteter Programme und Materialabtrag bei gestoppter Spindel.
+- Verbesserte Kollisionswarnungen, M4-Anzeige und Touch-Bedienung.
+- Fehlerberichte über GitHub oder E-Mail ohne Token.
+</de-DE>

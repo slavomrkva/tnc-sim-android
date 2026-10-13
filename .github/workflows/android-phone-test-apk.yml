@@ -1,0 +1,90 @@
+name: Android phone test APK
+on:
+  push:
+    branches:
+      - test/android-audit-apk-2026-10-13
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-phone-apk-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout test revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install and verify source
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          git ls-files -z -- '*.js' '*.mjs' | xargs -0 -n 1 node --check
+          mapfile -d '' test_files < <(find tests -maxdepth 1 -type f \( -name '*.test.js' -o -name '*.test.mjs' \) -print0 | sort -z)
+          test "${#test_files[@]}" -gt 0
+          for test_file in "${test_files[@]}"; do node "$test_file"; done
+          git diff --check
+      - name: Sync authoritative app source
+        run: npx cap sync android
+      - name: Configure isolated test install and Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x "$JAVA_HOME_21_X64/bin/java"
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/build.gradle')
+          s = p.read_text()
+          marker = '    buildTypes {'
+          assert s.count(marker) == 1
+          s = s.replace(marker, marker + '\n        debug {\n            applicationIdSuffix ".debug"\n            versionNameSuffix "-test"\n        }', 1)
+          p.write_text(s)
+          p = Path('android/app/src/main/res/values/strings.xml')
+          s = p.read_text().replace('>TNC Sim<', '>TNC Sim Test<')
+          p.write_text(s)
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          s = p.read_text().replace('android:name=".MainActivity"', 'android:name="org.tncsim.twa.MainActivity"')
+          p.write_text(s)
+          PY
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Verify package and collect installable APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          "$SDK_ROOT/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+          "$SDK_ROOT/build-tools/36.0.0/aapt" dump badging "$APK" > /tmp/apk-badging.txt
+          grep "package: name='org.tncsim.twa.debug'" /tmp/apk-badging.txt
+          unzip -p "$APK" assets/public/android/app.js | grep -F "APP_VERSION = '1.0.113'"
+          mkdir -p phone-test
+          cp "$APK" phone-test/tnc-sim-1.0.113-test.apk
+          sha256sum phone-test/tnc-sim-1.0.113-test.apk > phone-test/SHA256SUMS.txt
+          cat > phone-test/README.txt <<'TXT'
+          TNC Sim phone test - APP_VERSION 1.0.113
+          Based on Android audit branch abdf8a91.
+          Package org.tncsim.twa.debug; installs alongside the Play app.
+          Debug signed, for testing only. Extract ZIP and install the APK.
+          Test offline, Normal/Compatibility, keyboard, export, Learn, and machining.
+          TXT
+          printf '## Phone test APK\n\nAPP_VERSION 1.0.113. Isolated package org.tncsim.twa.debug. Download the artifact, extract it and install the APK.\n' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload phone APK
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: tnc-sim-1.0.113-phone-test
+          path: phone-test/
+          if-no-files-found: error
+          retention-days: 14

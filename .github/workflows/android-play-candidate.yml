@@ -1,0 +1,79 @@
+name: Play release candidate AAB
+on:
+  push:
+    branches: [release/1.0.7]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: play-candidate-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify release sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          git ls-files -z -- '*.js' '*.mjs' | xargs -0 -n 1 node --check
+          mapfile -d '' test_files < <(find tests -maxdepth 1 -type f \( -name '*.test.js' -o -name '*.test.mjs' \) -print0 | sort -z)
+          test "${#test_files[@]}" -gt 0
+          for test_file in "${test_files[@]}"; do node "$test_file"; done
+          git diff --check
+      - name: Sync production app
+        run: npx cap sync android
+      - name: Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x "$JAVA_HOME_21_X64/bin/java"
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+      - name: Build production bundle
+        working-directory: android
+        run: ./gradlew --no-daemon bundleRelease
+      - name: Verify and sign when original upload key is configured
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p play-candidate
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          unzip -t "$AAB"
+          unzip -p "$AAB" base/assets/public/android/app.js | grep -F "APP_VERSION = '1.0.114'"
+          if [[ -n "$KEYSTORE_BASE64" && -n "$STORE_PASSWORD" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" ]]; then
+            umask 077
+            KEY_FILE="$RUNNER_TEMP/tnc-sim-upload-key"
+            trap 'rm -f "$KEY_FILE"' EXIT
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEY_FILE"
+            jarsigner -keystore "$KEY_FILE" -storepass:env STORE_PASSWORD -keypass:env KEY_PASSWORD -signedjar play-candidate/tnc-sim-1.0.7-code-8.aab "$AAB" "$KEY_ALIAS"
+            jarsigner -verify play-candidate/tnc-sim-1.0.7-code-8.aab
+            printf 'Signed candidate: 1.0.7 / code 8. Original upload-key secrets were used.\n' > play-candidate/STATUS.txt
+          else
+            cp "$AAB" play-candidate/tnc-sim-1.0.7-code-8-UNSIGNED.aab
+            printf 'Unsigned candidate: 1.0.7 / code 8. Sign with the original upload key before uploading to Play.\n' > play-candidate/STATUS.txt
+          fi
+          cp store/release-notes-1.0.7.txt play-candidate/
+          sha256sum play-candidate/*.aab > play-candidate/SHA256SUMS.txt
+          cat play-candidate/STATUS.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: tnc-sim-play-1.0.7-code-8
+          path: play-candidate/
+          if-no-files-found: error
+          retention-days: 30
