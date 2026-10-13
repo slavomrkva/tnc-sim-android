@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.114 — 2026-10-13 — Play 1.0.7/code 8 candidate
+
+- Owner accepted phone-test APK 1.0.113; move the October audit to BUG_HISTORY.
+- Set production versionName 1.0.7/versionCode 8 after confirmed published 1.0.6/code 7. Keep org.tncsim.twa identity and original upload-key requirement.
+- Add checked production AAB build and short EN/DE notes; unsigned output is explicitly marked if upload-key secrets are absent. No Play publication until a signed bundle is uploaded.
+
 ## APP_VERSION 1.0.113 — 2026-10-13 — isolated phone-test APK
 
 - Add a test-branch-only GitHub Actions build with complete syntax/regression checks, Capacitor sync, debug APK compilation, signing/package and embedded-version verification.

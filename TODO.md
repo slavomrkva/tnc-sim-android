@@ -6,18 +6,6 @@
 
 ## Open bugs
 
-- **October 2026 audit A01–A13 — Android port implemented, awaiting device
-  acceptance.** Attempt 1 deliberately ports shared fixes from web test commit
-  `87cf607` onto Android `93f99f5` (APP_VERSION 1.0.111 → 1.0.112).
-  Numerical regressions cover small arcs, Q expressions, cycles 208/209 and
-  cumulative path limits; runtime checks cover stale pause/resume, collisions,
-  spindle-gated live/Refine cutting, status and accessible view buttons.
-  A06's failed-WebGL startup fallback already existed on Android; preserve its
-  visible manual Compatibility-mode recovery instead of copying web boot.
-  Keep open until native testing and acceptance. No APK/AAB build, Capacitor
-  sync, Play release or merge in this attempt. See
-  [the Android audit port and device checklist](docs/android-audit-2026-10-12.md).
-
 - **C62 / web issue #44 — compensated retrace skips the contour (implemented,
   awaiting Android acceptance).** The analytic loop check lacked the nominal
   source geometry for generated corner transitions and missed collinear

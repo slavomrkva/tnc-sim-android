@@ -13,6 +13,16 @@ Newest first.
 
 ---
 
+
+## October 2026 Android audit A01–A13 — accepted on phone
+
+**Accepted:** 2026-10-13 by the owner after installing test APK APP_VERSION 1.0.113 (GitHub Actions run 38352044743). The owner authorized preparation of a Play update. No individual device model or per-scenario results were supplied.
+
+**Cause and repair:** deliberately ported the web numerical/playback fixes, preserving Android keyboard ownership, 12M/32M voxel budgets, manual Compatibility mode and native behavior. Fixes cover tiny arcs, bounded Q expressions, dirty-pause restart, rapid/stopped-spindle collisions, spindle-gated live/Refine cutting, cycles 208/209, generation limits, M4 and accessible view controls.
+
+**Verification:** all regression files, JavaScript syntax checks, Capacitor sync, assembleDebug, APK signature, org.tncsim.twa.debug identity and embedded marker verification passed. See docs/android-audit-2026-10-12.md and the CI run for evidence. Play publication is tracked separately.
+
+
 ## C55-C59 — Deferred validation, spindle timing and valid Learn solutions
 **Repos:** Android `tnc-sim-android` APP_VERSION 1.0.101 and web `tnc-sim`
 v0.926. **Fixed and accepted:** 2026-07-30.

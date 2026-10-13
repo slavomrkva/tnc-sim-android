@@ -69,3 +69,7 @@ No APK was built, so native acceptance remains open in TODO.md.
    TalkBack button labels/states and touch targets without keyboard overlap.
 
 Merge only after acceptance. Android and web fixes remain independently reviewable.
+
+## Phone acceptance and Play candidate — 2026-10-13
+
+The owner installed test APK 1.0.113, accepted it and authorized preparation for Play. Build/test evidence: https://github.com/slavomrkva/tnc-sim-android/actions/runs/38352044743. Candidate production identifiers are 1.0.7/code 8; APP_VERSION 1.0.114. Earlier statements about no APK built describe the original source-only audit attempt.

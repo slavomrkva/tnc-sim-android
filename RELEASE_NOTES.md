@@ -12,24 +12,15 @@ user-facing history.
 
 ---
 
-## Unreleased test branch (APP_VERSION 1.0.112; no APK built)
-- Corrected tiny arcs, nested Q formulas and inverse trigonometry.
-- Editing a paused program now validates and rebuilds its path before Run.
-- Detect rapid collisions in every direction; a stopped spindle no longer
-  removes material in live simulation or Refine.
-- Corrected short tapping retracts, improved bore-milling path accuracy and
-  bounded excessive cycle expansion.
-- Show M4 correctly and make view buttons accessible with larger touch targets.
-- Preserve Android's keyboard, memory limits and manual 3D compatibility mode.
+## 1.0.7 (versionCode 8) — prepared for Google Play
+- Improved arcs, Q formulas and machining cycles.
+- Fixed restarting edited programs and material removal with a stopped spindle.
+- Improved collision warnings, M4 status and touch controls.
+- Bug reports now use GitHub or email without tokens.
 
-## 1.0.6 (versionCode 7) — next Google Play release
-- Added a persistent English/German language switch and complete German
-  localization.
-- Learn practice now highlights the exact answer rows.
-- Cancelling any Path-function panel removes the unfinished input completely.
-- Added the APPR/DEP Contour demo and kept the restored-program status compact.
-- Refreshed the Play Store icon, screenshots, feature graphic and preview video
-  to match the current app.
+## 1.0.6 (versionCode 7) — published
+- Added English/German switching, clearer Learn practice and reliable Path-panel cancellation.
+- Updated the Play Store artwork and APPR/DEP demo.
 
 ## Unreleased test build (APP_VERSION 1.0.110)
 - Fixed compensated contours that return along an earlier edge so the
