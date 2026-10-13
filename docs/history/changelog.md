@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.113 — 2026-10-13 — isolated phone-test APK
+
+- Add a test-branch-only GitHub Actions build with complete syntax/regression checks, Capacitor sync, debug APK compilation, signing/package and embedded-version verification.
+- Keep production package and Play identifiers unchanged in source; generated debug build uses org.tncsim.twa.debug and TNC Sim Test for side-by-side phone testing.
+- Device acceptance remains pending; no main merge or Play publication.
+
 ## APP_VERSION 1.0.112 — 2026-10-12 — Android audit test branch
 
 - Deliberately port the October web audit fixes from `87cf607`, preserving
