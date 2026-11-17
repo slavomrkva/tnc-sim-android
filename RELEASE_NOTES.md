@@ -12,7 +12,7 @@ user-facing history.
 
 ---
 
-## Unreleased test build (APP_VERSION 1.0.115)
+## Unreleased test build (APP_VERSION 1.0.116)
 - Learn lessons are now reference cards: block format, example, rules, common
   mistakes and links to the matching pages of the official HEIDENHAIN manual,
   in English and German, with all lesson drawings redrawn.
