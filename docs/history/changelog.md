@@ -7,6 +7,11 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.118 — 2026-11-17 — Settings without 3D quality
+
+- Settings menu no longer lists 3D quality; it stays in the Simulation controls drawer (`www/android/ui-shell.js`). Test `tests/ui-shell.test.js` extended.
+- Fourth local phone-test build; pushed to `test/web-1000-port`, not merged.
+
 ## APP_VERSION 1.0.117 — 2026-11-17 — false collisions, encoding, support line
 
 - Port web fix 57e3ddd (false collisions on shaped-tool retracts): cutting and collision share `vxToolRadiusAtHeight()` and the per-segment tool shape and DL. Complete Part no longer reports a collision; `tests/complete-part-collision.test.js` ported (fails without the fix).
