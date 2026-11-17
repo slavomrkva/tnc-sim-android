@@ -9,8 +9,7 @@
 //   Help     -> tap help, quick reference, M functions
 //   Program  -> import, export, reset, clear
 //   Settings -> language, theme, 3D quality, editor text size
-// The demo picker stays beside Undo/Redo, and the footer is a single line
-// asking for bug reports and suggestions.
+// The demo picker stays beside Undo/Redo. Bug reports live in About.
 // The original buttons stay in index.html (other code and tests refer to them)
 // and are hidden by the "UI shell" block at the end of android/styles.css. This
 // file only adds the menu buttons and calls the same global functions.
@@ -22,9 +21,6 @@
     'Help':'Hilfe', 'Program':'Programm', 'Settings':'Einstellungen', 'About':'Über',
     'Home':'Startseite', 'Hover help':'Hilfe beim Überfahren', 'Quick reference':'Kurzreferenz',
     'M functions':'M-Funktionen', 'Tap help':'Hilfe beim Antippen',
-    'Support this project:':'Projekt unterstützen:',
-    'report a bug or suggest an improvement':'Fehler melden oder Verbesserung vorschlagen',
-    'report a bug or idea':'Fehler oder Idee melden',
     'Import…':'Importieren…', 'Export':'Exportieren',
     'Reset to default program':'Auf Standardprogramm zurücksetzen',
     'Clear program':'Programm leeren',
@@ -264,19 +260,7 @@
       };
     }
 
-    // Always visible: the one thing the project asks of its users.
-    var footer = document.querySelector('footer');
-    if(footer){
-      var sup = el('button', 'us-support',
-        '<span>' + tr('Support this project:') + '</span>'
-        + '<b class="us-sup-long">' + tr('report a bug or suggest an improvement') + '</b>'
-        + '<b class="us-sup-short">' + tr('report a bug or idea') + '</b>');
-      sup.type = 'button';
-      sup.id = 'usSupportBtn';
-      sup.addEventListener('click', function(){ closeMenu(); if(typeof openBugReport === 'function') openBugReport(); });
-      footer.appendChild(sup);
-    }
-
+    // Bug reports are reached from About; the app has no footer line.
     document.documentElement.classList.add('ui-shell');
   }
 

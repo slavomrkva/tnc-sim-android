@@ -7,6 +7,13 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.117 — 2026-11-17 — false collisions, encoding, support line
+
+- Port web fix 57e3ddd (false collisions on shaped-tool retracts): cutting and collision share `vxToolRadiusAtHeight()` and the per-segment tool shape and DL. Complete Part no longer reports a collision; `tests/complete-part-collision.test.js` ported (fails without the fix).
+- Repair 116 double-encoded lines in `www/core/parser-engine.js` (for example `â€”` instead of `—` in Problems messages and comments).
+- Remove the ui-shell footer support line; bug reports stay in About (EN and DE).
+- Third local phone-test build; not pushed.
+
 ## APP_VERSION 1.0.116 — 2026-11-17 — simplified UI from web v1.000
 
 - Simplified UI from web v1.000: new `www/android/ui-shell.js` (Help ▾, Program ▾, Settings and About icons, one-line support footer) mounted on the app's `.ph-tools`/`.ph-hdr-actions`; the web ui-shell/visual-pass/slate-light CSS appended to `www/android/styles.css` with Android selectors and without desktop-only media rules. Tap help replaces hover help; no website links. Loaded after `custom-keyboard.js`; covered by `tests/ui-shell.test.js`.

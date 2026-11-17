@@ -1101,15 +1101,7 @@ html.ui-shell #_idleDemo{font-size:12px !important;padding:4px 6px !important;}
   html.ui-shell #ctxPanel .ctx-row2 > .btn{padding:4px 7px !important;}
 }
 
-/* The footer is one quiet line: the way to report a bug or suggest something. */
-html.ui-shell footer{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;padding:5px 16px;min-height:30px;box-sizing:border-box;}
-html.ui-shell.kbd-open footer{display:none;}
-.us-support{display:inline-flex;align-items:baseline;gap:6px;border:0;background:none;padding:2px 0;font-family:var(--sans);font-size:12px;line-height:1.4;color:var(--text3);cursor:pointer;text-align:right;}
-.us-support b{font-weight:500;color:var(--text);text-decoration:underline;text-decoration-color:var(--text3);text-underline-offset:3px;}
-.us-support:hover b{text-decoration-color:var(--text);}
-.us-support:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px;}
-.us-support .us-sup-short{display:none;}
-@media(max-width:520px){ .us-support .us-sup-long{display:none;} .us-support .us-sup-short{display:inline;} }
+/* The app keeps its footer hidden; bug reports are reached from About. */
 
 .us-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;line-height:1.2;cursor:pointer;white-space:nowrap;}
 .us-ico{width:15px;height:15px;flex:none;}
@@ -1390,8 +1382,6 @@ html[data-theme="light"].ui-shell .logo-sub{color:#3d4146;}
 html[data-theme="light"].ui-shell .us-head-btn{background:#ffffff;border-color:#9a9ea5;color:#15171a;}
 html[data-theme="light"].ui-shell .line-nums{background:#dfe2e5;color:#50545a;border-right-color:#b6babf;}
 html[data-theme="light"].ui-shell footer{background:#d3d6da;border-top-color:#a4a8ae;}
-html[data-theme="light"].ui-shell .us-support{color:#3d4146;}
-html[data-theme="light"].ui-shell .us-support b{color:#111315;}
 html[data-theme="light"].ui-shell .editor-panel{border-right-color:#a4a8ae;}
 
 /* Light theme, third pass: slate chrome. Halfway between the original black
@@ -1423,8 +1413,6 @@ html[data-theme="light"].ui-shell .ctx-panel{background:#585e66 !important;borde
 html[data-theme="light"].ui-shell .ctx-panel{--bg:#3f444b;}
 html[data-theme="light"].ui-shell .logo-text{color:#f5f6f7;}
 html[data-theme="light"].ui-shell .logo-sub{color:#c8ccd1;}
-html[data-theme="light"].ui-shell .us-support{color:#c8ccd1;}
-html[data-theme="light"].ui-shell .us-support b{color:#ffffff;}
 /* Pale controls on the slate */
 html[data-theme="light"].ui-shell .btn,
 html[data-theme="light"].ui-shell .keypad .key,
