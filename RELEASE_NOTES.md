@@ -17,6 +17,8 @@ user-facing history.
   mistakes and links to the matching pages of the official HEIDENHAIN manual,
   in English and German, with all lesson drawings redrawn.
 - The Start here intro lesson is removed; the course has 15 lessons.
+- Simpler interface as on the website: Help, Program and Settings menus and a
+  calmer look in both themes.
 - The running program line is marked in neutral grey.
 
 ## 1.0.7 (versionCode 8) — prepared for Google Play
