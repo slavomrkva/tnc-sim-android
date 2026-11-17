@@ -8,7 +8,8 @@
 // what is used all the time:
 //   Help     -> tap help, quick reference, M functions
 //   Program  -> import, export, reset, clear
-//   Settings -> language, theme, 3D quality, editor text size
+//   Settings -> language, theme, editor text size (3D quality stays in the
+//               app's Simulation controls drawer)
 // The demo picker stays beside Undo/Redo. Bug reports live in About.
 // The original buttons stay in index.html (other code and tests refer to them)
 // and are hidden by the "UI shell" block at the end of android/styles.css. This
@@ -25,7 +26,7 @@
     'Reset to default program':'Auf Standardprogramm zurücksetzen',
     'Clear program':'Programm leeren',
     'Language':'Sprache', 'Theme':'Design', 'Dark':'Dunkel', 'Light':'Hell',
-    '3D quality':'3D-Qualität', 'Editor text size':'Editor-Schriftgröße',
+    'Editor text size':'Editor-Schriftgröße',
     'Smaller text':'Kleinere Schrift', 'Larger text':'Größere Schrift',
     'Android app on Google Play':'Android-App bei Google Play'
   };
@@ -56,13 +57,8 @@
 
   /* ── One open popover at a time ─────────────────────────────────── */
   var open = null;   // { btn, pop }
-  var qualityHome = null;   // toolbar wrapper the quality group returns to
   function closeMenu(){
     if(!open) return;
-    // The quality group is only lent to the Settings popover; give it back so
-    // nothing that looks it up ever finds it detached.
-    var q = document.getElementById('qualityGroup');
-    if(q && qualityHome && open.pop.contains(q)) qualityHome.appendChild(q);
     open.pop.remove();
     open.btn.setAttribute('aria-expanded', 'false');
     open = null;
@@ -172,10 +168,6 @@
         });
       });
 
-    // The real quality buttons are shown here, so setQuality() keeps its state.
-    var q = document.getElementById('qualityGroup');
-    if(q) row(pop, tr('3D quality')).appendChild(q);
-
     var c = row(pop, tr('Editor text size'));
     var g = el('div', 'us-step');
     var minus = el('button', '', 'A−'), val = el('span', 'us-step-v'), plus = el('button', '', 'A+');
@@ -209,8 +201,6 @@
   }
 
   function mount(){
-    var q = document.getElementById('qualityGroup');
-    if(q) qualityHome = q.parentElement;
 
     // Learn gets the same icon + label shape as Help and Program. Its label is
     // set here, so the i18n sweep must not overwrite the button's content.

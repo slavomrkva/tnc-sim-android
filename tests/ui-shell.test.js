@@ -18,6 +18,7 @@ assert.match(shell, /documentElement\.classList\.add\('ui-shell'\)/, 'the old bu
   .forEach(fn => assert.ok(shell.includes(`'${fn}'`) || shell.includes(fn + '()') || shell.includes(fn + ' ==='),
     `menus still reach ${fn}`));
 assert.doesNotMatch(shell, /\/learn\/|play\.google\.com|header \.logo/, 'no website-only links or header in the app');
+assert.doesNotMatch(shell, /getElementById\('qualityGroup'\)|tr\('3D quality'\)/, '3D quality stays only in Simulation controls');
 assert.doesNotMatch(shell, /us-support|openBugReport/, 'no footer bug-report line in the app');
 assert.match(read('www/core/theme-toast.js'), /openBugReport\(\)/, 'bug reports are reached from About');
 assert.match(read('www/android/i18n-about-de.js'), /openBugReport\(\)/, 'German About keeps the bug report button');

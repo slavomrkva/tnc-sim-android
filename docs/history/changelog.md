@@ -12,6 +12,7 @@ History through APP_VERSION 1.0.36 is preserved in
 - Port web fix 57e3ddd (false collisions on shaped-tool retracts): cutting and collision share `vxToolRadiusAtHeight()` and the per-segment tool shape and DL. Complete Part no longer reports a collision; `tests/complete-part-collision.test.js` ported (fails without the fix).
 - Repair 116 double-encoded lines in `www/core/parser-engine.js` (for example `â€”` instead of `—` in Problems messages and comments).
 - Remove the ui-shell footer support line; bug reports stay in About (EN and DE).
+- Settings menu without 3D quality: the app already has it in Simulation controls.
 - Third local phone-test build; not pushed.
 
 ## APP_VERSION 1.0.116 — 2026-11-17 — simplified UI from web v1.000
