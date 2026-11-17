@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.115 — 2026-11-17 — Learn reference cards from web v1.000
+
+- Port web v1.000 Learn: `www/core/learn-tutorial.js` and `www/core/data-tables.js` taken whole from web (reference cards with official-manual links, shared practice renderer with collapsible reference, slide figures on the cards, redrawn `learnSvg*` set, L11 bore-milling texts, L00 intro and `learn-coach.js` removed). `www/android/i18n-lessons-de.js` carries the German cards; nine German card labels and the final note added to `www/android/i18n.js`.
+- `www/android/styles.css`: appended the web Learn card/practice rules and `--fig-*`/`--learn-*` palettes (web single-column rules applied unconditionally, desktop-only rules omitted, `flex-wrap` kept on `.lp-foot`); removed the dead coach styles; neutral grey running-line and lesson hover marks.
+- About text (EN/DE) updated from web v1.000, keeping the Android app links. Simulator, editor, keyboard and WebGL code untouched. Play versionName/versionCode unchanged.
+
 ## APP_VERSION 1.0.114 — 2026-10-13 — Play 1.0.7/code 8 candidate
 
 - Owner accepted phone-test APK 1.0.113; move the October audit to BUG_HISTORY.

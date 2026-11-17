@@ -12,6 +12,13 @@ user-facing history.
 
 ---
 
+## Unreleased test build (APP_VERSION 1.0.115)
+- Learn lessons are now reference cards: block format, example, rules, common
+  mistakes and links to the matching pages of the official HEIDENHAIN manual,
+  in English and German, with all lesson drawings redrawn.
+- The Start here intro lesson is removed; the course has 15 lessons.
+- The running program line is marked in neutral grey.
+
 ## 1.0.7 (versionCode 8) — prepared for Google Play
 - Improved arcs, Q formulas and machining cycles.
 - Fixed restarting edited programs and material removal with a stopped spindle.

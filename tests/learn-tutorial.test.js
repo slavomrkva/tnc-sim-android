@@ -10,7 +10,6 @@ const appSource = read('www/android/app.js');
 const demoSource = read('www/core/demo-programs.js');
 const editorCoreSource = read('www/core/editor-core.js');
 const panelsSource = read('www/android/panels.js');
-const coachSource = read('www/core/learn-coach.js');
 const stylesSource = read('www/android/styles.css');
 const context = {
   console, Math, JSON, RegExp, Date, parseFloat, parseInt, isFinite,
@@ -37,29 +36,20 @@ function solutionFor(task){
   return null;
 }
 
-const intro = context.LESSONS.find(lesson => lesson.id === 'L00');
-assert.strictEqual(intro.slides.length, 3, 'Start here has three information slides');
-assert.match(intro.slides[0].html(), /reopen these slides at any time during practice/);
-assert.match(intro.slides[1].html(), /question panel[\s\S]*highlighted answer row/);
-assert.match(intro.slides[1].html(), /Hint 1[\s\S]*Hint 2[\s\S]*Hint 3/, 'Hint levels render in order');
-assert.match(intro.slides[2].html(), /green[\s\S]*Check[\s\S]*green or red/);
-assert.strictEqual(intro.tasks[0].prompt, 'Type a short comment on the highlighted line');
-assert.strictEqual(intro.tasks[0].answerPrefix, '; ', 'Start here opens a real answer row');
-assert.strictEqual(intro.tasks[0].checks.length, 2, 'Start here demonstrates graded Check results');
-assert.ok(context.learnEvalChecks(solutionFor(intro.tasks[0]), intro.tasks[0]).every(result => result.ok),
-  'Start here has a working example solution');
-assert.match(read('www/core/data-tables.js'), /Learn, Editor and 3D sections at the bottom/);
+assert.ok(!context.LESSONS.some(lesson => lesson.intro || lesson.id === 'L00'),
+  'the Start here intro lesson is removed; the list opens with lesson 1');
+assert.ok(!fs.existsSync(path.join(root, 'www', 'core', 'learn-coach.js')), 'the spotlight tour is removed');
+assert.doesNotMatch(learnSource + read('www/index.html') + stylesSource, /learnCoach|learn-coach/,
+  'nothing loads, styles or starts the removed spotlight tour');
 
 assert.match(editorCoreSource, /learn-answer-line/,
   'the syntax overlay paints the intended answer rows');
 assert.match(panelsSource, /cls\+=' learn-target'/,
   'the line-number gutter marks the same answer rows');
-assert.match(stylesSource, /#hlLayer \.learn-answer-line\{[^}]*background:rgba\(240,169,74/,
-  'answer rows use the established amber highlight');
+assert.match(stylesSource, /#hlLayer \.learn-answer-line\{[^}]*background:var\(--learn-answer-bg\)/,
+  'answer rows use the muted web v1.000 answer highlight');
 assert.match(appSource, /var answerRange = typeof learnAnswerLineRange[\s\S]*atProtectedStart[\s\S]*atProtectedEnd/,
   'Backspace and Delete preserve the outer answer boundaries');
-assert.match(coachSource, /key === 'answer'[\s\S]*#hlLayer \.learn-answer-line/,
-  'the Start here coach points to the exact highlighted answer row');
 
 const svgOpenings = learnSource.match(/return '<svg class="learn-svg"[^\r\n]*/g) || [];
 assert.strictEqual(svgOpenings.length, 31, 'all Learn diagram factories are covered by the accessibility check');
@@ -116,7 +106,9 @@ for(const lesson of context.LESSONS){
     if(!solution || !task.checks) continue;
 
     const zonedSolution = context._learnSolvedCode(lesson, i);
-    if(plan.mode === 'insert'){
+    // A comment task with an answer prefix may receive its official comment on
+    // the block below the prefix row (same as web v1.000); grading covers it.
+    if(plan.mode === 'insert' && task.answerPrefix === undefined){
       assert.notDeepStrictEqual(
         zonedSolution.split('\n').slice(plan.start, plan.start + plan.count),
         plan.code.split('\n').slice(plan.start, plan.start + plan.count),
@@ -142,10 +134,10 @@ assert.ok(insertRanges > 40 && editRanges > 0,
   `all tasks use answer zoning (${insertRanges} insertion ranges, ${editRanges} edit ranges)`);
 
 const onlyMarker = 'BEGIN PGM HELLO MM\n; >>> YOUR ANSWER \u2014 TASK 1/1\nEND PGM HELLO MM';
-assert.ok(!context.learnEvalChecks(onlyMarker, intro.tasks[0]).some(result => result.ok && /comment/i.test(result.label)),
+assert.ok(!context.learnEvalChecks(onlyMarker, context.LESSONS.find(lesson => lesson.id === 'L01').tasks[0]).some(result => result.ok && /comment/i.test(result.label)),
   'the injected answer marker cannot satisfy a comment task');
 const emptyComment = 'BEGIN PGM HELLO MM\n; \nBLK FORM 0.1 Z X+0 Y+0 Z-20\nEND PGM HELLO MM';
-assert.ok(!context.learnEvalChecks(emptyComment, intro.tasks[0]).some(result => result.ok && /comment/i.test(result.label)),
+assert.ok(!context.learnEvalChecks(emptyComment, context.LESSONS.find(lesson => lesson.id === 'L01').tasks[0]).some(result => result.ok && /comment/i.test(result.label)),
   'an empty comment row cannot borrow text from the following NC block');
 
 function validationErrors(code){
