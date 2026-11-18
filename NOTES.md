@@ -49,9 +49,10 @@ The detailed module-split rationale is in
 5. For Play: use a new `versionCode`, the original signing keystore, and the
    current `RELEASE_NOTES.md` entry. Upload to the existing `org.tncsim.twa`
    listing.
-6. After a shipped release, create `android-v<version>-code-<versionCode>`, a
-   GitHub Release with the signed bundle attached, and retain the latest four
-   shipped releases. Never commit APK/AAB artifacts.
+6. After a shipped release, create the tag `android-v<version>-code-<versionCode>`
+   on the released commit. No GitHub Release and no attached bundle: the code is
+   the record, the signed bundle stays with the owner. Never commit APK/AAB
+   artifacts.
 
 ## Current non-obvious invariants
 

@@ -7,6 +7,11 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.120 — 2026-11-18 — release flow without GitHub Release
+
+- Owner decision: a shipped release gets only the tag `android-v<version>-code-<versionCode>`; no GitHub Release and no attached bundle. `NOTES.md` step 6 updated.
+- Play 1.0.8/code 9 submitted from `main` commit `4c39e79` (signed AAB built locally with the original upload key).
+
 ## APP_VERSION 1.0.119 — 2026-11-18 — Play 1.0.8/code 9 candidate
 
 - Google Play already serves 1.0.7 (code 8, updated 2026-10-13); set production versionName 1.0.8/versionCode 9, keep org.tncsim.twa and the original upload key requirement.
