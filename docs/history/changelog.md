@@ -7,6 +7,12 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.119 — 2026-11-18 — Play 1.0.8/code 9 candidate
+
+- Google Play already serves 1.0.7 (code 8, updated 2026-10-13); set production versionName 1.0.8/versionCode 9, keep org.tncsim.twa and the original upload key requirement.
+- Point the production AAB workflow at `release/1.0.8` and APP_VERSION 1.0.119; add `store/release-notes-1.0.8.txt` (EN/DE) for the web v1.000 Learn/UI port and the collision fix; update `play-version.test.js`.
+- Merge the tested web v1.000 port (`test/web-1000-port`) into `main`. No Play publication until a signed bundle is uploaded.
+
 ## APP_VERSION 1.0.118 — 2026-11-17 — Settings without 3D quality
 
 - Settings menu no longer lists 3D quality; it stays in the Simulation controls drawer (`www/android/ui-shell.js`). Test `tests/ui-shell.test.js` extended.

@@ -1,0 +1,12 @@
+<en-US>
+- New Learn: reference cards with block format, examples and links to the official HEIDENHAIN manual, in English and German.
+- Simpler interface with Help, Program and Settings menus and a calmer look in both themes.
+- Fixed a false collision warning in the Complete Part demo.
+- Simulator messages now show dashes correctly.
+</en-US>
+<de-DE>
+- Neues Lernen: Referenzkarten mit Satzformat, Beispielen und Links zum offiziellen HEIDENHAIN-Handbuch, auf Englisch und Deutsch.
+- Einfachere Oberfläche mit den Menüs Hilfe, Programm und Einstellungen und ruhigerem Design in beiden Themes.
+- Falsche Kollisionswarnung in der Demo Complete Part behoben.
+- Meldungen des Simulators zeigen Gedankenstriche jetzt korrekt an.
+</de-DE>
