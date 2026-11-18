@@ -12,7 +12,18 @@ user-facing history.
 
 ---
 
-## 1.0.7 (versionCode 8) — prepared for Google Play
+## 1.0.8 (versionCode 9) — prepared for Google Play
+- Learn lessons are now reference cards: block format, example, rules, common
+  mistakes and links to the matching pages of the official HEIDENHAIN manual,
+  in English and German, with all lesson drawings redrawn.
+- The Start here intro lesson is removed; the course has 15 lessons.
+- Simpler interface as on the website: Help, Program and Settings menus and a
+  calmer look in both themes.
+- The running program line is marked in neutral grey.
+- Fixed a false collision warning in the Complete Part demo.
+- Simulator messages show dashes correctly instead of garbled characters.
+
+## 1.0.7 (versionCode 8) — published
 - Improved arcs, Q formulas and machining cycles.
 - Fixed restarting edited programs and material removal with a stopped spindle.
 - Improved collision warnings, M4 status and touch controls.

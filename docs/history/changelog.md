@@ -7,6 +7,36 @@ in root `RELEASE_NOTES.md`; keep detailed resolved-bug evidence in root
 History through APP_VERSION 1.0.36 is preserved in
 [`project-notes-through-1.0.36.md`](project-notes-through-1.0.36.md).
 
+## APP_VERSION 1.0.119 — 2026-11-18 — Play 1.0.8/code 9 candidate
+
+- Google Play already serves 1.0.7 (code 8, updated 2026-10-13); set production versionName 1.0.8/versionCode 9, keep org.tncsim.twa and the original upload key requirement.
+- Point the production AAB workflow at `release/1.0.8` and APP_VERSION 1.0.119; add `store/release-notes-1.0.8.txt` (EN/DE) for the web v1.000 Learn/UI port and the collision fix; update `play-version.test.js`.
+- Merge the tested web v1.000 port (`test/web-1000-port`) into `main`. No Play publication until a signed bundle is uploaded.
+
+## APP_VERSION 1.0.118 — 2026-11-17 — Settings without 3D quality
+
+- Settings menu no longer lists 3D quality; it stays in the Simulation controls drawer (`www/android/ui-shell.js`). Test `tests/ui-shell.test.js` extended.
+- Fourth local phone-test build; pushed to `test/web-1000-port`, not merged.
+
+## APP_VERSION 1.0.117 — 2026-11-17 — false collisions, encoding, support line
+
+- Port web fix 57e3ddd (false collisions on shaped-tool retracts): cutting and collision share `vxToolRadiusAtHeight()` and the per-segment tool shape and DL. Complete Part no longer reports a collision; `tests/complete-part-collision.test.js` ported (fails without the fix).
+- Repair 116 double-encoded lines in `www/core/parser-engine.js` (for example `â€”` instead of `—` in Problems messages and comments).
+- Remove the ui-shell footer support line; bug reports stay in About (EN and DE).
+- Settings menu without 3D quality: the app already has it in Simulation controls.
+- Third local phone-test build; not pushed.
+
+## APP_VERSION 1.0.116 — 2026-11-17 — simplified UI from web v1.000
+
+- Simplified UI from web v1.000: new `www/android/ui-shell.js` (Help ▾, Program ▾, Settings and About icons, one-line support footer) mounted on the app's `.ph-tools`/`.ph-hdr-actions`; the web ui-shell/visual-pass/slate-light CSS appended to `www/android/styles.css` with Android selectors and without desktop-only media rules. Tap help replaces hover help; no website links. Loaded after `custom-keyboard.js`; covered by `tests/ui-shell.test.js`.
+- Second local phone-test build; not pushed.
+
+## APP_VERSION 1.0.115 — 2026-11-17 — Learn reference cards from web v1.000
+
+- Port web v1.000 Learn: `www/core/learn-tutorial.js` and `www/core/data-tables.js` taken whole from web (reference cards with official-manual links, shared practice renderer with collapsible reference, slide figures on the cards, redrawn `learnSvg*` set, L11 bore-milling texts, L00 intro and `learn-coach.js` removed). `www/android/i18n-lessons-de.js` carries the German cards; nine German card labels and the final note added to `www/android/i18n.js`.
+- `www/android/styles.css`: appended the web Learn card/practice rules and `--fig-*`/`--learn-*` palettes (web single-column rules applied unconditionally, desktop-only rules omitted, `flex-wrap` kept on `.lp-foot`); removed the dead coach styles; neutral grey running-line and lesson hover marks.
+- About text (EN/DE) updated from web v1.000, keeping the Android app links. Simulator, editor, keyboard and WebGL code untouched. Play versionName/versionCode unchanged.
+
 ## APP_VERSION 1.0.114 — 2026-10-13 — Play 1.0.7/code 8 candidate
 
 - Owner accepted phone-test APK 1.0.113; move the October audit to BUG_HISTORY.
